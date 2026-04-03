@@ -13,7 +13,7 @@ CREATE TABLE profiles (
         user_id BIGINT NOT NULL UNIQUE,
         first_name VARCHAR(50),
         last_name VARCHAR(50),
-        phone VARCHAR(20),
+        phone VARCHAR(12),
         bio TEXT,
         avatar_url VARCHAR(255),
         CONSTRAINT fk_profile_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

@@ -61,7 +61,8 @@ public class User implements UserDetails {
     private boolean enabled = true;
 
 
-
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Profile profile;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
