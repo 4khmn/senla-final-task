@@ -51,7 +51,7 @@ CREATE TABLE ad_images (
         is_primary BOOLEAN DEFAULT FALSE,
         CONSTRAINT fk_image_ad FOREIGN KEY (ad_id) REFERENCES advertisements(id) ON DELETE CASCADE
 );
-
+CREATE UNIQUE INDEX idx_unique_primary_image_per_ad ON ad_images (ad_id) WHERE (is_primary = TRUE);
 CREATE INDEX idx_ad_images_ad ON ad_images(ad_id);
 
 CREATE TABLE comments (
