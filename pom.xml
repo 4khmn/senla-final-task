@@ -5,10 +5,10 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>3.5.9</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>akhm.project</groupId>
+    <groupId>com.project.velo</groupId>
     <artifactId>senla-final-task</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>senla-final-task</name>
