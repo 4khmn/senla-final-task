@@ -8,8 +8,8 @@ import java.util.Optional;
 @Repository
 public class UserRepository extends BaseRepository<User, Long>{
 
-    protected UserRepository(Class<User> entityClass) {
-        super(entityClass);
+    protected UserRepository() {
+        super(User.class);
     }
 
     public Optional<User> findByUsername(String username) {
