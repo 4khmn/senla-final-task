@@ -36,21 +36,9 @@ public class AuthService {
 
     @Transactional
     public UserResponseDto addUser(UserCreateDto dto){
-        User user = new User();
-        user.setUsername(dto.username());
-        user.setEmail(dto.email());
+        User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
-        user.setRole(Role.ROLE_USER);
-        user.setRating(BigDecimal.ZERO);
-        user.setEnabled(true);
-
-        Profile profile = Profile.builder()
-                .user(user)
-                .firstName(dto.firstName())
-                .lastName(dto.lastName())
-                .build();
-
-        user.setProfile(profile);
+        
         User savedUser = userRepository.save(user);
 
         return mapper.toDto(savedUser);

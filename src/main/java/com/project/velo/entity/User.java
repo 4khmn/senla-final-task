@@ -50,13 +50,13 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private Role role;
+    private Role role = Role.ROLE_USER;
 
 
     @DecimalMin(value = "0.0", message = "Рейтинг не может быть меньше 0")
     @DecimalMax(value = "5.0", message = "Рейтинг не может быть больше 5")
     @Column(precision = 3, scale = 2)
-    private BigDecimal rating;
+    private BigDecimal rating = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private boolean enabled = true;
