@@ -13,11 +13,9 @@ public record AdvertisementResponseDto(
         String status,
         boolean isTop,
         LocalDateTime createdAt,
-
         UserResponseDto user,
-
         String categoryName,
-
-        List<String> imageUrls
+        String primaryImageUrl,
+        List<String> otherImageUrls
 ) {
 }

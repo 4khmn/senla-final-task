@@ -16,7 +16,8 @@ public class UserRepository extends BaseRepository<User, Long>{
         return entityManager.createQuery(
                         "SELECT u FROM User u WHERE u.username = :username", User.class)
                 .setParameter("username", username)
-                .getResultStream()
+                .getResultList()
+                .stream()
                 .findFirst();
     }
 

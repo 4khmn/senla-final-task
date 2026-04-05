@@ -2,6 +2,7 @@ package com.project.velo.service;
 
 import com.project.velo.dto.AdvertisementCreateDto;
 import com.project.velo.dto.AdvertisementResponseDto;
+import com.project.velo.dto.update.AdvertisementUpdateDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface AdvertisementService {
 
     List<AdvertisementResponseDto> getAll();
 
-    void updateStatus(Long id, String status, String username);
+    AdvertisementResponseDto update(Long id, AdvertisementUpdateDto dto, String username);
 
     void delete(Long id, String username);
 }

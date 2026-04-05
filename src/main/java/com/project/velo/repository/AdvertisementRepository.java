@@ -10,4 +10,6 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
     public AdvertisementRepository() {
         super(Advertisement.class);
     }
+
+
 }
