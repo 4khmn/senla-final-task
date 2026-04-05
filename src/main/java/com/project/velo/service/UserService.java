@@ -6,7 +6,6 @@ import com.project.velo.entity.User;
 import java.util.List;
 
 public interface UserService {
-    void register(User user);
     void updateRating(Long userId);
 
     UserResponseDto getById(Long id);

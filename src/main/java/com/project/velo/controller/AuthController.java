@@ -28,7 +28,7 @@ public class AuthController {
         log.info("POST /api/auth/register — User with username={} trying to register", dto.username());
         UserResponseDto response = authService.addUser(dto);
         log.info("POST /api/auth/register - User created successfully with id={}", response.id());
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 
