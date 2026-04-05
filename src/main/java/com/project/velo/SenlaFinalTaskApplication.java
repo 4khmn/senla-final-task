@@ -9,5 +9,4 @@ public class SenlaFinalTaskApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SenlaFinalTaskApplication.class, args);
 	}
-
 }
