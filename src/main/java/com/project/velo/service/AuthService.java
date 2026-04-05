@@ -1,0 +1,78 @@
+package com.project.velo.service;
+
+
+import com.project.velo.dto.UserCreateDto;
+import com.project.velo.dto.UserResponseDto;
+import com.project.velo.dto.auth.AuthResponseDto;
+import com.project.velo.dto.auth.LoginRequestDto;
+import com.project.velo.entity.Profile;
+import com.project.velo.entity.User;
+import com.project.velo.entity.enums.Role;
+import com.project.velo.mapper.UserMapper;
+import com.project.velo.repository.UserRepository;
+import com.project.velo.security.JwtUtil;
+import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.stream.Collectors;
+
+
+@Service
+@AllArgsConstructor
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserMapper mapper;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+
+    @Transactional
+    public UserResponseDto addUser(UserCreateDto dto){
+        User user = new User();
+        user.setUsername(dto.username());
+        user.setEmail(dto.email());
+        user.setPassword(passwordEncoder.encode(dto.password()));
+        user.setRole(Role.ROLE_USER);
+        user.setRating(BigDecimal.ZERO);
+        user.setEnabled(true);
+
+        Profile profile = Profile.builder()
+                .user(user)
+                .firstName(dto.firstName())
+                .lastName(dto.lastName())
+                .build();
+
+        user.setProfile(profile);
+        User savedUser = userRepository.save(user);
+
+        return mapper.toDto(savedUser);
+    }
+
+    public AuthResponseDto login(LoginRequestDto request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.username(),
+                        request.password()
+                )
+        );
+        var userDetails = (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();
+
+        String roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(", "));
+
+        String token = jwtUtil.generateToken(
+                userDetails.getUsername(),
+                roles);
+
+        return new AuthResponseDto(token);
+    }
+}
