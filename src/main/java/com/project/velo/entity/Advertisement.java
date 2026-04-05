@@ -32,11 +32,13 @@ public class Advertisement {
     private String title;
 
     @NotBlank(message = "Описание объявления не может быть пустым")
+    @Size(max = 2000, message = "Описание объявления должно быть до 2000 символов")
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
     @NotNull(message = "Цена должна быть указана")
-    @PositiveOrZero(message = "Слишком большая цена или много знаков после запятой")
+    @PositiveOrZero(message = "Цена не может быть отрицательной")
+    @Digits(integer = 10, fraction = 2, message = "Цена должна быть числом (до 10 знаков до запятой и 2 после)")
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
