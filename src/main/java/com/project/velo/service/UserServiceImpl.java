@@ -14,10 +14,6 @@ public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
 
-    @Override
-    public void register(User user) {
-
-    }
 
     @Override
     public void updateRating(Long userId) {
@@ -44,5 +40,4 @@ public class UserServiceImpl implements UserService{
         return List.of();
     }
 
-    public void a(){}
 }
