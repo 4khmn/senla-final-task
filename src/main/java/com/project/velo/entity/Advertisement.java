@@ -51,10 +51,11 @@ public class Advertisement {
     private Category category;
 
     @Column(name = "is_top")
-    private boolean isTop;
+    private boolean top;
 
     @Enumerated(EnumType.STRING)
-    private AdStatus status;
+    @Builder.Default
+    private AdStatus status = AdStatus.ACTIVE;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

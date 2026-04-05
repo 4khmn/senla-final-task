@@ -2,20 +2,22 @@ package com.project.velo.mapper;
 
 import com.project.velo.dto.AdvertisementCreateDto;
 import com.project.velo.dto.AdvertisementResponseDto;
+import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.entity.AdImage;
 import com.project.velo.entity.Advertisement;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
+
+import java.util.List;
 
 
-// uses = UserMapper.class позволяет MapStruct использовать логику UserMapper
-// для заполнения поля UserResponseDto user
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface AdvertisementMapper {
 
-    @Mapping(target = "user", source = "seller") // Мапим User seller -> UserResponseDto user
-    @Mapping(target = "categoryName", source = "category.name") // Достаем имя из объекта Category
-    @Mapping(target = "imageUrls", source = "images") // Мапим список объектов картинок в список строк
+    @Mapping(target = "user", source = "seller")
+    @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "primaryImageUrl", source = "images")
+    @Mapping(target = "otherImageUrls", source = "images")
+    @Mapping(target = "status", expression = "java(advertisement.getStatus().name())")
     AdvertisementResponseDto toDto(Advertisement advertisement);
 
     @Mapping(target = "id", ignore = true)
@@ -28,7 +30,28 @@ public interface AdvertisementMapper {
     @Mapping(target = "updatedAt", ignore = true)
     Advertisement toEntity(AdvertisementCreateDto dto);
 
-    default String mapImageToUrl(AdImage image) {
-        return image != null ? image.getImageUrl() : null;
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "images", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    void updateEntityFromDto(AdvertisementUpdateDto dto, @MappingTarget Advertisement advertisement);
+
+
+
+    default String mapPrimaryImage(List<AdImage> images) {
+        if (images == null) return null;
+        return images.stream()
+                .filter(AdImage::isPrimary)
+                .map(AdImage::getImageUrl)
+                .findFirst()
+                .orElse(null);
+    }
+
+    default List<String> mapOtherImages(List<AdImage> images) {
+        if (images == null) return List.of();
+        return images.stream()
+                .filter(img -> !img.isPrimary())
+                .map(AdImage::getImageUrl)
+                .toList();
     }
 }

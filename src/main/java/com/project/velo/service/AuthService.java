@@ -5,9 +5,7 @@ import com.project.velo.dto.UserCreateDto;
 import com.project.velo.dto.UserResponseDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
-import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
-import com.project.velo.entity.enums.Role;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
 import com.project.velo.security.JwtUtil;
@@ -20,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 
@@ -35,10 +32,10 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public UserResponseDto addUser(UserCreateDto dto){
+    public UserResponseDto addUser(UserCreateDto dto) {
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
-        
+
         User savedUser = userRepository.save(user);
 
         return mapper.toDto(savedUser);

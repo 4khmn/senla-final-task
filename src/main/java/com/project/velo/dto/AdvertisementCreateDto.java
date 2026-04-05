@@ -1,9 +1,9 @@
 package com.project.velo.dto;
 
-import com.project.velo.entity.Category;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record AdvertisementCreateDto(
         @NotBlank(message = "Название объявления не может быть пустым")
@@ -11,6 +11,7 @@ public record AdvertisementCreateDto(
         String title,
 
         @NotBlank(message = "Описание объявления не может быть пустым")
+        @Size(max = 2000, message = "Описание объявления должно быть до 2000 символов")
         String description,
 
         @NotNull(message = "Цена должна быть указана")
@@ -20,5 +21,7 @@ public record AdvertisementCreateDto(
 
         Long categoryId,
 
-        boolean isTop
+        boolean isTop,
+
+        List<String> imageUrls // get(0) - primary
 ) {}

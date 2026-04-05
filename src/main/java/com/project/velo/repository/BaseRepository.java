@@ -36,4 +36,9 @@ public abstract class BaseRepository <T, ID> {
         entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
     }
 
+    public void saveAndFlush(T entity) {
+        entityManager.persist(entity);
+        entityManager.flush();
+    }
+
 }
