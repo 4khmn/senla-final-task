@@ -1,7 +1,7 @@
 package com.project.velo.controller;
 
-import com.project.velo.dto.UserCreateDto;
-import com.project.velo.dto.UserResponseDto;
+import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.service.AuthService;
@@ -24,9 +24,9 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> addUser(@RequestBody UserCreateDto dto) {
+    public ResponseEntity<ProfileResponseDto> addUser(@RequestBody UserCreateDto dto) {
         log.info("POST /api/auth/register — User with username={} trying to register", dto.username());
-        UserResponseDto response = authService.addUser(dto);
+        ProfileResponseDto response = authService.addUser(dto);
         log.info("POST /api/auth/register - User created successfully with id={}", response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

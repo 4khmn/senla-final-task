@@ -1,7 +1,7 @@
 package com.project.velo.controller;
 
-import com.project.velo.dto.AdvertisementCreateDto;
-import com.project.velo.dto.AdvertisementResponseDto;
+import com.project.velo.dto.create.AdvertisementCreateDto;
+import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.service.AdvertisementService;
 import lombok.RequiredArgsConstructor;

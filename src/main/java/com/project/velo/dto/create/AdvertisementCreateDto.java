@@ -1,4 +1,4 @@
-package com.project.velo.dto;
+package com.project.velo.dto.create;
 
 import jakarta.validation.constraints.*;
 

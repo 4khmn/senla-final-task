@@ -1,7 +1,7 @@
 package com.project.velo.service;
 
-import com.project.velo.dto.AdvertisementCreateDto;
-import com.project.velo.dto.AdvertisementResponseDto;
+import com.project.velo.dto.create.AdvertisementCreateDto;
+import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import org.springframework.stereotype.Service;
 

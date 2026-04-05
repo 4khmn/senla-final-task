@@ -1,6 +1,6 @@
 package com.project.velo.controller;
 
-import com.project.velo.dto.UserResponseDto;
+import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +21,9 @@ public class UserController {
 
 
     @GetMapping
-    public List<UserResponseDto> getUsers() {
+    public List<ProfileResponseDto> getUsers() {
         log.info("GET /api/users - fetching all users");
-        List<UserResponseDto> users = userService.getAll();
+        List<ProfileResponseDto> users = userService.getAll();
         log.info("GET /api/users - users successfully retrieved");
         return users;
     }

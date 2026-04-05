@@ -1,4 +1,4 @@
-package com.project.velo.dto;
+package com.project.velo.dto.response;
 
 
 import java.math.BigDecimal;
@@ -13,7 +13,7 @@ public record AdvertisementResponseDto(
         String status,
         boolean isTop,
         LocalDateTime createdAt,
-        UserResponseDto user,
+        AuthorResponseDto author,
         String categoryName,
         String primaryImageUrl,
         List<String> otherImageUrls

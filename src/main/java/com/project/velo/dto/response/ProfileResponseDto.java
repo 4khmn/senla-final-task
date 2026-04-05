@@ -1,8 +1,8 @@
-package com.project.velo.dto;
+package com.project.velo.dto.response;
 
 import java.math.BigDecimal;
 
-public record UserResponseDto(
+public record ProfileResponseDto(
         Long id,
         String username,
         String email,

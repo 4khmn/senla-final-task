@@ -1,7 +1,6 @@
 package com.project.velo.service;
 
-import com.project.velo.dto.UserResponseDto;
-import com.project.velo.entity.User;
+import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserResponseDto getById(Long id) {
+    public ProfileResponseDto getById(Long id) {
         return null;
     }
 
@@ -36,7 +35,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<UserResponseDto> getAll() {
+    public List<ProfileResponseDto> getAll() {
         return List.of();
     }
 
