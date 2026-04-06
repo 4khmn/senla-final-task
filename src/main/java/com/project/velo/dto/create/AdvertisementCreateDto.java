@@ -19,9 +19,11 @@ public record AdvertisementCreateDto(
         @Digits(integer = 10, fraction = 2, message = "Цена должна быть числом (до 10 знаков до запятой и 2 после)")
         BigDecimal price,
 
+        @NotNull(message = "ID категории обязателен")
         Long categoryId,
 
         boolean isTop,
 
-        List<String> imageUrls // get(0) - primary
+        @Size(min = 1, max = 20, message = "Количество фотографий может быть от 1 до 20")
+        List<@NotBlank String> imageUrls // get(0) - primary
 ) {}

@@ -1,0 +1,77 @@
+package com.project.velo.exception;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(EntityNotFoundException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex, request);
+    }
+
+    @ExceptionHandler(AdvertisementNotAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleAdvertisementNotAvailable(AdvertisementNotAvailableException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex, request);
+    }
+
+    @ExceptionHandler(NotEnoughRightsException.class)
+    public ResponseEntity<ErrorResponse> handleNotEnoughRights(NotEnoughRightsException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.FORBIDDEN, ex, request);
+    }
+
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex, HttpServletRequest request) {
+        log.warn("Authentication failed: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex, request);
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return buildResponse(HttpStatus.BAD_REQUEST, new RuntimeException(errorMessage), request);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUsernameNotFound(UsernameNotFoundException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex, request);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleAll(Exception ex, HttpServletRequest request) {
+        log.error("Unhandled exception at {}: ", request.getRequestURI(), ex);
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "Произошла внутренняя ошибка сервера",
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, Exception ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                status.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, status);
+    }
+}
