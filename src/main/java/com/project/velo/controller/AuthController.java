@@ -1,10 +1,11 @@
 package com.project.velo.controller;
 
-import com.project.velo.dto.UserCreateDto;
-import com.project.velo.dto.UserResponseDto;
+import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,16 +25,16 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> addUser(@RequestBody UserCreateDto dto) {
-        log.info("POST /api/auth/register — User with username={} trying to register", dto.username());
-        UserResponseDto response = authService.addUser(dto);
-        log.info("POST /api/auth/register - User created successfully with id={}", response.id());
+    public ResponseEntity<ProfileResponseDto> addUser(@RequestBody @Valid UserCreateDto dto) {
+        log.info("POST /api/auth/register — User: {} trying to register", dto.username());
+        ProfileResponseDto response = authService.addUser(dto);
+        log.info("POST /api/auth/register - User created successfully with id: {}", response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 
     @PostMapping("/login")
-    public AuthResponseDto login(@RequestBody LoginRequestDto request) {
+    public AuthResponseDto login(@RequestBody @Valid LoginRequestDto request) {
         log.info("POST /api/auth/login - Login attempt for user: {}", request.username());
         AuthResponseDto login = authService.login(request);
         log.info("POST /api/auth/login - User successfully login as user: {}", request.username());

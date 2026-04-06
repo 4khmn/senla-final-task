@@ -70,4 +70,10 @@ public class Advertisement {
 
     @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
+
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+        comment.setAdvertisement(this);
+    }
 }

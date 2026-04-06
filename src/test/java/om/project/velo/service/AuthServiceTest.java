@@ -1,6 +1,6 @@
 package om.project.velo.service;
 
-import com.project.velo.dto.UserCreateDto;
+import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.entity.Profile;

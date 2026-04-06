@@ -3,8 +3,8 @@ package com.project.velo.service;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.entity.AdImage;
 import com.project.velo.entity.Advertisement;
-import com.project.velo.dto.AdvertisementCreateDto;
-import com.project.velo.dto.AdvertisementResponseDto;
+import com.project.velo.dto.create.AdvertisementCreateDto;
+import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.entity.Category;
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
@@ -101,7 +101,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         if (dto.imageUrls() != null) {
             advertisement.getImages().clear();
             advertisementRepository.saveAndFlush(advertisement);
-            
+
             List<String> urls = dto.imageUrls();
             for (int i = 0; i < urls.size(); i++) {
                 AdImage newImg = new AdImage();

@@ -1,8 +1,8 @@
 package com.project.velo.service;
 
 
-import com.project.velo.dto.UserCreateDto;
-import com.project.velo.dto.UserResponseDto;
+import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.entity.User;
@@ -32,13 +32,13 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public UserResponseDto addUser(UserCreateDto dto) {
+    public ProfileResponseDto addUser(UserCreateDto dto) {
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
 
         User savedUser = userRepository.save(user);
 
-        return mapper.toDto(savedUser);
+        return mapper.toProfileDto(savedUser);
     }
 
     public AuthResponseDto login(LoginRequestDto request) {

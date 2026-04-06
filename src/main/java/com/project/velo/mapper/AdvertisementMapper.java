@@ -1,7 +1,7 @@
 package com.project.velo.mapper;
 
-import com.project.velo.dto.AdvertisementCreateDto;
-import com.project.velo.dto.AdvertisementResponseDto;
+import com.project.velo.dto.create.AdvertisementCreateDto;
+import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.entity.AdImage;
 import com.project.velo.entity.Advertisement;
@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface AdvertisementMapper {
 
-    @Mapping(target = "user", source = "seller")
+    @Mapping(target = "author", source = "seller")
     @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "primaryImageUrl", source = "images")
     @Mapping(target = "otherImageUrls", source = "images")
