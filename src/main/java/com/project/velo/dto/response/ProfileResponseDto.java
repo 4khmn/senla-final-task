@@ -14,5 +14,4 @@ public record ProfileResponseDto(
         String phone,
         String bio,
         String avatarUrl
-) {
-}
+) { }
