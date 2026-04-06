@@ -34,10 +34,10 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public AuthResponseDto login(@RequestBody @Valid LoginRequestDto request) {
+    public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid LoginRequestDto request) {
         log.info("POST /api/auth/login - Login attempt for user: {}", request.username());
         AuthResponseDto login = authService.login(request);
         log.info("POST /api/auth/login - User successfully login as user: {}", request.username());
-        return login;
+        return ResponseEntity.ok(login);
     }
 }
