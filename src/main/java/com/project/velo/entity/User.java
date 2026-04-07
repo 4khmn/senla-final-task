@@ -50,16 +50,18 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role = Role.ROLE_USER;
 
-
+    @Builder.Default
     @DecimalMin(value = "0.0", message = "Рейтинг не может быть меньше 0")
     @DecimalMax(value = "5.0", message = "Рейтинг не может быть больше 5")
     @Column(precision = 3, scale = 2)
     private BigDecimal rating = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean enabled = true;
 
