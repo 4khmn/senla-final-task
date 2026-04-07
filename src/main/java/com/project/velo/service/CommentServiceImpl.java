@@ -7,7 +7,7 @@ import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.Comment;
 import com.project.velo.entity.User;
-import com.project.velo.exception.NotEnoughRights;
+import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.mapper.CommentMapper;
 import com.project.velo.repository.AdvertisementRepository;
 import com.project.velo.repository.CommentRepository;
@@ -57,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
                 () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено.")
         );
         if (!comment.getAuthor().getUsername().equals(username)) {
-            throw new NotEnoughRights("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии.");
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии.");
         }
         commentRepository.delete(comment);
     }
@@ -75,7 +75,8 @@ public class CommentServiceImpl implements CommentService {
                 () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено.")
         );
         if (!comment.getAuthor().getUsername().equals(username)) {
-                throw new NotEnoughRights("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии.");
+
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии.");
         }
         comment.setContent(dto.content());
         return mapper.toDetailsDto(comment);

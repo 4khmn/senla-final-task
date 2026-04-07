@@ -9,7 +9,7 @@ import com.project.velo.entity.Category;
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
 import com.project.velo.exception.AdvertisementNotAvailableException;
-import com.project.velo.exception.NotEnoughRights;
+import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.mapper.AdvertisementMapper;
 import com.project.velo.repository.AdvertisementRepository;
 import com.project.velo.repository.CategoryRepository;
@@ -87,7 +87,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено.")
         );
         if (!advertisement.getSeller().getUsername().equals(username)) {
-            throw new NotEnoughRights("Недостаточно прав для этого действия: Вы не можете изменить чужое объявление");
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете изменить чужое объявление");
         }
 
         mapper.updateEntityFromDto(dto, advertisement);
@@ -125,7 +125,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
             advertisementRepository.delete(advertisement);
         }
         else {
-            throw new NotEnoughRights("Недостаточно прав для этого действия: Вы не можете удалить чужое объявление");
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалить чужое объявление");
         }
     }
 }
