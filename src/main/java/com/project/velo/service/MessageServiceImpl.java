@@ -6,7 +6,7 @@ import com.project.velo.dto.update.MessageUpdateDto;
 import com.project.velo.entity.Chat;
 import com.project.velo.entity.Message;
 import com.project.velo.entity.User;
-import com.project.velo.exception.NotEnoughRights;
+import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.mapper.MessageMapper;
 import com.project.velo.repository.ChatRepository;
 import com.project.velo.repository.MessageRepository;
@@ -73,7 +73,7 @@ public class MessageServiceImpl implements MessageService {
         );
 
         if (!message.getSender().getUsername().equals(username)) {
-            throw new NotEnoughRights("Недостаточно прав для этого действия: Вы не можете изменять чужие сообщения");
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете изменять чужие сообщения");
         }
         message.setContent(dto.content());
         return mapper.toDto(message, username);
@@ -87,7 +87,7 @@ public class MessageServiceImpl implements MessageService {
         );
 
         if (!message.getSender().getUsername().equals(username)) {
-            throw new NotEnoughRights("Недостаточно прав для этого действия: Вы не можете удалять чужие сообщения");
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие сообщения");
         }
         messageRepository.delete(message);
     }
@@ -98,7 +98,7 @@ public class MessageServiceImpl implements MessageService {
         boolean isBuyer = chat.getBuyer().getUsername().equals(username);
 
         if (!isSeller && !isBuyer) {
-            throw new NotEnoughRights("Недостаточно прав для этого действия: Вы не являетесь участником этого чата");
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не являетесь участником этого чата");
         }
     }
 
