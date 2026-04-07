@@ -75,6 +75,7 @@ public class CommentServiceImpl implements CommentService {
                 () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено.")
         );
         if (!comment.getAuthor().getUsername().equals(username)) {
+
             throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии.");
         }
         comment.setContent(dto.content());
