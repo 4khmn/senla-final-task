@@ -54,6 +54,10 @@ public class Advertisement {
     @Column(name = "is_top")
     private boolean top;
 
+
+    @Column(name = "top_until")
+    private LocalDateTime topUntil;
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private AdStatus status = AdStatus.ACTIVE;
@@ -77,5 +81,9 @@ public class Advertisement {
     public void addComment(Comment comment) {
         this.comments.add(comment);
         comment.setAdvertisement(this);
+    }
+
+    public boolean isTopActive() {
+        return topUntil != null && topUntil.isAfter(LocalDateTime.now());
     }
 }

@@ -1,5 +1,6 @@
 package com.project.velo.service;
 
+import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.entity.*;
 import com.project.velo.dto.create.AdvertisementCreateDto;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,9 +135,9 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Override
     @Transactional
     public void processPurchase(Long adId, String username) {
-        Advertisement advertisement = advertisementRepository.findById(adId)
-                .orElseThrow(() -> new EntityNotFoundException("Объявление не найдено"));
-
+        Advertisement advertisement = advertisementRepository.findById(adId).orElseThrow(
+                () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено.")
+        );
         User buyer = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено.")
         );
@@ -156,6 +158,26 @@ public class AdvertisementServiceImpl implements AdvertisementService {
                 .build();
 
         salesHistoryRepository.save(history);
+    }
+
+    @Override
+    @Transactional
+    public void promote(Long adId, AdvertisementPromoteDto dto, String username) {
+        Advertisement advertisement = advertisementRepository.findById(adId).orElseThrow(
+                () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено.")
+        );
+
+        if (!advertisement.getSeller().getUsername().equals(username)) {
+            throw new ValidationException("У вас нет прав на продвижение этого объявления");
+        }
+
+        LocalDateTime currentTopUntil = advertisement.getTopUntil();
+        LocalDateTime baseTime = (currentTopUntil != null && currentTopUntil.isAfter(LocalDateTime.now()))
+                ? currentTopUntil
+                : LocalDateTime.now();
+
+        advertisement.setTopUntil(baseTime.plusDays(dto.days()));
+        advertisement.setTop(true);
     }
 
     @Override
