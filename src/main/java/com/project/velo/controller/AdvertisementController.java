@@ -70,4 +70,15 @@ public class AdvertisementController {
         log.info("PATCH /api/advertisement/{} - Advertisement with id: {} was successfully updated", id, id);
         return ResponseEntity.ok(advertisement);
     }
+
+    @PostMapping("/{adId}/buy")
+    public ResponseEntity<Void> buyAdvertisement(
+            @PathVariable Long adId,
+            @AuthenticationPrincipal UserDetails buyer
+    ) {
+        log.info("POST /api/advertisements/{}/buy - User {} is buying by advertisement {}", adId, buyer.getUsername(), adId);
+        advertisementService.processPurchase(adId, buyer.getUsername());
+        log.info("POST /api/advertisements/{}/buy - User {} successfully purchased by advertisement {}", adId,buyer.getUsername(), adId);
+        return ResponseEntity.noContent().build();
+    }
 }

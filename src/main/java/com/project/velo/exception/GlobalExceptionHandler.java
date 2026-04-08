@@ -51,6 +51,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex, request);
     }
 
+    @ExceptionHandler(ResourceAlreadyProcessedException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(ResourceAlreadyProcessedException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, ex, request);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(ValidationException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex, request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception ex, HttpServletRequest request) {
         log.error("Unhandled exception at {}: ", request.getRequestURI(), ex);

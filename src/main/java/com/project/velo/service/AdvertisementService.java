@@ -20,4 +20,8 @@ public interface AdvertisementService {
     AdvertisementResponseDto update(Long id, AdvertisementUpdateDto dto, String username);
 
     void delete(Long id, String username);
+
+    void processPurchase(Long adId, String username);
+
+    List<AdvertisementResponseDto> findAdvertisementsByUsername(String username);
 }

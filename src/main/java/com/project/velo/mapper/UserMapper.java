@@ -18,7 +18,6 @@ public interface UserMapper {
 
     @Mapping(target = "firstName", source = "profile.firstName")
     @Mapping(target = "lastName", source = "profile.lastName")
-    @Mapping(target = "phone", source = "profile.phone")
     @Mapping(target = "bio", source = "profile.bio")
     @Mapping(target = "avatarUrl", source = "profile.avatarUrl")
     ProfileResponseDto toProfileDto(User user);
