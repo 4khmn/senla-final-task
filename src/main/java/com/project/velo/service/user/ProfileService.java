@@ -8,4 +8,6 @@ public interface ProfileService {
     ProfileResponseDto getByUsername(String username);
 
     ProfileResponseDto update(ProfileUpdateDto dto, String username);
+
+    void updateAvatar(String username, String newAvatarUrl);
 }
