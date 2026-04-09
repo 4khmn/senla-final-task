@@ -1,7 +1,8 @@
-package com.project.velo.service;
+package com.project.velo.service.advertisement;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
+import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import org.springframework.stereotype.Service;
 
@@ -23,5 +24,9 @@ public interface AdvertisementService {
 
     void processPurchase(Long adId, String username);
 
+    void promote(Long adId, AdvertisementPromoteDto dto, String username);
+
     List<AdvertisementResponseDto> findAdvertisementsByUsername(String username);
+
+
 }

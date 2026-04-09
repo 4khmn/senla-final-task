@@ -1,4 +1,4 @@
-package com.project.velo.service;
+package com.project.velo.service.social;
 
 import com.project.velo.dto.response.ChatListResponseDto;
 import com.project.velo.dto.response.ChatResponseDto;

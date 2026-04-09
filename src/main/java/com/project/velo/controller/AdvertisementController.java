@@ -2,8 +2,9 @@ package com.project.velo.controller;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
+import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
-import com.project.velo.service.AdvertisementService;
+import com.project.velo.service.advertisement.AdvertisementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,6 @@ public class AdvertisementController {
         return ResponseEntity.noContent().build();
     }
 
-
     @PatchMapping("/{id}")
     public ResponseEntity<AdvertisementResponseDto> updateAdvertisement(
             @PathVariable Long id,
@@ -81,4 +81,16 @@ public class AdvertisementController {
         log.info("POST /api/advertisements/{}/buy - User {} successfully purchased by advertisement {}", adId,buyer.getUsername(), adId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{adId}/promote")
+    public ResponseEntity<Void> promote(
+            @PathVariable Long adId,
+            @RequestBody @Valid AdvertisementPromoteDto dto,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        advertisementService.promote(adId, dto, user.getUsername());
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

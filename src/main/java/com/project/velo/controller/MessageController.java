@@ -2,7 +2,7 @@ package com.project.velo.controller;
 
 import com.project.velo.dto.response.MessageResponseDto;
 import com.project.velo.dto.update.MessageUpdateDto;
-import com.project.velo.service.MessageService;
+import com.project.velo.service.social.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,7 @@ package com.project.velo.controller;
 
 import com.project.velo.dto.create.ReviewCreateDto;
 import com.project.velo.dto.response.ReviewResponseDto;
-import com.project.velo.service.ReviewService;
+import com.project.velo.service.social.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
