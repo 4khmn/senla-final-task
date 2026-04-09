@@ -42,4 +42,7 @@ public class SalesHistory {
     @CreationTimestamp
     @Column(name = "sold_at", updatable = false)
     private LocalDateTime soldAt;
+
+    @Column(name = "was_top")
+    private boolean wasTop = false;
 }

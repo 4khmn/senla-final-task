@@ -152,10 +152,13 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
         SalesHistory history = SalesHistory.builder()
                 .advertisement(advertisement)
+                .wasTop(advertisement.isTop())
                 .seller(advertisement.getSeller())
                 .buyer(buyer)
                 .finalPrice(advertisement.getPrice())
                 .build();
+
+        advertisement.setTop(false);
 
         salesHistoryRepository.save(history);
     }
