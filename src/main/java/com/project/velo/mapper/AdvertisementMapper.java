@@ -18,6 +18,7 @@ public interface AdvertisementMapper {
     @Mapping(target = "primaryImageUrl", source = "images")
     @Mapping(target = "otherImageUrls", source = "images")
     @Mapping(target = "status", expression = "java(advertisement.getStatus().name())")
+    @Mapping(target = "isTop", source = "top")
     AdvertisementResponseDto toDto(Advertisement advertisement);
 
     @Mapping(target = "id", ignore = true)

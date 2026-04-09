@@ -22,6 +22,7 @@ public record AdvertisementCreateDto(
         @NotNull(message = "ID категории обязателен")
         Long categoryId,
 
+        @NotNull(message = "Объявление нельзя создать без фотографии")
         @Size(min = 1, max = 20, message = "Количество фотографий может быть от 1 до 20")
         List<@NotBlank String> imageUrls // get(0) - primary
 ) {}
