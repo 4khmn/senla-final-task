@@ -1,4 +1,4 @@
-package com.project.velo.service;
+package com.project.velo.service.user;
 
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.repository.UserRepository;

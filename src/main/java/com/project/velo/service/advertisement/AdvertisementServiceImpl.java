@@ -1,4 +1,4 @@
-package com.project.velo.service;
+package com.project.velo.service.advertisement;
 
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;

@@ -4,7 +4,7 @@ import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
-import com.project.velo.service.AdvertisementService;
+import com.project.velo.service.advertisement.AdvertisementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +85,7 @@ public class AdvertisementController {
     @PostMapping("/{adId}/promote")
     public ResponseEntity<Void> promote(
             @PathVariable Long adId,
-            @RequestBody AdvertisementPromoteDto dto,
+            @RequestBody @Valid AdvertisementPromoteDto dto,
             @AuthenticationPrincipal UserDetails user
     ) {
         advertisementService.promote(adId, dto, user.getUsername());

@@ -4,7 +4,7 @@ import com.project.velo.dto.create.CommentCreateDto;
 import com.project.velo.dto.response.CommentDetailsResponseDto;
 import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.entity.User;
-import com.project.velo.service.CommentService;
+import com.project.velo.service.social.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,7 @@ public class CommentController {
 
     @PutMapping("/api/comments/{commentId}")
     public ResponseEntity<CommentDetailsResponseDto> updateComment(
-            @RequestBody CommentUpdateDto dto,
+            @RequestBody @Valid CommentUpdateDto dto,
             @PathVariable Long commentId,
             @AuthenticationPrincipal User user
     ) {

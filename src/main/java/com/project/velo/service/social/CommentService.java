@@ -1,4 +1,4 @@
-package com.project.velo.service;
+package com.project.velo.service.social;
 
 import com.project.velo.dto.create.CommentCreateDto;
 import com.project.velo.dto.response.CommentDetailsResponseDto;

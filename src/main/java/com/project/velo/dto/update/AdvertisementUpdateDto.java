@@ -20,7 +20,5 @@ public record AdvertisementUpdateDto(
 
         Long categoryId,
 
-        Boolean isTop,
-
         List<String> imageUrls
 ) {}

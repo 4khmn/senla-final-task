@@ -1,4 +1,4 @@
-package com.project.velo.service;
+package com.project.velo.service.advertisement;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
