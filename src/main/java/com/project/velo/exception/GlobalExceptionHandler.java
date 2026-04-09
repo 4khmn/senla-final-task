@@ -9,8 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,7 +37,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex, HttpServletRequest request) {
-        log.warn("Authentication failed: {}", ex.getMessage());
         return buildResponse(HttpStatus.UNAUTHORIZED, ex, request);
     }
 
@@ -64,6 +66,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidFileException.class)
     public ResponseEntity<ErrorResponse> handleValidation(InvalidFileException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex, request);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxSizeException(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        String errorMessage = "Файл слишком велик! Максимальный размер — 5 МБ.";
+        return buildResponse(HttpStatus.PAYLOAD_TOO_LARGE, new RuntimeException(errorMessage), request);
     }
 
     @ExceptionHandler(Exception.class)
