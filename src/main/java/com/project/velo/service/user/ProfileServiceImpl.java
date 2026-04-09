@@ -2,13 +2,16 @@ package com.project.velo.service.user;
 
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
+import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
 import com.project.velo.mapper.ProfileMapper;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
+import com.project.velo.service.storage.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -18,11 +21,12 @@ public class ProfileServiceImpl implements ProfileService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
+    private final FileStorageService storageService;
 
     @Override
     public ProfileResponseDto getByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username е найдено.")
+                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
         );
         return userMapper.toProfileDto(user);
     }
@@ -31,10 +35,22 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public ProfileResponseDto update(ProfileUpdateDto dto, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username е найдено.")
+                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
         );
         profileMapper.updateEntityFromDto(dto, user.getProfile());
 
         return userMapper.toProfileDto(user);
+    }
+
+    @Transactional
+    public void updateAvatar(String username, String newAvatarUrl) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
+        );
+        Profile profile = user.getProfile();
+        if (profile.getAvatarUrl() != null) {
+            storageService.delete(profile.getAvatarUrl());
+        }
+        profile.setAvatarUrl(newAvatarUrl);
     }
 }

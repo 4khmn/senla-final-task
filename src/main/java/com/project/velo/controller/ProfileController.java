@@ -8,15 +8,18 @@ import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.User;
 import com.project.velo.service.advertisement.AdvertisementService;
 import com.project.velo.service.social.CommentService;
+import com.project.velo.service.storage.FileStorageService;
 import com.project.velo.service.user.ProfileService;
 import com.project.velo.service.advertisement.SalesHistoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,9 +33,10 @@ public class ProfileController {
     private final CommentService commentService;
     private final SalesHistoryService salesHistoryService;
     private final AdvertisementService advertisementService;
+    private final FileStorageService storageService;
 
     @PatchMapping
-    public ResponseEntity<ProfileResponseDto> updateProfile(
+    public ResponseEntity<ProfileResponseDto> updateProfileInfo(
             @RequestBody @Valid ProfileUpdateDto dto,
             @AuthenticationPrincipal User user
     ) {
@@ -40,6 +44,18 @@ public class ProfileController {
         ProfileResponseDto updated = profileService.update(dto, user.getUsername());
         log.info("PATCH /api/profile - Profile for username: {} was successfully updated", user.getUsername());
         return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> uploadAvatar(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        log.info("POST /api/profile/avatar - Uploading avatar for username: {}", user.getUsername());
+        String newAvatarUrl = storageService.save(file, "avatars");
+        profileService.updateAvatar(user.getUsername(), newAvatarUrl);
+        log.info("POST /api/profile/avatar - User {} updated avatar to {}", user.getUsername(), newAvatarUrl);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

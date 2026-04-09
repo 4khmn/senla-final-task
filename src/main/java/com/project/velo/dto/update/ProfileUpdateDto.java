@@ -18,8 +18,6 @@ public record ProfileUpdateDto(
         String phone,
 
         @Size(max = 500, message = "О себе: максимум 500 символов")
-        String bio,
-
-        @Size(max = 255, message = "Ссылка на аватар слишком длинная")
-        String avatarUrl) {
+        String bio
+) {
 }
