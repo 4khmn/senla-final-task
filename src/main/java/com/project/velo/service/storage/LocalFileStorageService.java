@@ -57,7 +57,7 @@ public class LocalFileStorageService implements FileStorageService{
     @Override
     public Resource load(String folder, String filename) {
         try {
-            // Paths.get сам склеит путь правильно
+            // Paths.get склеивает путь
             Path file = Paths.get(uploadPath, folder, filename);
             Resource resource = new UrlResource(file.toUri());
 

@@ -2,6 +2,7 @@ package com.project.velo.mapper;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
+import com.project.velo.dto.response.AdvertisementShortResponseDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.entity.AdImage;
 import com.project.velo.entity.Advertisement;
@@ -37,6 +38,12 @@ public interface AdvertisementMapper {
     @Mapping(target = "category", ignore = true)
     void updateEntityFromDto(AdvertisementUpdateDto dto, @MappingTarget Advertisement advertisement);
 
+
+    @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "primaryImageUrl", source = "images")
+    @Mapping(target = "isTop", source = "top")
+    @Mapping(target = "authorUsername", source = "seller.username")
+    AdvertisementShortResponseDto toShortDto(Advertisement advertisement);
 
 
     default String mapPrimaryImage(List<AdImage> images) {

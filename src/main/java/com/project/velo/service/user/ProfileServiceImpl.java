@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
@@ -43,14 +44,17 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Transactional
-    public void updateAvatar(String username, String newAvatarUrl) {
+    @Override
+    public String updateAvatar(String username, MultipartFile file) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
         );
+        String newAvatarUrl = storageService.save(file, "avatars");
         Profile profile = user.getProfile();
         if (profile.getAvatarUrl() != null) {
             storageService.delete(profile.getAvatarUrl());
         }
         profile.setAvatarUrl(newAvatarUrl);
+        return newAvatarUrl;
     }
 }
