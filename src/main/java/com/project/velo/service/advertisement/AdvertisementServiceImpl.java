@@ -44,7 +44,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     public AdvertisementResponseDto create(AdvertisementCreateDto dto, List<MultipartFile> files, String username) {
         Advertisement advertisement = mapper.toEntity(dto);
         User seller = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         advertisement.setSeller(seller);
 
@@ -75,17 +75,19 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AdvertisementResponseDto getById(Long id) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Объявления с id " + id + " не найдено.")
+                () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
-        if (advertisement.getStatus() != AdStatus.ACTIVE) {
-            throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно.");
+        if (!advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+            throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно");
         }
         return mapper.toDto(advertisement);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AdvertisementShortResponseDto> getAll() {
         return advertisementRepository.findAll().stream()
                 .filter(ad -> ad.getStatus().equals(AdStatus.ACTIVE))
@@ -97,7 +99,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Transactional
     public AdvertisementResponseDto update(Long id, AdvertisementUpdateDto dto, String username) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Объявления с id " + id + " не найдено.")
+                () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
         if (!advertisement.getSeller().getUsername().equals(username)) {
             throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете изменить чужое объявление");
@@ -132,7 +134,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Transactional
     public void delete(Long id, String username) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Объявления с id " + id + " не найдено.")
+                () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
         if (advertisement.getSeller().getUsername().equals(username) || advertisement.getSeller().getRole().equals("ROLE_ADMIN")) {
             advertisement.setStatus(AdStatus.ARCHIVED);
@@ -146,10 +148,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Transactional
     public void processPurchase(Long adId, String username) {
         Advertisement advertisement = advertisementRepository.findById(adId).orElseThrow(
-                () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено.")
+                () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено")
         );
         User buyer = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         if (advertisement.getSeller().getUsername().equals(username)) {
             throw new ValidationException("Нельзя купить свой собственный товар");
@@ -177,11 +179,15 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     @Transactional
     public void promote(Long adId, AdvertisementPromoteDto dto, String username) {
         Advertisement advertisement = advertisementRepository.findById(adId).orElseThrow(
-                () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено.")
+                () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено")
         );
 
         if (!advertisement.getSeller().getUsername().equals(username)) {
             throw new ValidationException("У вас нет прав на продвижение этого объявления");
+        }
+
+        if (!advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+            throw new AdvertisementNotAvailableException("Объявление с id " + adId + " не доступно");
         }
 
         LocalDateTime currentTopUntil = advertisement.getTopUntil();
@@ -194,7 +200,11 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AdvertisementResponseDto> findAdvertisementsByUsername(String username) {
+        if (!userRepository.existsByUsername(username)) {
+            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
+        }
         return advertisementRepository.findAllByUsername(username).stream().map(mapper::toDto).toList();
     }
 }

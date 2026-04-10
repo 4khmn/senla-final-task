@@ -33,7 +33,6 @@ public class ProfileController {
     private final CommentService commentService;
     private final SalesHistoryService salesHistoryService;
     private final AdvertisementService advertisementService;
-    private final FileStorageService storageService;
 
     @PatchMapping
     public ResponseEntity<ProfileResponseDto> updateProfileInfo(

@@ -7,6 +7,8 @@ import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.Comment;
 import com.project.velo.entity.User;
+import com.project.velo.entity.enums.AdStatus;
+import com.project.velo.exception.AdvertisementNotAvailableException;
 import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.mapper.CommentMapper;
 import com.project.velo.repository.AdvertisementRepository;
@@ -32,11 +34,14 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public CommentDetailsResponseDto postComment(Long adId, CommentCreateDto dto, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username е найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         Advertisement advertisement = advertisementRepository.findById(adId).orElseThrow(
-                () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено.")
+                () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено")
         );
+        if (!advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+            throw new AdvertisementNotAvailableException("Объявление с id " + adId + " не доступно");
+        }
         Comment comment = mapper.toEntity(dto);
         advertisement.addComment(comment);
         comment.setAuthor(user);
@@ -45,8 +50,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<CommentDetailsResponseDto> getCommentsByAdvertisement(Long id) {
-        List<Comment> comments = commentRepository.getCommentsByAdvertisement(id);
+        Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
+        );
+        if (!advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+            throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно");
+        }
+        List<Comment> comments = advertisement.getComments();
         return comments.stream().map(mapper::toDetailsDto).toList();
     }
 
@@ -54,15 +66,19 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void delete(Long commentId, String username) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено.")
+                () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено")
         );
+        if (!comment.getAdvertisement().getStatus().equals(AdStatus.ACTIVE)) {
+            throw new AdvertisementNotAvailableException("Объявление с id " + comment.getAdvertisement().getId() + " не доступно");
+        }
         if (!comment.getAuthor().getUsername().equals(username)) {
-            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии.");
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии");
         }
         commentRepository.delete(comment);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserCommentResponseDto> getCommentsByUser(String username) {
         List<Comment> commentsByUser = commentRepository.getCommentsByUser(username);
         return commentsByUser.stream().map(mapper::toShortDto).toList();
@@ -72,15 +88,17 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public CommentDetailsResponseDto update(Long commentId, CommentUpdateDto dto, String username) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено.")
+                () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено")
         );
+        if (!comment.getAdvertisement().getStatus().equals(AdStatus.ACTIVE)) {
+            throw new AdvertisementNotAvailableException("Объявление с id " + comment.getAdvertisement().getId() + " не доступно");
+        }
+
         if (!comment.getAuthor().getUsername().equals(username)) {
 
-            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии.");
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие комментарии");
         }
         comment.setContent(dto.content());
         return mapper.toDetailsDto(comment);
     }
-
-
 }

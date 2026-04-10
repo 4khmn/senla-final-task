@@ -4,7 +4,7 @@ import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
-import com.project.velo.service.AuthService;
+import com.project.velo.service.auth.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

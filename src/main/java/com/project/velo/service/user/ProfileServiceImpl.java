@@ -25,29 +25,31 @@ public class ProfileServiceImpl implements ProfileService {
     private final FileStorageService storageService;
 
     @Override
+    @Transactional(readOnly = true)
     public ProfileResponseDto getByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         return userMapper.toProfileDto(user);
     }
 
 
     @Override
+    @Transactional
     public ProfileResponseDto update(ProfileUpdateDto dto, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         profileMapper.updateEntityFromDto(dto, user.getProfile());
 
         return userMapper.toProfileDto(user);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public String updateAvatar(String username, MultipartFile file) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         String newAvatarUrl = storageService.save(file, "avatars");
         Profile profile = user.getProfile();

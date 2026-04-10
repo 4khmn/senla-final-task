@@ -5,6 +5,7 @@ import com.project.velo.dto.response.ChatResponseDto;
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.Chat;
 import com.project.velo.entity.User;
+import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ChatMapper;
 import com.project.velo.repository.AdvertisementRepository;
 import com.project.velo.repository.ChatRepository;
@@ -26,6 +27,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatMapper mapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ChatListResponseDto> findAllByUser(String username) {
         List<Chat> chats = chatRepository.findAllByUsername(username);
 
@@ -38,7 +40,7 @@ public class ChatServiceImpl implements ChatService {
     @Transactional
     public ChatResponseDto getOrCreate(Long adId, String username) {
         User buyer = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователя с username " + username + " не найдено."));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователя с username " + username + " не найдено"));
 
         return chatRepository.findByAdvertisementIdAndBuyerId(adId, buyer.getId())
                 .map(mapper::toResponseDto)
@@ -47,10 +49,10 @@ public class ChatServiceImpl implements ChatService {
 
     private ChatResponseDto createNewChat(Long adId, User buyer) {
         Advertisement advertisement = advertisementRepository.findById(adId)
-                .orElseThrow(() -> new EntityNotFoundException("Объявления с id " + adId + " не найдено."));
+                .orElseThrow(() -> new EntityNotFoundException("Объявления с id " + adId + " не найдено"));
 
         if (advertisement.getSeller().getUsername().equals(buyer.getUsername())) {
-            throw new IllegalArgumentException("Вы не можете начать чат с самим собой");
+            throw new ValidationException("Вы не можете начать чат с самим собой");
         }
 
         Chat newChat = Chat.builder()

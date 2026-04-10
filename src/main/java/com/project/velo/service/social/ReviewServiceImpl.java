@@ -33,19 +33,19 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewResponseDto leaveReview(Long adId, ReviewCreateDto dto, String username) {
         if (reviewRepository.existsByAdvertisementId(adId)) {
-            throw new ResourceAlreadyProcessedException("Отзыв на это объявление уже оставлен.");
+            throw new ResourceAlreadyProcessedException("Отзыв на это объявление уже оставлен");
         }
 
         SalesHistory sale = salesHistoryRepository.findByAdvertisementId(adId)
-                .orElseThrow(() -> new EntityNotFoundException("Нельзя оставить отзыв: товар еще не продан или сделка не зафиксирована."));
+                .orElseThrow(() -> new EntityNotFoundException("Нельзя оставить отзыв: товар еще не продан или сделка не зафиксирована"));
 
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с username " + username + " не найден.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
 
 
         if (!sale.getBuyer().getUsername().equals(username)) {
-            throw new ValidationException("Только покупатель может оставить отзыв.");
+            throw new ValidationException("Только покупатель может оставить отзыв");
         }
 
         Review review = mapper.toEntity(dto);
@@ -65,6 +65,9 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional(readOnly = true)
     public List<ReviewResponseDto> getReviewsByUser(String username) {
+        if (!userRepository.existsByUsername(username)) {
+            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
+        }
         List<Review> reviews = reviewRepository.getBySeller(username);
         return reviews.stream().map(mapper::toDto).toList();
     }

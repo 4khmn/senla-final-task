@@ -1,4 +1,4 @@
-package com.project.velo.service;
+package com.project.velo.service.auth;
 
 
 import com.project.velo.dto.response.ProfileResponseDto;
@@ -41,6 +41,7 @@ public class AuthService {
         return mapper.toProfileDto(savedUser);
     }
 
+    @Transactional(readOnly = true)
     public AuthResponseDto login(LoginRequestDto request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

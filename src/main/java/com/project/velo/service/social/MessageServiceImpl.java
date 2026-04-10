@@ -32,13 +32,13 @@ public class MessageServiceImpl implements MessageService {
     @Transactional
     public MessageResponseDto sendMessage(Long chatId, MessageCreateDto dto, String username) {
         Chat chat = chatRepository.findById(chatId).orElseThrow(
-                () -> new EntityNotFoundException("Чата с id " + chatId + " не найдено.")
+                () -> new EntityNotFoundException("Чата с id " + chatId + " не найдено")
         );
 
         validateParticipant(chat, username);
 
         User sender = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователя с username " + username + " не найдено"));
 
         Message message = mapper.toEntity(dto);
         message.setSender(sender);
@@ -53,7 +53,7 @@ public class MessageServiceImpl implements MessageService {
     @Transactional(readOnly = true)
     public List<MessageResponseDto> getMessagesByChat(Long chatId, String username) {
         Chat chat = chatRepository.findById(chatId).orElseThrow(
-                () -> new EntityNotFoundException("Чата с id " + chatId + " не найдено.")
+                () -> new EntityNotFoundException("Чата с id " + chatId + " не найдено")
         );
 
         validateParticipant(chat, username);
@@ -69,7 +69,7 @@ public class MessageServiceImpl implements MessageService {
     @Transactional
     public MessageResponseDto editMessage(Long messageId, MessageUpdateDto dto, String username) {
         Message message = messageRepository.findById(messageId).orElseThrow(
-                () -> new EntityNotFoundException("Сообщения с id" + messageId + " не найдено.")
+                () -> new EntityNotFoundException("Сообщения с id" + messageId + " не найдено")
         );
 
         if (!message.getSender().getUsername().equals(username)) {
@@ -83,7 +83,7 @@ public class MessageServiceImpl implements MessageService {
     @Transactional
     public void deleteMessage(Long messageId, String username) {
         Message message = messageRepository.findById(messageId).orElseThrow(
-                () -> new EntityNotFoundException("Сообщения с id" + messageId + " не найдено.")
+                () -> new EntityNotFoundException("Сообщения с id" + messageId + " не найдено")
         );
 
         if (!message.getSender().getUsername().equals(username)) {
@@ -101,6 +101,4 @@ public class MessageServiceImpl implements MessageService {
             throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не являетесь участником этого чата");
         }
     }
-
-
 }
