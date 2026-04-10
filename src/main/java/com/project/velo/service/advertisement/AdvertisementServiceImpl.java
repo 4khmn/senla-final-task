@@ -15,10 +15,12 @@ import com.project.velo.repository.AdvertisementRepository;
 import com.project.velo.repository.CategoryRepository;
 import com.project.velo.repository.SalesHistoryRepository;
 import com.project.velo.repository.UserRepository;
+import com.project.velo.service.storage.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,32 +35,39 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final SalesHistoryRepository salesHistoryRepository;
+    private final FileStorageService storageService;
 
 
     @Override
     @Transactional
-    public AdvertisementResponseDto create(AdvertisementCreateDto dto, String username) {
+    public AdvertisementResponseDto create(AdvertisementCreateDto dto, List<MultipartFile> files, String username) {
         Advertisement advertisement = mapper.toEntity(dto);
         User seller = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено.")
         );
         advertisement.setSeller(seller);
 
+
         Category category = categoryRepository.findById(dto.categoryId()).orElseThrow(
                 () -> new EntityNotFoundException("Категория не найдена"));
         advertisement.setCategory(category);
 
-        if (dto.imageUrls() != null && !dto.imageUrls().isEmpty()) {
+
+        if (files != null && !files.isEmpty()) {
             List<AdImage> images = new ArrayList<>();
-            for (int i = 0; i < dto.imageUrls().size(); i++) {
+            for (int i = 0; i < files.size(); i++) {
+                MultipartFile file = files.get(i);
+                String savedPath = storageService.save(file, "advertisements");
+
                 images.add(AdImage.builder()
-                        .imageUrl(dto.imageUrls().get(i))
+                        .imageUrl(savedPath)
                         .advertisement(advertisement)
                         .isPrimary(i == 0)
                         .build());
             }
             advertisement.setImages(images);
         }
+
 
         Advertisement savedAd = advertisementRepository.save(advertisement);
         return mapper.toDto(savedAd);

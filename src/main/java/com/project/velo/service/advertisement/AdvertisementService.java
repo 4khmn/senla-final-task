@@ -5,6 +5,7 @@ import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
 public interface AdvertisementService {
 
 
-    AdvertisementResponseDto create(AdvertisementCreateDto dto, String username);
+    AdvertisementResponseDto create(AdvertisementCreateDto dto, List<MultipartFile> files, String username);
 
     AdvertisementResponseDto getById(Long id);
 

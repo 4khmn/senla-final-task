@@ -52,8 +52,7 @@ public class ProfileController {
             @AuthenticationPrincipal UserDetails user
     ) {
         log.info("POST /api/profile/avatar - Uploading avatar for username: {}", user.getUsername());
-        String newAvatarUrl = storageService.save(file, "avatars");
-        profileService.updateAvatar(user.getUsername(), newAvatarUrl);
+        String newAvatarUrl = profileService.updateAvatar(user.getUsername(), file);
         log.info("POST /api/profile/avatar - User {} updated avatar to {}", user.getUsername(), newAvatarUrl);
         return ResponseEntity.noContent().build();
     }
