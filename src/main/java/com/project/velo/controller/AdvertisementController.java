@@ -2,6 +2,7 @@ package com.project.velo.controller;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
+import com.project.velo.dto.response.AdvertisementShortResponseDto;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.service.advertisement.AdvertisementService;
@@ -31,9 +32,9 @@ public class AdvertisementController {
     private final AdvertisementService advertisementService;
 
     @GetMapping
-    public ResponseEntity<List<AdvertisementResponseDto>> getAllAdvertisements() {
+    public ResponseEntity<List<AdvertisementShortResponseDto>> getAllAdvertisements() {
         log.info("GET /api/advertisements - Fetching all advertisements");
-        List<AdvertisementResponseDto> advertisements = advertisementService.getAll();
+        List<AdvertisementShortResponseDto> advertisements = advertisementService.getAll();
         log.info("GET /api/advertisements - Found {} advertisements", advertisements.size());
         return ResponseEntity.ok(advertisements);
     }

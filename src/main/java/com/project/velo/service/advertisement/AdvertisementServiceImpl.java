@@ -1,5 +1,6 @@
 package com.project.velo.service.advertisement;
 
+import com.project.velo.dto.response.AdvertisementShortResponseDto;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.entity.*;
@@ -85,10 +86,10 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public List<AdvertisementResponseDto> getAll() {
+    public List<AdvertisementShortResponseDto> getAll() {
         return advertisementRepository.findAll().stream()
                 .filter(ad -> ad.getStatus().equals(AdStatus.ACTIVE))
-                .map(mapper::toDto)
+                .map(mapper::toShortDto)
                 .toList();
     }
 
