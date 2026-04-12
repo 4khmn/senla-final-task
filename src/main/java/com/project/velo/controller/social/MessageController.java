@@ -1,11 +1,14 @@
-package com.project.velo.controller;
+package com.project.velo.controller.social;
 
+import com.project.velo.dto.create.MessageCreateDto;
 import com.project.velo.dto.response.MessageResponseDto;
 import com.project.velo.dto.update.MessageUpdateDto;
+import com.project.velo.entity.User;
 import com.project.velo.service.social.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,5 +43,18 @@ public class MessageController {
         messageService.deleteMessage(messageId, user.getUsername());
         log.info("DELETE /api/messages/{} - Message: {} was successfully deleted", messageId, messageId);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/chat/{chatId}")
+    public ResponseEntity<MessageResponseDto> sendMessage(
+            @PathVariable Long chatId,
+            @RequestBody @Valid MessageCreateDto dto,
+            @AuthenticationPrincipal User user
+    ) {
+        log.info("POST /api/messages/chat/{} - User: {} sending message", chatId, user.getUsername());
+        MessageResponseDto message = messageService.sendMessage(chatId, dto, user.getUsername());
+        log.info("POST /api/messages/chat/{} - Message: {} sent to chat: {}", chatId, message.id(), chatId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 }

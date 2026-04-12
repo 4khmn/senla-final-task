@@ -1,4 +1,4 @@
-package com.project.velo.controller;
+package com.project.velo.controller.social;
 
 import com.project.velo.dto.create.CommentCreateDto;
 import com.project.velo.dto.response.CommentDetailsResponseDto;
@@ -17,34 +17,35 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@RequestMapping("/api/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping("/api/advertisements/{adId}/comments")
+    @PostMapping("/advertisement/{adId}")
     public ResponseEntity<CommentDetailsResponseDto> createComment(
             @PathVariable Long adId,
             @RequestBody @Valid CommentCreateDto dto,
             @AuthenticationPrincipal User user
     ) {
-        log.info("POST /api/advertisements/{}/comments - User: {} trying to post a comment to advertisement with id: {}", adId, user.getUsername(), adId);
+        log.info("POST /api/comments/advertisement/{} - User: {} trying to post a comment to advertisement with id: {}", adId, user.getUsername(), adId);
         CommentDetailsResponseDto comment = commentService.postComment(adId, dto, user.getUsername());
-        log.info("POST /api/advertisements/{}/comments - Comment: {} by user: {} was successfully posted", adId, comment, user.getUsername());
+        log.info("POST /api/comments/advertisement/{} - Comment: {} by user: {} was successfully posted", adId, comment, user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 
-    @GetMapping("/api/advertisements/{adId}/comments")
+    @GetMapping("/advertisement/{adId}")
     public ResponseEntity<List<CommentDetailsResponseDto>> getComments(
             @PathVariable Long adId) {
-        log.info("GET /api/advertisements/{}/comments - Fetching all comments by advertisement with id: {}", adId, adId);
+        log.info("GET /api/comments/advertisement/{} - Fetching all comments by advertisement with id: {}", adId, adId);
         List<CommentDetailsResponseDto> comments = commentService.getCommentsByAdvertisement(adId);
-        log.info("GET /api/advertisements/{}/comments - Found {} comments for advertisement: {}", adId, comments.size(), adId);
+        log.info("GET /api/comments/advertisement/{} - Found {} comments for advertisement: {}", adId, comments.size(), adId);
         return ResponseEntity.ok(comments);
     }
 
 
-    @DeleteMapping("/api/comments/{commentId}")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> delete(@PathVariable Long commentId, @AuthenticationPrincipal User user) {
         log.info("DELETE /api/comments/{} - User: {} trying to delete a comment with id: {}", commentId, user.getUsername(), commentId);
         commentService.delete(commentId, user.getUsername());
@@ -53,7 +54,7 @@ public class CommentController {
     }
 
 
-    @PutMapping("/api/comments/{commentId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<CommentDetailsResponseDto> updateComment(
             @RequestBody @Valid CommentUpdateDto dto,
             @PathVariable Long commentId,
@@ -64,4 +65,5 @@ public class CommentController {
         log.info("PUT /api/comments/{} - Comment: {} by user: {} was successfully updated", commentId, updated, user.getUsername());
         return ResponseEntity.ok(updated);
     }
+
 }

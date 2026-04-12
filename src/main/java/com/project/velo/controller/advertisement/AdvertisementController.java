@@ -1,4 +1,4 @@
-package com.project.velo.controller;
+package com.project.velo.controller.advertisement;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
@@ -100,9 +100,9 @@ public class AdvertisementController {
             @RequestBody @Valid AdvertisementPromoteDto dto,
             @AuthenticationPrincipal UserDetails user
     ) {
+        log.info("POST /api/advertisements/{}/promote - Promoting advertisement: {}", adId, adId);
         advertisementService.promote(adId, dto, user.getUsername());
+        log.info("POST /api/advertisements/{}/promote - Advertisement: {} successfully promoted by user: {}", adId, adId, user.getUsername());
         return ResponseEntity.noContent().build();
     }
-
-
 }

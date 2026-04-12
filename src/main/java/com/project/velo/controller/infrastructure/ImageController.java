@@ -1,4 +1,4 @@
-package com.project.velo.controller;
+package com.project.velo.controller.infrastructure;
 
 import com.project.velo.service.storage.FileStorageService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.project.velo.service.user;
+package com.project.velo.service.profile;
 
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
@@ -17,26 +17,26 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class ProfileServiceImpl implements ProfileService {
+public class ProfileService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
     private final FileStorageService storageService;
 
-    @Override
+    @Transactional(readOnly = true)
     public ProfileResponseDto getByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         return userMapper.toProfileDto(user);
     }
 
 
-    @Override
+    @Transactional
     public ProfileResponseDto update(ProfileUpdateDto dto, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         profileMapper.updateEntityFromDto(dto, user.getProfile());
 
@@ -44,10 +44,9 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Transactional
-    @Override
     public String updateAvatar(String username, MultipartFile file) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с таким username не найдено.")
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         String newAvatarUrl = storageService.save(file, "avatars");
         Profile profile = user.getProfile();
