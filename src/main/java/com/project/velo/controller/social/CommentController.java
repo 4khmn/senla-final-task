@@ -54,7 +54,7 @@ public class CommentController {
     }
 
 
-    @PutMapping("/{commentId}")
+    @PatchMapping("/{commentId}")
     public ResponseEntity<CommentDetailsResponseDto> updateComment(
             @RequestBody @Valid CommentUpdateDto dto,
             @PathVariable Long commentId,
