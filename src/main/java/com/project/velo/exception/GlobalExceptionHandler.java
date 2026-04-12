@@ -74,6 +74,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.PAYLOAD_TOO_LARGE, new RuntimeException(errorMessage), request);
     }
 
+    @ExceptionHandler(FileNotFoundCustomException.class)
+    public ResponseEntity<ErrorResponse> handleFileNotFoundCustom(FileNotFoundCustomException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex, request);
+    }
+
+    @ExceptionHandler(FileStorageException.class)
+    public ResponseEntity<ErrorResponse> handleFileStorageException(FileStorageException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex, request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(Exception ex, HttpServletRequest request) {
         log.error("Unhandled exception at {}: ", request.getRequestURI(), ex);
