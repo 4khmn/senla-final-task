@@ -1,5 +1,8 @@
 package com.project.velo.service.storage;
 
+import com.project.velo.dto.infrastracture.MediaResource;
+import com.project.velo.exception.FileNotFoundCustomException;
+import com.project.velo.exception.FileStorageException;
 import com.project.velo.exception.InvalidFileException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -38,7 +41,8 @@ public class LocalFileStorageService implements FileStorageService{
 
             return "/api/images/" + folder + "/" + fileName;
         } catch (IOException e) {
-            throw new RuntimeException("Ошибка при сохранении файла", e);
+            log.error("Cannot save file: {}", file.getOriginalFilename(), e);
+            throw new FileStorageException("Не удалось сохранить файл. Попробуйте позже.", e);
         }
     }
 
@@ -55,7 +59,23 @@ public class LocalFileStorageService implements FileStorageService{
     }
 
     @Override
-    public Resource load(String folder, String filename) {
+    public MediaResource loadAsResource(String folder, String filename) {
+        Resource resource = load(folder, filename);
+
+        String contentType;
+        try {
+            contentType = Files.probeContentType(resource.getFile().toPath());
+        } catch (IOException e) {
+            log.error("Could not determine file type for: {}", filename);
+            contentType = "application/octet-stream";
+        }
+
+        return new MediaResource(resource, contentType);
+    }
+
+
+
+    private Resource load(String folder, String filename) {
         try {
             // Paths.get склеивает путь
             Path file = Paths.get(uploadPath, folder, filename);
@@ -64,10 +84,10 @@ public class LocalFileStorageService implements FileStorageService{
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new RuntimeException("Файл не найден: " + filename);
+                throw new FileNotFoundCustomException("Файл " + filename + " не найден или недоступен");
             }
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Ошибка при чтении файла", e);
+            throw new FileStorageException("Внутренняя ошибка при чтении файла", e);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.project.velo.controller.infrastructure;
 
+import com.project.velo.dto.infrastracture.MediaResource;
 import com.project.velo.service.storage.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,30 +12,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.nio.file.Files;
-
 @RestController
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
 @Slf4j
 public class ImageController {
 
-    private final String uploadPath = "uploads/";
     private final FileStorageService storageService;
 
     @GetMapping("/{folder}/{filename}")
     public ResponseEntity<Resource> getImage(@PathVariable String folder, @PathVariable String filename) {
-        Resource file = storageService.load(folder, filename);
-        String contentType = "application/octet-stream"; // Тип по умолчанию
-        try {
-            contentType = Files.probeContentType(file.getFile().toPath());
-        } catch (IOException e) {
-            log.error("GET /api/images/{}/{} - Impossible to parse content type: {}",  folder, filename, filename, e);
-        }
-
+        log.info("GET /api/images/{}/{} - Fetching image by folder: {} and by filename: {}", folder, filename, folder, filename);
+        MediaResource media = storageService.loadAsResource(folder, filename);
+        log.info("GET /api/images/{}/{} - Image was successfully retrieved: {}", folder, filename, media);
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(file);
+                .contentType(MediaType.parseMediaType(media.contentType()))
+                .body(media.resource());
     }
 }
