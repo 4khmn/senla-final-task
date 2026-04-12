@@ -1,13 +1,10 @@
-package com.project.velo.controller;
+package com.project.velo.controller.social;
 
-import com.project.velo.dto.create.MessageCreateDto;
 import com.project.velo.dto.response.ChatListResponseDto;
 import com.project.velo.dto.response.ChatResponseDto;
 import com.project.velo.dto.response.MessageResponseDto;
-import com.project.velo.entity.User;
 import com.project.velo.service.social.ChatService;
 import com.project.velo.service.social.MessageService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -55,17 +52,5 @@ public class ChatController {
         List<MessageResponseDto> messages = messageService.getMessagesByChat(chatId, user.getUsername());
         log.info("GET /api/chats/{}/messages - Found {} messages in chat: {}", chatId, messages.size(), chatId);
         return ResponseEntity.ok(messages);
-    }
-
-    @PostMapping("/{chatId}/messages")
-    public ResponseEntity<MessageResponseDto> sendMessage(
-            @PathVariable Long chatId,
-            @RequestBody @Valid MessageCreateDto dto,
-            @AuthenticationPrincipal User user
-    ) {
-        log.info("POST /api/chats/{}/messages - User: {} sending message", chatId, user.getUsername());
-        MessageResponseDto message = messageService.sendMessage(chatId, dto, user.getUsername());
-        log.info("POST /api/chats/{}/messages - Message: {} sent to chat: {}", chatId, message.id(), chatId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 }

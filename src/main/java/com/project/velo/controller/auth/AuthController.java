@@ -1,4 +1,4 @@
-package com.project.velo.controller;
+package com.project.velo.controller.auth;
 
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.create.UserCreateDto;

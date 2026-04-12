@@ -2,14 +2,63 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.response.ChatListResponseDto;
 import com.project.velo.dto.response.ChatResponseDto;
+import com.project.velo.entity.Advertisement;
+import com.project.velo.entity.Chat;
+import com.project.velo.entity.User;
+import com.project.velo.exception.ValidationException;
+import com.project.velo.mapper.ChatMapper;
+import com.project.velo.repository.AdvertisementRepository;
+import com.project.velo.repository.ChatRepository;
+import com.project.velo.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface ChatService {
+@Service
+@RequiredArgsConstructor
+public class ChatService {
 
-    List<ChatListResponseDto> findAllByUser(String username);
+    private final ChatRepository chatRepository;
+    private final UserRepository userRepository;
+    private final AdvertisementRepository advertisementRepository;
+    private final ChatMapper mapper;
 
-    ChatResponseDto getOrCreate(Long adId, String username);
+    @Transactional(readOnly = true)
+    public List<ChatListResponseDto> findAllByUser(String username) {
+        List<Chat> chats = chatRepository.findAllByUsername(username);
 
+        return chats.stream()
+                .map(chat -> mapper.toListDto(chat, username))
+                .toList();
+    }
 
+    @Transactional
+    public ChatResponseDto getOrCreate(Long adId, String username) {
+        User buyer = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователя с username " + username + " не найдено"));
+
+        return chatRepository.findByAdvertisementIdAndBuyerId(adId, buyer.getId())
+                .map(mapper::toResponseDto)
+                .orElseGet(() -> createNewChat(adId, buyer));
+    }
+
+    private ChatResponseDto createNewChat(Long adId, User buyer) {
+        Advertisement advertisement = advertisementRepository.findById(adId)
+                .orElseThrow(() -> new EntityNotFoundException("Объявления с id " + adId + " не найдено"));
+
+        if (advertisement.getSeller().getUsername().equals(buyer.getUsername())) {
+            throw new ValidationException("Вы не можете начать чат с самим собой");
+        }
+
+        Chat newChat = Chat.builder()
+                .advertisement(advertisement)
+                .seller(advertisement.getSeller())
+                .buyer(buyer)
+                .build();
+
+        return mapper.toResponseDto(chatRepository.save(newChat));
+    }
 }
