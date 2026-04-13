@@ -1,4 +1,4 @@
-package om.project.velo.service;
+package com.project.velo.service.auth;
 
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
@@ -8,7 +8,6 @@ import com.project.velo.entity.User;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
 import com.project.velo.security.JwtUtil;
-import com.project.velo.service.auth.AuthService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

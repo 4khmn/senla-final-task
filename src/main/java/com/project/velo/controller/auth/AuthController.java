@@ -25,7 +25,7 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<ProfileResponseDto> addUser(@RequestBody @Valid UserCreateDto dto) {
+    public ResponseEntity<ProfileResponseDto> register(@RequestBody @Valid UserCreateDto dto) {
         log.info("POST /api/auth/register — User: {} trying to register", dto.username());
         ProfileResponseDto response = authService.addUser(dto);
         log.info("POST /api/auth/register - User created successfully with id: {}", response.id());
