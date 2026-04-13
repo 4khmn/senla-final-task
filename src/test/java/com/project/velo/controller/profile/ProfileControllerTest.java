@@ -3,6 +3,7 @@ package com.project.velo.controller.profile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
+import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.profile.ProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,7 @@ class ProfileControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(profileController)
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .setCustomArgumentResolvers(new HandlerMethodArgumentResolver() {
                     @Override
                     public boolean supportsParameter(MethodParameter parameter) {
@@ -101,6 +103,19 @@ class ProfileControllerTest {
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value("firstName2"));
+    }
+
+    @Test
+    void updateProfileInfo_ValidationError_InvalidPhone() throws Exception {
+
+        ProfileUpdateDto updateDto = new ProfileUpdateDto("firstName2", null, "invalid", null);
+
+        mockMvc.perform(patch("/api/profiles/my")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").exists());
     }
 
     @Test
