@@ -1,4 +1,4 @@
-package com.project.velo.service;
+package com.project.velo.service.profile;
 
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
@@ -7,7 +7,6 @@ import com.project.velo.entity.User;
 import com.project.velo.mapper.ProfileMapper;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
-import com.project.velo.service.profile.ProfileService;
 import com.project.velo.service.storage.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,5 @@
-package com.project.velo.controller;
+package com.project.velo.controller.profile;
 
-import com.project.velo.controller.profile.ProfileSocialController;
 import com.project.velo.dto.response.ReviewResponseDto;
 import com.project.velo.dto.response.UserCommentResponseDto;
 import com.project.velo.service.social.CommentService;

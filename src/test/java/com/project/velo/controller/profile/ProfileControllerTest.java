@@ -1,7 +1,6 @@
-package com.project.velo.controller;
+package com.project.velo.controller.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.velo.controller.profile.ProfileController;
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.service.profile.ProfileService;

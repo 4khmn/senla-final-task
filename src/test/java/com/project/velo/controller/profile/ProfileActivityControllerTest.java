@@ -1,6 +1,5 @@
-package com.project.velo.controller;
+package com.project.velo.controller.profile;
 
-import com.project.velo.controller.profile.ProfileActivityController;
 import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.response.SalesHistoryResponseDto;
 import com.project.velo.service.advertisement.AdvertisementService;
