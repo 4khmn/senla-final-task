@@ -27,7 +27,7 @@ public class ProfileSocialController {
     private final ReviewService reviewService;
 
     @GetMapping("/my/comments")
-    public ResponseEntity<List<UserCommentResponseDto>> getAllComments(@AuthenticationPrincipal User user) {
+    public ResponseEntity<List<UserCommentResponseDto>> getAllComments(@AuthenticationPrincipal UserDetails user) {
         log.info("GET /api/profiles/my/comments - Fetching all comments for user: {}", user.getUsername());
         List<UserCommentResponseDto> comments = commentService.getCommentsByUser(user.getUsername());
         log.info("GET /api/profiles/my/comments - Found {} comments for user: {}", comments.size(), user.getUsername());
