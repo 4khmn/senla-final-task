@@ -1,4 +1,4 @@
-package om.project.velo.service;
+package com.project.velo.service;
 
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;

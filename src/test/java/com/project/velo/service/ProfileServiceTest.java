@@ -1,4 +1,4 @@
-package om.project.velo.service;
+package com.project.velo.service;
 
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
