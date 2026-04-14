@@ -34,13 +34,13 @@ public class AdvertisementController {
 
     @GetMapping
     public ResponseEntity<PageResponse<AdvertisementShortResponseDto>> getAllAdvertisements(
-            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        log.info("GET /api/advertisements - Fetching advertisements: query={}, category={}, page={}, size={}", query, category, page, size);
-        PageResponse<AdvertisementShortResponseDto> advertisements = advertisementService.getAll(query, category, page, size);
+        log.info("GET /api/advertisements - Fetching advertisements: query={}, category={}, page={}, size={}", search, category, page, size);
+        PageResponse<AdvertisementShortResponseDto> advertisements = advertisementService.getAll(search, category, page, size);
         log.info("GET /api/advertisements - Found {} advertisements", advertisements.size());
         return ResponseEntity.ok(advertisements);
     }
