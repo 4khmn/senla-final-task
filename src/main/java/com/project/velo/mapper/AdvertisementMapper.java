@@ -14,7 +14,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface AdvertisementMapper {
 
-    @Mapping(target = "author", source = "seller")
+    @Mapping(target = "seller", source = "seller")
     @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "primaryImageUrl", source = "images")
     @Mapping(target = "otherImageUrls", source = "images")
@@ -42,7 +42,8 @@ public interface AdvertisementMapper {
     @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "primaryImageUrl", source = "images")
     @Mapping(target = "isTop", source = "top")
-    @Mapping(target = "authorUsername", source = "seller.username")
+    @Mapping(target = "sellerUsername", source = "seller.username")
+    @Mapping(target = "sellerScore", source = "seller.rating")
     AdvertisementShortResponseDto toShortDto(Advertisement advertisement);
 
 

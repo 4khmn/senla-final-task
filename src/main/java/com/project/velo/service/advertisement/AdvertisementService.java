@@ -1,6 +1,7 @@
 package com.project.velo.service.advertisement;
 
 import com.project.velo.dto.response.AdvertisementShortResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.entity.*;
@@ -85,11 +86,24 @@ public class AdvertisementService {
     }
 
     @Transactional(readOnly = true)
-    public List<AdvertisementShortResponseDto> getAll() {
-        return advertisementRepository.findAll().stream()
-                .filter(ad -> ad.getStatus().equals(AdStatus.ACTIVE))
+    public PageResponse<AdvertisementShortResponseDto> getAll(String query, String category, int page, int size) {
+        List<Advertisement> entities = advertisementRepository.findAllFiltered(query, category, page, size);
+
+        long totalElements = advertisementRepository.countFiltered(query, category);
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<AdvertisementShortResponseDto> dtos = entities.stream()
                 .map(mapper::toShortDto)
                 .toList();
+
+        return new PageResponse<>(
+                dtos,
+                totalElements,
+                totalPages,
+                page,
+                size
+        );
     }
 
     @Transactional
