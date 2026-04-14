@@ -1,6 +1,7 @@
 package com.project.velo.service.social;
 
 import com.project.velo.dto.create.ReviewCreateDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.ReviewResponseDto;
 import com.project.velo.entity.Review;
 import com.project.velo.entity.SalesHistory;
@@ -62,11 +63,19 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewResponseDto> getReviewsByUser(String username) {
+    public PageResponse<ReviewResponseDto> getReviewsByUser(String username, Integer rating, String sortDirection, int page, int size) {
         if (!userRepository.existsByUsername(username)) {
             throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
         }
-        List<Review> reviews = reviewRepository.getBySeller(username);
-        return reviews.stream().map(mapper::toDto).toList();
+        List<Review> reviews = reviewRepository.geyBySellerWithPagination(username, rating, sortDirection, page, size);
+
+        long totalElements = reviewRepository.countBySeller(username, rating);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<ReviewResponseDto> dtos = reviews.stream()
+                .map(mapper::toDto)
+                .toList();
+
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
 }

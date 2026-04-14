@@ -1,5 +1,6 @@
 package com.project.velo.controller.profile;
 
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.ReviewResponseDto;
 import com.project.velo.dto.response.UserCommentResponseDto;
 import com.project.velo.entity.User;
@@ -10,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,17 +33,27 @@ public class ProfileSocialController {
     }
 
     @GetMapping("/my/reviews")
-    public ResponseEntity<List<ReviewResponseDto>> getMyReceivedReviews(@AuthenticationPrincipal UserDetails user) {
+    public ResponseEntity<PageResponse<ReviewResponseDto>> getMyReceivedReviews(
+            @AuthenticationPrincipal UserDetails user,
+            @RequestParam(required = false) Integer rating,
+            @RequestParam(required = false) String sortDirection,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         log.info("GET /api/profiles/my/reviews - Fetching reviews by user: {}", user.getUsername());
-        List<ReviewResponseDto> reviews = reviewService.getReviewsByUser(user.getUsername());
+        PageResponse<ReviewResponseDto> reviews = reviewService.getReviewsByUser(user.getUsername(), rating, sortDirection, page, size);
         log.info("GET /api/profiles/my/reviews - Found {} reviews by user: {}", reviews.size(), user.getUsername());
         return ResponseEntity.ok(reviews);
     }
 
     @GetMapping("/{username}/reviews")
-    public ResponseEntity<List<ReviewResponseDto>> getUserReceivedReviews(@PathVariable String username) {
+    public ResponseEntity<PageResponse<ReviewResponseDto>> getUserReceivedReviews(
+            @PathVariable String username,
+            @RequestParam(required = false) Integer rating,
+            @RequestParam(required = false) String sortDirection,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         log.info("GET /api/profiles/{}/reviews - Fetching reviews by user: {}", username, username);
-        List<ReviewResponseDto> reviews = reviewService.getReviewsByUser(username);
+        PageResponse<ReviewResponseDto> reviews = reviewService.getReviewsByUser(username, rating, sortDirection, page, size);
         log.info("GET /api/profiles/{}/reviews - Found {} reviews by user: {}", username, reviews.size(), username);
         return ResponseEntity.ok(reviews);
     }

@@ -128,6 +128,4 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
         return entityManager.createQuery(cq).getSingleResult();
     }
-
-
 }
