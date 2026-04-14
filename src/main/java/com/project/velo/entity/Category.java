@@ -22,4 +22,7 @@ public class Category {
     @Size(min = 2, max = 100, message = "Название категории должно быть от 2 до 100 символов")
     @Column(length = 100, nullable = false, unique = true)
     private String name;
+
+    @Column(name = "display_name")
+    private String displayName;
 }
