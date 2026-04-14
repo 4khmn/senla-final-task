@@ -3,6 +3,7 @@ package com.project.velo.controller.advertisement;
 import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.response.AdvertisementShortResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.service.advertisement.AdvertisementService;
@@ -32,9 +33,14 @@ public class AdvertisementController {
     private final AdvertisementService advertisementService;
 
     @GetMapping
-    public ResponseEntity<List<AdvertisementShortResponseDto>> getAllAdvertisements() {
-        log.info("GET /api/advertisements - Fetching all advertisements");
-        List<AdvertisementShortResponseDto> advertisements = advertisementService.getAll();
+    public ResponseEntity<PageResponse<AdvertisementShortResponseDto>> getAllAdvertisements(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        log.info("GET /api/advertisements - Fetching advertisements: query={}, category={}, page={}, size={}", query, category, page, size);
+        PageResponse<AdvertisementShortResponseDto> advertisements = advertisementService.getAll(query, category, page, size);
         log.info("GET /api/advertisements - Found {} advertisements", advertisements.size());
         return ResponseEntity.ok(advertisements);
     }

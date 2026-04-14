@@ -11,6 +11,7 @@ public record AdvertisementShortResponseDto(
         String primaryImageUrl,
         boolean isTop,
         LocalDateTime createdAt,
-        String authorUsername
+        String sellerUsername,
+        BigDecimal sellerScore
 ) {
 }

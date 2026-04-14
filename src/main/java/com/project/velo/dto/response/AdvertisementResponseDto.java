@@ -13,7 +13,7 @@ public record AdvertisementResponseDto(
         String status,
         boolean isTop,
         LocalDateTime createdAt,
-        AuthorResponseDto author,
+        AuthorResponseDto seller,
         String categoryName,
         String primaryImageUrl,
         List<String> otherImageUrls
