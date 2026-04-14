@@ -8,7 +8,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 import jakarta.persistence.criteria.*;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,12 +49,39 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
         predicates.add(cb.equal(root.get("status"), AdStatus.ACTIVE));
 
+        Expression<Integer> searchRelevance = cb.literal(0);
+
         if (query != null && !query.isBlank()) {
-            String pattern = "%" + query.toLowerCase() + "%";
-            predicates.add(cb.or(
-                    cb.like(cb.lower(root.get("title")), pattern),
-                    cb.like(cb.lower(root.get("description")), pattern)
-            ));
+            String[] words = query.toLowerCase().split("\\s+");
+            List<Predicate> wordPredicates = new ArrayList<>();
+
+            for (String word : words) {
+                String pattern = "%" + word + "%";
+
+                wordPredicates.add(cb.or(
+                        cb.like(cb.lower(root.get("title")), pattern),
+                        cb.like(cb.lower(root.get("description")), pattern),
+                        cb.like(cb.lower(root.get("category").get("name")), pattern),
+                        cb.like(cb.lower(root.get("category").get("displayName")), pattern)
+                ));
+                Expression<Integer> categoryMatch = cb.selectCase()
+                        .when(cb.or(
+                                cb.like(cb.lower(root.get("category").get("name")), pattern),
+                                cb.like(cb.lower(root.get("category").get("displayName")), pattern)
+                        ), 5)
+                        .otherwise(0)
+                        .as(Integer.class);
+
+                Expression<Integer> caseExpression = cb.selectCase()
+                        .when(cb.like(cb.lower(root.get("title")), pattern), 10)
+                        .when(cb.greaterThan(categoryMatch, 0), 5)
+                        .when(cb.like(cb.lower(root.get("description")), pattern), 1)
+                        .otherwise(0)
+                        .as(Integer.class);
+
+                searchRelevance = cb.sum(searchRelevance, caseExpression);
+            }
+            predicates.add(cb.and(wordPredicates.toArray(new Predicate[0])));
         }
 
         if (category != null && !category.isBlank()) {
@@ -70,6 +96,7 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
         cq.orderBy(
                 cb.desc(root.get("top")),
+                cb.desc(searchRelevance),
                 cb.desc(effectiveRating),
                 cb.desc(root.get("createdAt"))
         );
