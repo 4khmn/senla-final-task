@@ -3,7 +3,6 @@ package com.project.velo.controller.profile;
 import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.ReviewResponseDto;
 import com.project.velo.dto.response.UserCommentResponseDto;
-import com.project.velo.entity.User;
 import com.project.velo.service.social.CommentService;
 import com.project.velo.service.social.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +38,9 @@ public class ProfileSocialController {
             @RequestParam(required = false) String sortDirection,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        log.info("GET /api/profiles/my/reviews - Fetching reviews by user: {}", user.getUsername());
+        log.info("GET /api/profiles/my/reviews - Fetching reviews by user: {}, page: {}, size: {}", user.getUsername(), page, size);
         PageResponse<ReviewResponseDto> reviews = reviewService.getReviewsByUser(user.getUsername(), rating, sortDirection, page, size);
-        log.info("GET /api/profiles/my/reviews - Found {} reviews by user: {}", reviews.size(), user.getUsername());
+        log.info("GET /api/profiles/my/reviews - Found {} reviews by user: {}, page: {}, size: {}", reviews.size(), user.getUsername(), page, size);
         return ResponseEntity.ok(reviews);
     }
 
@@ -52,9 +51,9 @@ public class ProfileSocialController {
             @RequestParam(required = false) String sortDirection,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        log.info("GET /api/profiles/{}/reviews - Fetching reviews by user: {}", username, username);
+        log.info("GET /api/profiles/{}/reviews - Fetching reviews by user: {}, page: {}, size: {}", username, username, page, size);
         PageResponse<ReviewResponseDto> reviews = reviewService.getReviewsByUser(username, rating, sortDirection, page, size);
-        log.info("GET /api/profiles/{}/reviews - Found {} reviews by user: {}", username, reviews.size(), username);
+        log.info("GET /api/profiles/{}/reviews - Found {} reviews by user: {}, page: {}, size: {}", username, reviews.size(), username, page, size);
         return ResponseEntity.ok(reviews);
     }
 }

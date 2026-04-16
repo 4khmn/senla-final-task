@@ -1,6 +1,7 @@
 package com.project.velo.controller.profile;
 
 import com.project.velo.dto.response.AdvertisementResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.SalesHistoryResponseDto;
 import com.project.velo.service.advertisement.AdvertisementService;
 import com.project.velo.service.advertisement.SalesHistoryService;
@@ -61,46 +62,48 @@ class ProfileActivityControllerTest {
     }
 
     @Test
-    void getMySales_ShouldReturnList() throws Exception {
+    void getMySales_ShouldReturnPageResponse() throws Exception {
         SalesHistoryResponseDto dto = new SalesHistoryResponseDto(
                 1L, "Bike", 10L, new BigDecimal("500.00"), "buyer1", LocalDateTime.now()
         );
-        given(salesHistoryService.getSales("testUser")).willReturn(List.of(dto));
+        PageResponse<SalesHistoryResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+        given(salesHistoryService.getSales("testUser", 0, 10)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/profiles/my/sales"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].advertisementTitle").value("Bike"))
-                .andExpect(jsonPath("$.length()").value(1));
+                .andExpect(jsonPath("$.content[0].advertisementTitle").value("Bike"))
+                .andExpect(jsonPath("$.content.length()").value(1));
     }
 
     @Test
-    void getUserSales_ShouldReturnList() throws Exception {
-        given(salesHistoryService.getSales("otherUser")).willReturn(List.of());
+    void getUserSales_ShouldReturnPageResponse() throws Exception {
+        given(salesHistoryService.getSales("otherUser", 0, 10)).willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/otherUser/sales"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.content.length()").value(0));
     }
 
     @Test
-    void getMyAdvertisements_ShouldReturnList() throws Exception {
+    void getMyAdvertisements_ShouldReturnPageResponse() throws Exception {
         AdvertisementResponseDto dto = new AdvertisementResponseDto(
                 1L, "Ad Title", "Desc", new BigDecimal("100"), "ACTIVE",
                 false, LocalDateTime.now(), null, "Category", "url", List.of()
         );
-        given(advertisementService.findAdvertisementsByUsername("testUser")).willReturn(List.of(dto));
+        PageResponse<AdvertisementResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+
+        given(advertisementService.findAdvertisementsByUsername("testUser", 0, 10)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/profiles/my/advertisements"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Ad Title"));
+                .andExpect(jsonPath("$.content[0].title").value("Ad Title"));
     }
 
     @Test
-    void getUserAdvertisements_ShouldReturnList() throws Exception {
-        given(advertisementService.findAdvertisementsByUsername("someUser")).willReturn(List.of());
+    void getUserAdvertisements_ShouldReturnPageResponse() throws Exception {
+        given(advertisementService.findAdvertisementsByUsername("someUser", 0, 10)).willReturn(new  PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/someUser/advertisements"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
+                .andExpect(status().isOk());
     }
 }

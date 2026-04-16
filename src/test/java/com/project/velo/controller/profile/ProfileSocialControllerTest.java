@@ -76,7 +76,7 @@ class ProfileSocialControllerTest {
     }
 
     @Test
-    void getMyReceivedReviews_ShouldReturnList() throws Exception {
+    void getMyReceivedReviews_ShouldReturnPageResponse() throws Exception {
         ReviewResponseDto dto = new ReviewResponseDto(
                 1L, "Giant TCR", 100L, "buyer77",
                 new BigDecimal("5.0"), "Great seller", LocalDateTime.now()
@@ -92,7 +92,7 @@ class ProfileSocialControllerTest {
     }
 
     @Test
-    void getUserReceivedReviews_ShouldReturnList() throws Exception {
+    void getUserReceivedReviews_ShouldReturnPageResponse() throws Exception {
         given(reviewService.getReviewsByUser("maxim", null, null, 0, 10)).willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/maxim/reviews"))

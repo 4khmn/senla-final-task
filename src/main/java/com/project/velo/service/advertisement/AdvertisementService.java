@@ -207,10 +207,16 @@ public class AdvertisementService {
     }
 
     @Transactional(readOnly = true)
-    public List<AdvertisementResponseDto> findAdvertisementsByUsername(String username) {
+    public PageResponse<AdvertisementResponseDto> findAdvertisementsByUsername(String username, int page, int size) {
         if (!userRepository.existsByUsername(username)) {
             throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
         }
-        return advertisementRepository.findAllByUsername(username).stream().map(mapper::toDto).toList();
+        List<Advertisement> advertisements = advertisementRepository.findAllByUsername(username, page, size);
+        long totalElements = advertisementRepository.countByUsernameAndStatus(username, AdStatus.ACTIVE);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<AdvertisementResponseDto> dtos = advertisements.stream().map(mapper::toDto).toList();
+
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
 }

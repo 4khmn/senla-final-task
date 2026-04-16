@@ -21,14 +21,25 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         super(Advertisement.class);
     }
 
-    public List<Advertisement> findAllByUsername(String username) {
+    public List<Advertisement> findAllByUsername(String username, int page, int size) {
         return entityManager.createQuery(
                 "SELECT a FROM Advertisement a WHERE seller.username = :username " +
-                        "AND a.status = 'ACTIVE' ORDER BY a.createdAt ASC", Advertisement.class)
+                        "AND a.status = :status ORDER BY a.createdAt DESC", Advertisement.class)
                 .setParameter("username", username)
+                .setParameter("status", AdStatus.ACTIVE)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
                 .getResultList();
     }
 
+    public long countByUsernameAndStatus(String username, AdStatus status) {
+        return entityManager.createQuery(
+                        "SELECT COUNT(a) FROM Advertisement a WHERE a.seller.username = :username " +
+                                "AND a.status = :status", Long.class)
+                .setParameter("username", username)
+                .setParameter("status", status)
+                .getSingleResult();
+    }
 
     public int resetExpiredTopFlags(LocalDateTime now) {
         return entityManager.createQuery(
