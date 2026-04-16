@@ -2,6 +2,7 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.response.ChatListResponseDto;
 import com.project.velo.dto.response.ChatResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.Chat;
 import com.project.velo.entity.User;
@@ -27,12 +28,15 @@ public class ChatService {
     private final ChatMapper mapper;
 
     @Transactional(readOnly = true)
-    public List<ChatListResponseDto> findAllByUser(String username) {
-        List<Chat> chats = chatRepository.findAllByUsername(username);
+    public PageResponse<ChatListResponseDto> findAllByUser(String username, int page, int size) {
+        List<Chat> chats = chatRepository.findAllByUsernameWithPagination(username, page, size);
 
-        return chats.stream()
+        long totalElements = chatRepository.countByUsername(username);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<ChatListResponseDto> dtos = chats.stream()
                 .map(chat -> mapper.toListDto(chat, username))
                 .toList();
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
 
     @Transactional

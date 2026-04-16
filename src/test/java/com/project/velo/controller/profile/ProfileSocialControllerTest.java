@@ -1,5 +1,6 @@
 package com.project.velo.controller.profile;
 
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.ReviewResponseDto;
 import com.project.velo.dto.response.UserCommentResponseDto;
 import com.project.velo.service.social.CommentService;
@@ -66,34 +67,37 @@ class ProfileSocialControllerTest {
         UserCommentResponseDto dto = new UserCommentResponseDto(
                 1L, "Nice bike!", LocalDateTime.now(), 100L, "Giant TCR"
         );
-        given(commentService.getCommentsByUser("denis")).willReturn(List.of(dto));
+        PageResponse<UserCommentResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+        given(commentService.getCommentsByUser("denis", 0, 10)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/profiles/my/comments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].content").value("Nice bike!"))
-                .andExpect(jsonPath("$[0].advertisementTitle").value("Giant TCR"));
+                .andExpect(jsonPath("$.content[0].content").value("Nice bike!"))
+                .andExpect(jsonPath("$.content[0].advertisementTitle").value("Giant TCR"));
     }
 
     @Test
-    void getMyReceivedReviews_ShouldReturnList() throws Exception {
+    void getMyReceivedReviews_ShouldReturnPageResponse() throws Exception {
         ReviewResponseDto dto = new ReviewResponseDto(
                 1L, "Giant TCR", 100L, "buyer77",
                 new BigDecimal("5.0"), "Great seller", LocalDateTime.now()
         );
-        given(reviewService.getReviewsByUser("denis")).willReturn(List.of(dto));
+
+        PageResponse<ReviewResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+        given(reviewService.getReviewsByUser("denis", null, null, 0, 10)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/profiles/my/reviews"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].authorUsername").value("buyer77"))
-                .andExpect(jsonPath("$[0].score").value(5.0));
+                .andExpect(jsonPath("$.content[0].authorUsername").value("buyer77"))
+                .andExpect(jsonPath("$.content[0].score").value(5.0));
     }
 
     @Test
-    void getUserReceivedReviews_ShouldReturnList() throws Exception {
-        given(reviewService.getReviewsByUser("maxim")).willReturn(List.of());
+    void getUserReceivedReviews_ShouldReturnPageResponse() throws Exception {
+        given(reviewService.getReviewsByUser("maxim", null, null, 0, 10)).willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/maxim/reviews"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$.content.length()").value(0));
     }
 }

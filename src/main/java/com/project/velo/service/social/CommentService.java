@@ -2,6 +2,7 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.create.CommentCreateDto;
 import com.project.velo.dto.response.CommentDetailsResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.UserCommentResponseDto;
 import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.entity.Advertisement;
@@ -38,7 +39,7 @@ public class CommentService {
         Advertisement advertisement = advertisementRepository.findById(adId).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено")
         );
-        if (!advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+        if (advertisement.getStatus() != AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + adId + " не доступно");
         }
         Comment comment = mapper.toEntity(dto);
@@ -49,15 +50,23 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentDetailsResponseDto> getCommentsByAdvertisement(Long id) {
+    public PageResponse<CommentDetailsResponseDto> getCommentsByAdvertisement(Long id, int page, int size) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
-        if (!advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+        if (advertisement.getStatus() != AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно");
         }
-        List<Comment> comments = advertisement.getComments();
-        return comments.stream().map(mapper::toDetailsDto).toList();
+        List<Comment> comments = commentRepository.getCommentsByAdvertisementWithPagination(id, page, size);
+        long totalElements = commentRepository.countByAdvertisementId(id);
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<CommentDetailsResponseDto> dtos = comments.stream()
+                .map(mapper::toDetailsDto)
+                .toList();
+
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
 
     @Transactional
@@ -65,7 +74,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено")
         );
-        if (!comment.getAdvertisement().getStatus().equals(AdStatus.ACTIVE)) {
+        if (comment.getAdvertisement().getStatus() != AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + comment.getAdvertisement().getId() + " не доступно");
         }
         if (!comment.getAuthor().getUsername().equals(username)) {
@@ -74,10 +83,21 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+
     @Transactional(readOnly = true)
-    public List<UserCommentResponseDto> getCommentsByUser(String username) {
-        List<Comment> commentsByUser = commentRepository.getCommentsByUser(username);
-        return commentsByUser.stream().map(mapper::toShortDto).toList();
+    public PageResponse<UserCommentResponseDto> getCommentsByUser(String username, int page, int size) {
+        if (!userRepository.existsByUsername(username)) {
+            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
+        }
+
+        List<Comment> comments = commentRepository.getCommentsByUserWithPagination(username, page, size);
+        long totalElements = commentRepository.countByAuthor(username);
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<UserCommentResponseDto> dtos = comments.stream().map(mapper::toShortDto).toList();
+
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
 
     @Transactional
@@ -85,7 +105,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new EntityNotFoundException("Комментария с id " + commentId + " не найдено")
         );
-        if (!comment.getAdvertisement().getStatus().equals(AdStatus.ACTIVE)) {
+        if (comment.getAdvertisement().getStatus() != AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + comment.getAdvertisement().getId() + " не доступно");
         }
 

@@ -1,7 +1,6 @@
 package com.project.velo.repository;
 
 import com.project.velo.entity.SalesHistory;
-import com.project.velo.entity.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,12 +13,20 @@ public class SalesHistoryRepository extends BaseRepository<SalesHistory, Long> {
         super(SalesHistory.class);
     }
 
-    public List<SalesHistory> findAllBySellerUsernameOrderBySoldAt(String username){
+    public List<SalesHistory> findAllBySellerOrderBySoldAt(String username, int page, int size) {
         return entityManager.createQuery(
-                "SELECT s FROM SalesHistory s WHERE s.seller.username = :username ORDER BY s.soldAt DESC", SalesHistory.class)
+                        "SELECT s FROM SalesHistory s WHERE s.seller.username = :username ORDER BY s.soldAt DESC", SalesHistory.class)
                 .setParameter("username", username)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
                 .getResultList();
+    }
 
+    public long countSalesBySeller(String username) {
+        return entityManager.createQuery(
+                        "SELECT COUNT(s) FROM SalesHistory s WHERE s.seller.username = :username", Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
     }
 
     public Optional<SalesHistory> findByAdvertisementId(Long adId) {
