@@ -29,7 +29,7 @@ public class ProfileActivityController {
     ) {
         log.info("GET /api/profiles/my/sales - Fetching sales by user: {}, page: {}, size: {}", user.getUsername(), page, size);
         PageResponse<SalesHistoryResponseDto> mySales = salesHistoryService.getSales(user.getUsername(), page, size);
-        log.info("GET /api/profiles/my/sales - Found {} sales by user: {}, page: {}, size: {}", mySales.size(), user.getUsername(), page, size);
+        log.info("GET /api/profiles/my/sales - Found {} sales by user: {}, page: {}, size: {}", mySales.content().size(), user.getUsername(), page, size);
         return ResponseEntity.ok(mySales);
     }
 
@@ -41,7 +41,7 @@ public class ProfileActivityController {
     ) {
         log.info("GET /api/profiles/{}/sales - Fetching sales by user: {}, page: {}, size: {}", username, username, page, size);
         PageResponse<SalesHistoryResponseDto> mySales = salesHistoryService.getSales(username, page, size);
-        log.info("GET /api/profiles/{}/sales - Found {} sales by user: {}, page: {}, size: {}", username, mySales.size(), username, page, size);
+        log.info("GET /api/profiles/{}/sales - Found {} sales by user: {}, page: {}, size: {}", username, mySales.content().size(), username, page, size);
         return ResponseEntity.ok(mySales);
     }
 
@@ -55,7 +55,7 @@ public class ProfileActivityController {
                 user.getUsername(), page, size);
         PageResponse<AdvertisementResponseDto> advertisements = advertisementService.findAdvertisementsByUsername(user.getUsername(), page, size);
         log.info("GET /api/profiles/my/advertisements - Found {} advertisements by user: {}, page: {}, size: {}",
-                advertisements.size(), user.getUsername(), page, size);
+                advertisements.content().size(), user.getUsername(), page, size);
         return ResponseEntity.ok(advertisements);
     }
 
@@ -69,7 +69,7 @@ public class ProfileActivityController {
                 username, username, page, size);
         PageResponse<AdvertisementResponseDto> mySales = advertisementService.findAdvertisementsByUsername(username, page, size);
         log.info("GET /api/profiles/{}/advertisements - Found {} advertisements by user: {}, page: {}, size: {}",
-                username, mySales.size(), username, page, size);
+                username, mySales.content().size(), username, page, size);
         return ResponseEntity.ok(mySales);
     }
 }

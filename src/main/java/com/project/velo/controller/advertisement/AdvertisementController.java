@@ -41,7 +41,7 @@ public class AdvertisementController {
     ) {
         log.info("GET /api/advertisements - Fetching advertisements: query={}, category={}, page={}, size={}", search, category, page, size);
         PageResponse<AdvertisementShortResponseDto> advertisements = advertisementService.getAll(search, category, page, size);
-        log.info("GET /api/advertisements - Found {} advertisements", advertisements.size());
+        log.info("GET /api/advertisements - Found {} advertisements", advertisements.content().size());
         return ResponseEntity.ok(advertisements);
     }
 

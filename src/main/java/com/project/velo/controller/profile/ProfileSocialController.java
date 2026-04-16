@@ -24,10 +24,14 @@ public class ProfileSocialController {
     private final ReviewService reviewService;
 
     @GetMapping("/my/comments")
-    public ResponseEntity<List<UserCommentResponseDto>> getAllComments(@AuthenticationPrincipal UserDetails user) {
-        log.info("GET /api/profiles/my/comments - Fetching all comments for user: {}", user.getUsername());
-        List<UserCommentResponseDto> comments = commentService.getCommentsByUser(user.getUsername());
-        log.info("GET /api/profiles/my/comments - Found {} comments for user: {}", comments.size(), user.getUsername());
+    public ResponseEntity<PageResponse<UserCommentResponseDto>> getAllComments(
+            @AuthenticationPrincipal UserDetails user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        log.info("GET /api/profiles/my/comments - Fetching all comments for user: {}, page: {}, size: {}", user.getUsername(), page, size);
+        PageResponse<UserCommentResponseDto> comments = commentService.getCommentsByUser(user.getUsername(), page, size);
+        log.info("GET /api/profiles/my/comments - Found {} comments for user: {}, page: {}, size: {}",
+                comments.size(), user.getUsername(), page, size);
         return ResponseEntity.ok(comments);
     }
 
@@ -40,7 +44,7 @@ public class ProfileSocialController {
             @RequestParam(defaultValue = "10") int size) {
         log.info("GET /api/profiles/my/reviews - Fetching reviews by user: {}, page: {}, size: {}", user.getUsername(), page, size);
         PageResponse<ReviewResponseDto> reviews = reviewService.getReviewsByUser(user.getUsername(), rating, sortDirection, page, size);
-        log.info("GET /api/profiles/my/reviews - Found {} reviews by user: {}, page: {}, size: {}", reviews.size(), user.getUsername(), page, size);
+        log.info("GET /api/profiles/my/reviews - Found {} reviews by user: {}, page: {}, size: {}", reviews.content().size(), user.getUsername(), page, size);
         return ResponseEntity.ok(reviews);
     }
 
@@ -53,7 +57,7 @@ public class ProfileSocialController {
             @RequestParam(defaultValue = "10") int size) {
         log.info("GET /api/profiles/{}/reviews - Fetching reviews by user: {}, page: {}, size: {}", username, username, page, size);
         PageResponse<ReviewResponseDto> reviews = reviewService.getReviewsByUser(username, rating, sortDirection, page, size);
-        log.info("GET /api/profiles/{}/reviews - Found {} reviews by user: {}, page: {}, size: {}", username, reviews.size(), username, page, size);
+        log.info("GET /api/profiles/{}/reviews - Found {} reviews by user: {}, page: {}, size: {}", username, reviews.content().size(), username, page, size);
         return ResponseEntity.ok(reviews);
     }
 }

@@ -12,18 +12,20 @@ public class CommentRepository extends BaseRepository<Comment, Long> {
     }
 
 
-    public List<Comment> getCommentsByAdvertisement(Long id) {
+    public List<Comment> getCommentsByUserWithPagination(String username, int page, int size) {
         return entityManager.createQuery(
-                "SELECT c FROM Comment c WHERE c.advertisement.id = :id", Comment.class)
-                .setParameter("id", id)
+                        "SELECT c FROM Comment c WHERE c.author.username = :username ORDER BY c.createdAt DESC", Comment.class)
+                .setParameter("username", username)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
                 .getResultList();
     }
 
-    public List<Comment> getCommentsByUser(String username) {
+    public long countByAuthor(String username) {
         return entityManager.createQuery(
-                "SELECT c FROM Comment c WHERE c.author.username = :username", Comment.class)
+                        "SELECT COUNT(c) FROM Comment c WHERE c.author.username = :username", Long.class)
                 .setParameter("username", username)
-                .getResultList();
+                .getSingleResult();
     }
 
 

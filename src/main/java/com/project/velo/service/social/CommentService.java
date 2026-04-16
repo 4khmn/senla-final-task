@@ -2,6 +2,7 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.create.CommentCreateDto;
 import com.project.velo.dto.response.CommentDetailsResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.UserCommentResponseDto;
 import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.entity.Advertisement;
@@ -74,10 +75,21 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+
     @Transactional(readOnly = true)
-    public List<UserCommentResponseDto> getCommentsByUser(String username) {
-        List<Comment> commentsByUser = commentRepository.getCommentsByUser(username);
-        return commentsByUser.stream().map(mapper::toShortDto).toList();
+    public PageResponse<UserCommentResponseDto> getCommentsByUser(String username, int page, int size) {
+        if (!userRepository.existsByUsername(username)) {
+            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
+        }
+
+        List<Comment> comments = commentRepository.getCommentsByUserWithPagination(username, page, size);
+        long totalElements = commentRepository.countByAuthor(username);
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<UserCommentResponseDto> dtos = comments.stream().map(mapper::toShortDto).toList();
+
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
 
     @Transactional
