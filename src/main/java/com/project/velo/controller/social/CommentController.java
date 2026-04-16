@@ -2,6 +2,7 @@ package com.project.velo.controller.social;
 
 import com.project.velo.dto.create.CommentCreateDto;
 import com.project.velo.dto.response.CommentDetailsResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.entity.User;
 import com.project.velo.service.social.CommentService;
@@ -36,11 +37,15 @@ public class CommentController {
     }
 
     @GetMapping("/advertisement/{adId}")
-    public ResponseEntity<List<CommentDetailsResponseDto>> getComments(
-            @PathVariable Long adId) {
-        log.info("GET /api/comments/advertisement/{} - Fetching all comments by advertisement with id: {}", adId, adId);
-        List<CommentDetailsResponseDto> comments = commentService.getCommentsByAdvertisement(adId);
-        log.info("GET /api/comments/advertisement/{} - Found {} comments for advertisement: {}", adId, comments.size(), adId);
+    public ResponseEntity<PageResponse<CommentDetailsResponseDto>> getComments(
+            @PathVariable Long adId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        log.info("GET /api/comments/advertisement/{} - Fetching all comments by advertisement with id: {}, page: {}, size: {}",
+                adId, adId, page, size);
+        PageResponse<CommentDetailsResponseDto> comments = commentService.getCommentsByAdvertisement(adId, page, size);
+        log.info("GET /api/comments/advertisement/{} - Found {} comments for advertisement: {}, page: {}, size: {}",
+                adId, comments.size(), adId, page, size);
         return ResponseEntity.ok(comments);
     }
 

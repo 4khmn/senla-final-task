@@ -79,7 +79,7 @@ public class AdvertisementService {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
-        if (!advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+        if (advertisement.getStatus() != AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно");
         }
         return mapper.toDto(advertisement);
@@ -193,7 +193,7 @@ public class AdvertisementService {
             throw new ValidationException("У вас нет прав на продвижение этого объявления");
         }
 
-        if (!advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+        if (advertisement.getStatus() !=AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + adId + " не доступно");
         }
 
