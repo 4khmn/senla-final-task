@@ -43,7 +43,7 @@ public class ProfileServiceTest {
     private ProfileService profileService;
 
     @Test
-    void getByUsername_success() {
+    void getByUsername_Success() {
         String username = "username";
 
         User user = new User();
@@ -64,7 +64,7 @@ public class ProfileServiceTest {
 
 
     @Test
-    void getByUsername_UsernameDoesNotExist_ThrowEntityNotFoundException() {
+    void getByUsername_UsernameDoesNotExist_ShouldThrowEntityNotFoundException() {
 
         String username = "username";
         given(userRepository.findByUsername(username)).willReturn(Optional.empty());
@@ -102,7 +102,7 @@ public class ProfileServiceTest {
 
 
     @Test
-    void update_UserDoesNotExist_ThrowEntityNotFoundException() {
+    void update_UserDoesNotExist_ShouldThrowEntityNotFoundException() {
         String username = "username";
         ProfileUpdateDto dto = new ProfileUpdateDto("", "", "", "");
 
@@ -161,7 +161,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    void updateAvatar_UsernameDoesNotExist_ThrowEntityNotFoundException() {
+    void updateAvatar_UsernameDoesNotExist_ShouldThrowEntityNotFoundException() {
         String username = "username";
         MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", "data".getBytes());
 
