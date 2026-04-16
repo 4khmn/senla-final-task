@@ -67,7 +67,8 @@ class ProfileSocialControllerTest {
         UserCommentResponseDto dto = new UserCommentResponseDto(
                 1L, "Nice bike!", LocalDateTime.now(), 100L, "Giant TCR"
         );
-        given(commentService.getCommentsByUser("denis")).willReturn(List.of(dto));
+        PageResponse<UserCommentResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+        given(commentService.getCommentsByUser("denis", 0, 10)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/profiles/my/comments"))
                 .andExpect(status().isOk())
