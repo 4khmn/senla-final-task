@@ -24,11 +24,20 @@ public class ChatRepository extends BaseRepository<Chat, Long> {
     }
 
 
-    public List<Chat> findAllByUsername(String username) {
+    public List<Chat> findAllByUsernameWithPagination(String username, int page, int size) {
         return entityManager.createQuery(
                         "SELECT c FROM Chat c WHERE c.buyer.username = :username OR c.seller.username = :username " +
                                 "ORDER BY c.updatedAt DESC", Chat.class)
                 .setParameter("username", username)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
                 .getResultList();
+    }
+
+    public Long countByUsername(String username) {
+        return entityManager.createQuery(
+                "SELECT COUNT(c) FROM Chat c WHERE c.buyer.username = :username OR c.seller.username = :username", Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
     }
 }

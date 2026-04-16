@@ -2,6 +2,7 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.create.MessageCreateDto;
 import com.project.velo.dto.response.MessageResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.update.MessageUpdateDto;
 import com.project.velo.entity.Chat;
 import com.project.velo.entity.Message;
@@ -49,18 +50,23 @@ public class MessageService {
     }
 
     @Transactional(readOnly = true)
-    public List<MessageResponseDto> getMessagesByChat(Long chatId, String username) {
+    public PageResponse<MessageResponseDto> getMessagesByChat(Long chatId, String username, int page, int size) {
         Chat chat = chatRepository.findById(chatId).orElseThrow(
                 () -> new EntityNotFoundException("Чата с id " + chatId + " не найдено")
         );
 
         validateParticipant(chat, username);
 
-        List<Message> messages = messageRepository.findAllByChat(chatId);
+        List<Message> messages = messageRepository.findByChatWithPagination(chatId, page, size);
 
-        return messages.stream()
+        long totalElements = messageRepository.countByChat(chatId);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<MessageResponseDto> dtos = messages.stream()
                 .map(m -> mapper.toDto(m, username))
                 .toList();
+
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
 
     @Transactional

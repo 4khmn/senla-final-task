@@ -3,6 +3,7 @@ package com.project.velo.controller.social;
 import com.project.velo.dto.response.ChatListResponseDto;
 import com.project.velo.dto.response.ChatResponseDto;
 import com.project.velo.dto.response.MessageResponseDto;
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.service.social.ChatService;
 import com.project.velo.service.social.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -36,21 +37,28 @@ public class ChatController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChatListResponseDto>> getMyChats(@AuthenticationPrincipal UserDetails user) {
-        log.info("GET /api/chats - Fetching chat list for user: {}", user.getUsername());
-        List<ChatListResponseDto> chats = chatService.findAllByUser(user.getUsername());
-        log.info("GET /api/chats - Found {} chats for user: {}", chats.size(), user.getUsername());
+    public ResponseEntity<PageResponse<ChatListResponseDto>> getMyChats(
+            @AuthenticationPrincipal UserDetails user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size) {
+        log.info("GET /api/chats - Fetching chat list for user: {}, page: {}, size: {}", user.getUsername(), page, size);
+        PageResponse<ChatListResponseDto> chats = chatService.findAllByUser(user.getUsername(), page, size);
+        log.info("GET /api/chats - Found {} chats for user: {}, page: {}, size: {}", chats.size(), user.getUsername(), page, size);
         return ResponseEntity.ok(chats);
     }
 
     @GetMapping("/{chatId}/messages")
-    public ResponseEntity<List<MessageResponseDto>> getChatMessages(
+    public ResponseEntity<PageResponse<MessageResponseDto>> getChatMessages(
             @PathVariable Long chatId,
-            @AuthenticationPrincipal UserDetails user
+            @AuthenticationPrincipal UserDetails user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size
     ) {
-        log.info("GET /api/chats/{}/messages - User: {} fetching history for chat: {}", chatId, user.getUsername(), chatId);
-        List<MessageResponseDto> messages = messageService.getMessagesByChat(chatId, user.getUsername());
-        log.info("GET /api/chats/{}/messages - Found {} messages in chat: {}", chatId, messages.size(), chatId);
+        log.info("GET /api/chats/{}/messages - User: {} fetching history for chat: {}, page: {}, size: {}",
+                chatId, user.getUsername(), chatId, page, size);
+        PageResponse<MessageResponseDto> messages = messageService.getMessagesByChat(chatId, user.getUsername(), page, size);
+        log.info("GET /api/chats/{}/messages - Found {} messages in chat: {}, page: {}, size: {}",
+                chatId, messages.size(), chatId, page, size);
         return ResponseEntity.ok(messages);
     }
 }
