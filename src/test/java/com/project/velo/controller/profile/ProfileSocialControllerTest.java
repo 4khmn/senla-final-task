@@ -72,8 +72,8 @@ class ProfileSocialControllerTest {
 
         mockMvc.perform(get("/api/profiles/my/comments"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].content").value("Nice bike!"))
-                .andExpect(jsonPath("$[0].advertisementTitle").value("Giant TCR"));
+                .andExpect(jsonPath("$.content[0].content").value("Nice bike!"))
+                .andExpect(jsonPath("$.content[0].advertisementTitle").value("Giant TCR"));
     }
 
     @Test
