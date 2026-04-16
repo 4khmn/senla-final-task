@@ -2,6 +2,7 @@ package com.project.velo.repository;
 
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.enums.AdStatus;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -19,17 +20,6 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
     public AdvertisementRepository() {
         super(Advertisement.class);
-    }
-
-    public List<Advertisement> findAllByUsername(String username, int page, int size) {
-        return entityManager.createQuery(
-                "SELECT a FROM Advertisement a WHERE seller.username = :username " +
-                        "AND a.status = :status ORDER BY a.createdAt DESC", Advertisement.class)
-                .setParameter("username", username)
-                .setParameter("status", AdStatus.ACTIVE)
-                .setFirstResult(page * size)
-                .setMaxResults(size)
-                .getResultList();
     }
 
     public long countByUsernameAndStatus(String username, AdStatus status) {
@@ -50,56 +40,14 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
     }
 
     public List<Advertisement> findAllFiltered(String query, String category, int page, int size) {
-
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Advertisement> cq = cb.createQuery(Advertisement.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
         Join<Object, Object> authorJoin = root.join("seller");
 
-        List<Predicate> predicates = new ArrayList<>();
+        cq.where(buildPredicates(cb, root, query, category));
 
-        predicates.add(cb.equal(root.get("status"), AdStatus.ACTIVE));
-
-        Expression<Integer> searchRelevance = cb.literal(0);
-
-        if (query != null && !query.isBlank()) {
-            String[] words = query.toLowerCase().split("\\s+");
-            List<Predicate> wordPredicates = new ArrayList<>();
-
-            for (String word : words) {
-                String pattern = "%" + word + "%";
-
-                wordPredicates.add(cb.or(
-                        cb.like(cb.lower(root.get("title")), pattern),
-                        cb.like(cb.lower(root.get("description")), pattern),
-                        cb.like(cb.lower(root.get("category").get("name")), pattern),
-                        cb.like(cb.lower(root.get("category").get("displayName")), pattern)
-                ));
-                Expression<Integer> categoryMatch = cb.selectCase()
-                        .when(cb.or(
-                                cb.like(cb.lower(root.get("category").get("name")), pattern),
-                                cb.like(cb.lower(root.get("category").get("displayName")), pattern)
-                        ), 5)
-                        .otherwise(0)
-                        .as(Integer.class);
-
-                Expression<Integer> caseExpression = cb.selectCase()
-                        .when(cb.like(cb.lower(root.get("title")), pattern), 10)
-                        .when(cb.greaterThan(categoryMatch, 0), 5)
-                        .when(cb.like(cb.lower(root.get("description")), pattern), 1)
-                        .otherwise(0)
-                        .as(Integer.class);
-
-                searchRelevance = cb.sum(searchRelevance, caseExpression);
-            }
-            predicates.add(cb.and(wordPredicates.toArray(new Predicate[0])));
-        }
-
-        if (category != null && !category.isBlank()) {
-            predicates.add(cb.equal(root.get("category").get("name"), category));
-        }
-
-        cq.where(predicates.toArray(new Predicate[0]));
+        Expression<Integer> relevance = buildRelevance(cb, root, query);
 
         Expression<Object> effectiveRating = cb.selectCase()
                 .when(cb.equal(authorJoin.get("rating"), BigDecimal.ZERO), new BigDecimal("3.5"))
@@ -107,15 +55,13 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
         cq.orderBy(
                 cb.desc(root.get("top")),
-                cb.desc(searchRelevance),
+                cb.desc(relevance),
                 cb.desc(effectiveRating),
                 cb.desc(root.get("createdAt"))
         );
 
-        return entityManager.createQuery(cq)
-                .setFirstResult(page * size)
-                .setMaxResults(size)
-                .getResultList();
+        TypedQuery<Advertisement> typedQuery = entityManager.createQuery(cq);
+        return applyPagination(typedQuery, page, size).getResultList();
     }
 
 
@@ -124,19 +70,75 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
 
+        cq.select(cb.count(root)).where(buildPredicates(cb, root, query, category));
+
+        return entityManager.createQuery(cq).getSingleResult();
+    }
+
+    public List<Advertisement> findAllByUsername(String username, int page, int size) {
+        TypedQuery<Advertisement> q = entityManager.createQuery(
+                        "SELECT a FROM Advertisement a WHERE a.seller.username = :username " +
+                                "AND a.status = :status ORDER BY a.createdAt DESC", Advertisement.class)
+                .setParameter("username", username)
+                .setParameter("status", AdStatus.ACTIVE);
+        return applyPagination(q, page, size).getResultList();
+    }
+
+    private Predicate[] buildPredicates(CriteriaBuilder cb, Root<Advertisement> root, String query, String category) {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("status"), AdStatus.ACTIVE));
 
         if (query != null && !query.isBlank()) {
-            predicates.add(cb.like(cb.lower(root.get("title")), "%" + query.toLowerCase() + "%"));
+            String[] words = query.toLowerCase().split("\\s+");
+            List<Predicate> wordPredicates = new ArrayList<>();
+
+            for (String word : words) {
+                String pattern = "%" + word + "%";
+                wordPredicates.add(cb.or(
+                        cb.like(cb.lower(root.get("title")), pattern),
+                        cb.like(cb.lower(root.get("description")), pattern),
+                        cb.like(cb.lower(root.get("category").get("name")), pattern),
+                        cb.like(cb.lower(root.get("category").get("displayName")), pattern)
+                ));
+            }
+            predicates.add(cb.and(wordPredicates.toArray(new Predicate[0])));
         }
 
         if (category != null && !category.isBlank()) {
             predicates.add(cb.equal(root.get("category").get("name"), category));
         }
 
-        cq.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
-
-        return entityManager.createQuery(cq).getSingleResult();
+        return predicates.toArray(new Predicate[0]);
     }
+
+    private Expression<Integer> buildRelevance(CriteriaBuilder cb, Root<Advertisement> root, String query) {
+        if (query == null || query.isBlank()) {
+            return cb.literal(0);
+        }
+
+        Expression<Integer> totalRelevance = cb.literal(0);
+        String[] words = query.toLowerCase().split("\\s+");
+
+        for (String word : words) {
+            String pattern = "%" + word + "%";
+
+            Expression<Integer> wordWeight = cb.selectCase()
+                    .when(cb.like(cb.lower(root.get("title")), pattern), 10)
+                    .when(cb.or(
+                            cb.like(cb.lower(root.get("category").get("name")), pattern),
+                            cb.like(cb.lower(root.get("category").get("displayName")), pattern)
+                    ), 5)
+                    .when(cb.like(cb.lower(root.get("description")), pattern), 1)
+                    .otherwise(0)
+                    .as(Integer.class);
+
+            totalRelevance = cb.sum(totalRelevance, wordWeight);
+        }
+        return totalRelevance;
+    }
+
+    private <T> TypedQuery<T> applyPagination(TypedQuery<T> query, int page, int size) {
+        return query.setFirstResult(page * size).setMaxResults(size);
+    }
+
 }
