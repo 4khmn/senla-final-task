@@ -48,13 +48,11 @@ public class CategoryService {
 
         category.setName(dto.name());
         return mapper.toDto(categoryRepository.save(category));
-
-
     }
 
 
     @Transactional
-    public void deleteCategory(Long id) {
+    public void delete(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Категория с id " + id + " не найдена")
         );
