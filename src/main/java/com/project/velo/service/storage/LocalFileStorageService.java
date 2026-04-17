@@ -22,8 +22,16 @@ import java.util.UUID;
 @Slf4j
 public class LocalFileStorageService implements FileStorageService{
 
-    private final String uploadPath = "uploads/";
+    private final Path rootLocation;
     private final List<String> allowedTypes = List.of("image/jpeg", "image/png", "image/webp");
+
+    public LocalFileStorageService() {
+        this.rootLocation = Paths.get("uploads");
+    }
+
+    public LocalFileStorageService(String uploadPath) {
+        this.rootLocation = Paths.get(uploadPath);
+    }
 
     @Override
     public String save(MultipartFile file, String folder) {
@@ -33,11 +41,12 @@ public class LocalFileStorageService implements FileStorageService{
         }
         try {
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path path = Paths.get(uploadPath + folder + "/" + fileName);
+            // склейка
+            Path targetPath = this.rootLocation.resolve(folder).resolve(fileName);
 
-            Files.createDirectories(path.getParent());
+            Files.createDirectories(targetPath.getParent());
 
-            Files.write(path, file.getBytes());
+            Files.write(targetPath, file.getBytes());
 
             return "/api/images/" + folder + "/" + fileName;
         } catch (IOException e) {
@@ -49,10 +58,10 @@ public class LocalFileStorageService implements FileStorageService{
     @Override
     public void delete(String filePath) {
         try {
-            String relativePath = filePath.replace("/api/images/", "uploads/");
-            Path path = Paths.get(relativePath);
+            String relativePath = filePath.replace("/api/images/", "");
+            Path file = this.rootLocation.resolve(relativePath).normalize();
 
-            Files.deleteIfExists(path);
+            Files.deleteIfExists(file);
         } catch (IOException e) {
             log.error("Cannot delete file {}", filePath, e);
         }
@@ -77,8 +86,7 @@ public class LocalFileStorageService implements FileStorageService{
 
     private Resource load(String folder, String filename) {
         try {
-            // Paths.get склеивает путь
-            Path file = Paths.get(uploadPath, folder, filename);
+            Path file = rootLocation.resolve(folder).resolve(filename);
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
