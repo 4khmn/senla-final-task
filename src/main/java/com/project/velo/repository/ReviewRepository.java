@@ -30,7 +30,7 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
         return avg != null ? BigDecimal.valueOf(avg) : BigDecimal.ZERO;
     }
 
-    public List<Review> geyBySellerWithPagination(String sellerUsername, Integer rating, String sortDirection, int page, int size) {
+    public List<Review> getBySellerWithPagination(String sellerUsername, Integer rating, String sortDirection, int page, int size) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Review> cq = cb.createQuery(Review.class);
         Root<Review> root = cq.from(Review.class);
@@ -53,9 +53,10 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
         }
         orders.add(cb.desc(root.get("createdAt")));
 
-        cq.orderBy(orders);
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
 
         cq.orderBy(orders);
+
         return entityManager.createQuery(cq)
                 .setFirstResult(page * size)
                 .setMaxResults(size)

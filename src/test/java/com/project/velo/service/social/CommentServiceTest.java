@@ -53,7 +53,7 @@ public class CommentServiceTest {
     private CommentService commentService;
 
     @Test
-    void postComment_Success_ShouldReturnDto() {
+    void postComment_ShouldReturnDto_WhenSuccess() {
         String username = "username";
         User user = new User();
         user.setId(1L);
@@ -145,7 +145,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    void getCommentsByAdvertisement_Success_ShouldReturnPageResponse() {
+    void getCommentsByAdvertisement_ShouldReturnPageResponse_WhenSuccess() {
         Long adId = 1L;
         int page = 0;
         int size = 5;
@@ -295,7 +295,7 @@ public class CommentServiceTest {
 
 
     @Test
-    void getCommentsByUser_Success_ShouldReturnPageResponse() {
+    void getCommentsByUser_ShouldReturnPageResponse_WhenSuccess() {
         String username = "activeUser";
         int page = 0;
         int size = 10;
@@ -343,7 +343,7 @@ public class CommentServiceTest {
 
 
     @Test
-    void update_Success_ShouldReturnUpdatedDto() {
+    void update_ShouldReturnUpdatedDto_WhenSuccess() {
         Long commentId = 1L;
         String username = "authorUser";
         String newContent = "new content";
@@ -399,7 +399,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    void update_ShouldThrowException_WhenAdNotActive() {
+    void update_ShouldThrowException_WhenAdvertisementNotActive() {
         Long commentId = 1L;
         String username = "authorUser";
 

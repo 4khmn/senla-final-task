@@ -47,7 +47,7 @@ public class ChatServiceTest {
     private ChatService chatService;
 
     @Test
-    void findAllByUsername_Success_ShouldReturnPageResponse() {
+    void findAllByUsername_ShouldReturnPageResponse_WhenSuccess() {
         String username = "testUser";
         int page = 0;
         int size = 10;
@@ -95,7 +95,7 @@ public class ChatServiceTest {
     }
 
     @Test
-    void getOrCreate_ChatAlreadyExists_ShouldReturnChatDto() {
+    void getOrCreate_ChatAlreadyExists_ShouldReturnChatDto_WhenAdvertisementExists() {
         String username = "username";
 
         User buyer = new User();
@@ -124,7 +124,7 @@ public class ChatServiceTest {
     }
 
     @Test
-    void getOrCreate_NewChat_AdvertisementExists_ShouldReturnChatDto() {
+    void getOrCreate_NewChat_ShouldReturnChatDto_WhenAdvertisementExists() {
         String username = "username";
 
         User buyer = new User();
@@ -159,7 +159,7 @@ public class ChatServiceTest {
 
 
     @Test
-    void getOrCreate_NewChat_AdvertisementDoesNotExist_ShouldThrowENFException() {
+    void getOrCreate_NewChat_ShouldThrowENFException_WhenAdvertisementDoesNotExist() {
         String username = "username";
 
         User buyer = new User();
@@ -186,7 +186,7 @@ public class ChatServiceTest {
     }
 
     @Test
-    void getOrCreate_NewChat_WhenUserIsSeller_ShouldThrowValidationException() {
+    void getOrCreate_NewChat_ShouldThrowValidationException_WhenUserIsSeller() {
         String username = "username";
 
         User buyer = new User();
