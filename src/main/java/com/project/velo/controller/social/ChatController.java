@@ -42,7 +42,7 @@ public class ChatController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
         log.info("GET /api/chats - Fetching chat list for user: {}, page: {}, size: {}", user.getUsername(), page, size);
-        PageResponse<ChatListResponseDto> chats = chatService.findAllByUser(user.getUsername(), page, size);
+        PageResponse<ChatListResponseDto> chats = chatService.findAllByUsername(user.getUsername(), page, size);
         log.info("GET /api/chats - Found {} chats for user: {}, page: {}, size: {}", chats.size(), user.getUsername(), page, size);
         return ResponseEntity.ok(chats);
     }

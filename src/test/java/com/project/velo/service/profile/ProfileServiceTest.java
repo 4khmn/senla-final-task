@@ -43,7 +43,7 @@ public class ProfileServiceTest {
     private ProfileService profileService;
 
     @Test
-    void getByUsername_success() {
+    void getByUsername_Success() {
         String username = "username";
 
         User user = new User();
@@ -64,7 +64,7 @@ public class ProfileServiceTest {
 
 
     @Test
-    void getByUsername_UsernameDoesNotExist_ThrowEntityNotFoundException() {
+    void getByUsername_ShouldThrowEntityNotFoundException_WhenUsernameDoesNotExist() {
 
         String username = "username";
         given(userRepository.findByUsername(username)).willReturn(Optional.empty());
@@ -102,7 +102,7 @@ public class ProfileServiceTest {
 
 
     @Test
-    void update_UserDoesNotExist_ThrowEntityNotFoundException() {
+    void update_ShouldThrowEntityNotFoundException_WhenUserDoesNotExist() {
         String username = "username";
         ProfileUpdateDto dto = new ProfileUpdateDto("", "", "", "");
 
@@ -118,7 +118,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    void updateAvatar_OldAvatarIsNotNull_Success() {
+    void updateAvatar_OldAvatarIsNotNull_WhenSuccess() {
         String username = "username";
         String oldUrl = "/api/images/avatars/old.jpg";
         String newUrl = "/api/images/avatars/new.jpg";
@@ -143,7 +143,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    void updateAvatar_OldAvatarIsNull_Success() {
+    void updateAvatar_OldAvatarIsNull_WhenSuccess() {
         String username = "denis_pro";
         String newUrl = "/api/images/avatars/first.jpg";
         MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", "data".getBytes());
@@ -161,7 +161,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    void updateAvatar_UsernameDoesNotExist_ThrowEntityNotFoundException() {
+    void updateAvatar_ShouldThrowEntityNotFoundException_WhenUsernameDoesNotExist() {
         String username = "username";
         MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", "data".getBytes());
 

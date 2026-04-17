@@ -28,7 +28,7 @@ public class ChatService {
     private final ChatMapper mapper;
 
     @Transactional(readOnly = true)
-    public PageResponse<ChatListResponseDto> findAllByUser(String username, int page, int size) {
+    public PageResponse<ChatListResponseDto> findAllByUsername(String username, int page, int size) {
         List<Chat> chats = chatRepository.findAllByUsernameWithPagination(username, page, size);
 
         long totalElements = chatRepository.countByUsername(username);

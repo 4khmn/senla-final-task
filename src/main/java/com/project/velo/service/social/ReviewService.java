@@ -67,7 +67,7 @@ public class ReviewService {
         if (!userRepository.existsByUsername(username)) {
             throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
         }
-        List<Review> reviews = reviewRepository.geyBySellerWithPagination(username, rating, sortDirection, page, size);
+        List<Review> reviews = reviewRepository.getBySellerWithPagination(username, rating, sortDirection, page, size);
 
         long totalElements = reviewRepository.countBySeller(username, rating);
         int totalPages = (int) Math.ceil((double) totalElements / size);
