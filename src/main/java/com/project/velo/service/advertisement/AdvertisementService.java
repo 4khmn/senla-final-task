@@ -50,7 +50,7 @@ public class AdvertisementService {
 
 
         Category category = categoryRepository.findById(dto.categoryId()).orElseThrow(
-                () -> new EntityNotFoundException("Категория не найдена"));
+                () -> new EntityNotFoundException("Категория с id " + dto.categoryId() + " не найдена"));
         advertisement.setCategory(category);
 
 
@@ -145,7 +145,10 @@ public class AdvertisementService {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
-        if (advertisement.getSeller().getUsername().equals(username) || advertisement.getSeller().getRole().equals("ROLE_ADMIN")) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
+        );
+        if (advertisement.getSeller().getUsername().equals(username) || user.getRole().name().equals("ROLE_ADMIN")) {
             advertisement.setStatus(AdStatus.ARCHIVED);
         }
         else {
