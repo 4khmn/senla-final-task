@@ -49,7 +49,7 @@ public class MessageServiceTest {
 
 
     @Test
-    void sendMessage_ShouldReturnDtoSuccess() {
+    void sendMessage_ShouldReturnDto_Success() {
         Long chatId = 1L;
         String username = "senderUser";
         MessageCreateDto createDto = new MessageCreateDto("Hello!");
@@ -145,7 +145,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    void getMessagesByChat_ShouldReturnPageResponse_WhenSuccess() {
+    void getMessagesByChat_ShouldReturnPageResponse_Success() {
         Long chatId = 1L;
         String username = "participantUser";
         int page = 0;
@@ -213,7 +213,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    void editMessage_ShouldReturnDto_WhenSuccess() {
+    void editMessage_ShouldReturnDto_Success() {
         Long messageId = 1L;
         String username = "senderUser";
         String newContent = "Updated text";

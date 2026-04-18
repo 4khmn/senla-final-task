@@ -76,7 +76,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    void update_success() {
+    void update_Success() {
         String username = "username";
 
         Profile profile = new Profile();
@@ -118,7 +118,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    void updateAvatar_OldAvatarIsNotNull_WhenSuccess() {
+    void updateAvatar_OldAvatarIsNotNull_Success() {
         String username = "username";
         String oldUrl = "/api/images/avatars/old.jpg";
         String newUrl = "/api/images/avatars/new.jpg";
@@ -143,7 +143,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    void updateAvatar_OldAvatarIsNull_WhenSuccess() {
+    void updateAvatar_OldAvatarIsNull_Success() {
         String username = "denis_pro";
         String newUrl = "/api/images/avatars/first.jpg";
         MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", "data".getBytes());

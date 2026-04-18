@@ -106,7 +106,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void updateProfileInfo_ValidationError_InvalidPhone() throws Exception {
+    void updateProfileInfo_ShouldReturnBadRequest_WhenInvalidPhone() throws Exception {
 
         ProfileUpdateDto updateDto = new ProfileUpdateDto("firstName2", null, "invalid", null);
 

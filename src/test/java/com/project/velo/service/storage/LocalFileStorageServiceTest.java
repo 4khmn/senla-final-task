@@ -25,7 +25,7 @@ class LocalFileStorageServiceTest {
     }
 
     @Test
-    void save_ShouldReturnPath_WhenSuccess() throws IOException {
+    void save_ShouldReturnPath_Success() throws IOException {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "test.jpg", "image/jpeg", "content".getBytes());
 
@@ -38,7 +38,7 @@ class LocalFileStorageServiceTest {
     }
 
     @Test
-    void delete_ShouldRemoveFile_WhenSuccess() throws IOException {
+    void delete_ShouldRemoveFile_Success() throws IOException {
         Path folder = tempDir.resolve("testFolder");
         Files.createDirectories(folder);
         Path file = folder.resolve("to_delete.png");
@@ -51,7 +51,7 @@ class LocalFileStorageServiceTest {
     }
 
     @Test
-    void loadAsResource_WhenSuccess() throws IOException {
+    void loadAsResource_Success() throws IOException {
         Path folder = tempDir.resolve("items");
         Files.createDirectories(folder);
         Files.write(folder.resolve("bike.webp"), "data".getBytes());

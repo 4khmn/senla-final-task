@@ -48,7 +48,7 @@ public class ReviewServiceTest {
     private ReviewService reviewService;
 
     @Test
-    void leaveReview_ShouldReturnPageResponse_WhenSuccess() {
+    void leaveReview_ShouldReturnPageResponse_Success() {
         ReviewCreateDto request = new ReviewCreateDto(BigDecimal.ONE, "content");
         String username = "username";
         User buyer = new User();
@@ -181,7 +181,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    void getReviewsByUser_ShouldReturnPageResponse_WhenSuccess() {
+    void getReviewsByUser_ShouldReturnPageResponse_Success() {
         String username = "sellerUser";
         Integer rating = 5;
         String sort = "desc";

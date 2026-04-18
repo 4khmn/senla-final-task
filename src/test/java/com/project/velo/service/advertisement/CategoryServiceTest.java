@@ -70,7 +70,7 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void getAll_ShouldReturnListOfDtos_WhenSuccess() {
+    void getAll_ShouldReturnListOfDtos_Success() {
         Category category = new Category();
         category.setName("name");
 
@@ -89,7 +89,7 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void update_ShouldReturnDto_WhenSuccess() {
+    void update_ShouldReturnDto_Success() {
         CategoryUpdateDto dto = new CategoryUpdateDto("newName");
         Long id = 1L;
 
@@ -147,7 +147,7 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void delete_WhenSuccess() {
+    void delete_Success() {
         Category category = new Category();
         given(categoryRepository.findById(1L)).willReturn(Optional.of(category));
 

@@ -38,7 +38,7 @@ public class SalesHistoryServiceTest {
     private SalesHistoryService salesHistoryService;
 
     @Test
-    void getSales_ShouldReturnPageResponse_WhenSuccess() {
+    void getSales_ShouldReturnPageResponse_Success() {
         String username = "sellerUser";
         int page = 0;
         int size = 5;
