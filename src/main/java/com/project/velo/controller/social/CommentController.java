@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,10 +26,10 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/advertisement/{adId}")
-    public ResponseEntity<CommentDetailsResponseDto> createComment(
+    public ResponseEntity<CommentDetailsResponseDto> postComment(
             @PathVariable Long adId,
             @RequestBody @Valid CommentCreateDto dto,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetails user
     ) {
         log.info("POST /api/comments/advertisement/{} - User: {} trying to post a comment to advertisement with id: {}", adId, user.getUsername(), adId);
         CommentDetailsResponseDto comment = commentService.postComment(adId, dto, user.getUsername());
@@ -51,7 +52,7 @@ public class CommentController {
 
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> delete(@PathVariable Long commentId, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> delete(@PathVariable Long commentId, @AuthenticationPrincipal UserDetails user) {
         log.info("DELETE /api/comments/{} - User: {} trying to delete a comment with id: {}", commentId, user.getUsername(), commentId);
         commentService.delete(commentId, user.getUsername());
         log.info("DELETE /api/comments/{} - Comment with id: {} was successfully deleted", commentId, commentId);
@@ -63,11 +64,11 @@ public class CommentController {
     public ResponseEntity<CommentDetailsResponseDto> updateComment(
             @RequestBody @Valid CommentUpdateDto dto,
             @PathVariable Long commentId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetails user
     ) {
-        log.info("PUT /api/comments/{} - User: {} trying to update a comment with id: {}", commentId, user.getUsername(), commentId);
+        log.info("PATCH /api/comments/{} - User: {} trying to update a comment with id: {}", commentId, user.getUsername(), commentId);
         CommentDetailsResponseDto updated = commentService.update(commentId, dto, user.getUsername());
-        log.info("PUT /api/comments/{} - Comment: {} by user: {} was successfully updated", commentId, updated, user.getUsername());
+        log.info("PATCH /api/comments/{} - Comment: {} by user: {} was successfully updated", commentId, updated, user.getUsername());
         return ResponseEntity.ok(updated);
     }
 
