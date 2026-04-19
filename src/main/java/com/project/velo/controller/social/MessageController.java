@@ -50,7 +50,7 @@ public class MessageController {
     public ResponseEntity<MessageResponseDto> sendMessage(
             @PathVariable Long chatId,
             @RequestBody @Valid MessageCreateDto dto,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetails user
     ) {
         log.info("POST /api/messages/chat/{} - User: {} sending message", chatId, user.getUsername());
         MessageResponseDto message = messageService.sendMessage(chatId, dto, user.getUsername());

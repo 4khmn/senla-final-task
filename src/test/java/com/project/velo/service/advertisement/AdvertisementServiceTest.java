@@ -148,7 +148,7 @@ public class AdvertisementServiceTest {
     }
 
     @Test
-    void getById_ShouldReturnDto_WhenSuccess() {
+    void getById_ShouldReturnDto_Success() {
         Long adId = 1L;
         Advertisement ad = new Advertisement();
         ad.setId(adId);
@@ -197,7 +197,7 @@ public class AdvertisementServiceTest {
     }
 
     @Test
-    void getAll_ShouldReturnPageResponse_WhenSuccess() {
+    void getAll_ShouldReturnPageResponse_Success() {
         String query = "Velo";
         String category = "Bikes";
         int page = 0;
@@ -254,7 +254,7 @@ public class AdvertisementServiceTest {
     }
 
     @Test
-    void update_ShouldReturnDto_WhenSuccess() {
+    void update_ShouldReturnDto_Success() {
         Long adId = 1L;
         String username = "ownerUser";
         AdvertisementUpdateDto dto = new AdvertisementUpdateDto(
@@ -563,7 +563,7 @@ public class AdvertisementServiceTest {
     }
 
     @Test
-    void findAdvertisementsByUsername_ShouldReturnPageResponse_WhenSuccess() {
+    void findAdvertisementsByUsername_ShouldReturnPageResponse_Success() {
         String username = "velo_master";
         int page = 0;
         int size = 5;

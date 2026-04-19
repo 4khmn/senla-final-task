@@ -47,7 +47,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Успешная регистрация")
-    void register_Success() throws Exception {
+    void register_ShouldReturnDto_Success() throws Exception {
         UserCreateDto createDto = new UserCreateDto(
                 "denis1",
                 "Password123!",
@@ -87,7 +87,7 @@ class AuthControllerTest {
 
 
     @Test
-    void register_ValidationError_EmptyFields() throws Exception {
+    void register_ShouldReturnBadRequest_WhenEmptyFields() throws Exception {
         UserCreateDto invalidDto = new UserCreateDto(
                 "",
                 "short",
@@ -105,7 +105,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void register_ValidationError_ShortUsername() throws Exception {
+    void register_ShouldReturnBadRequest_WhenShortUsername() throws Exception {
         UserCreateDto invalidDto = new UserCreateDto(
                 "den",
                 "Password123!",

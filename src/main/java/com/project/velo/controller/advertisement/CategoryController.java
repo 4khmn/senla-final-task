@@ -7,6 +7,7 @@ import com.project.velo.service.advertisement.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class CategoryController {
         log.info("POST /api/categories - Trying to save new category: {}", dto.name());
         CategoryResponseDto category = categoryService.create(dto);
         log.info("POST /api/categories - Created category: {} with id: {}", category.name(), category.id());
-        return ResponseEntity.ok(category);
+        return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
 
     @GetMapping

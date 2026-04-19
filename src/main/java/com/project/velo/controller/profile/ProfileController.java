@@ -43,7 +43,7 @@ public class ProfileController {
     @PatchMapping("/my")
     public ResponseEntity<ProfileResponseDto> updateProfileInfo(
             @RequestBody @Valid ProfileUpdateDto dto,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserDetails user
     ) {
         log.info("PATCH /api/profiles/my - Fetching profile for username: {}", user.getUsername());
         ProfileResponseDto updated = profileService.update(dto, user.getUsername());

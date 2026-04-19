@@ -47,7 +47,7 @@ public class ChatServiceTest {
     private ChatService chatService;
 
     @Test
-    void findAllByUsername_ShouldReturnPageResponse_WhenSuccess() {
+    void findAllByUsername_ShouldReturnPageResponse_Success() {
         String username = "testUser";
         int page = 0;
         int size = 10;

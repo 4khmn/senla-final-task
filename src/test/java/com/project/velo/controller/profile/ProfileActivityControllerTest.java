@@ -62,7 +62,7 @@ class ProfileActivityControllerTest {
     }
 
     @Test
-    void getMySales_ShouldReturnPageResponse() throws Exception {
+    void getMySales_ShouldReturnPageResponse_Success() throws Exception {
         SalesHistoryResponseDto dto = new SalesHistoryResponseDto(
                 1L, "Bike", 10L, new BigDecimal("500.00"), "buyer1", LocalDateTime.now()
         );
@@ -76,7 +76,7 @@ class ProfileActivityControllerTest {
     }
 
     @Test
-    void getUserSales_ShouldReturnPageResponse() throws Exception {
+    void getUserSales_ShouldReturnPageResponse_Success() throws Exception {
         given(salesHistoryService.getSales("otherUser", 0, 10)).willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/otherUser/sales"))
@@ -85,7 +85,7 @@ class ProfileActivityControllerTest {
     }
 
     @Test
-    void getMyAdvertisements_ShouldReturnPageResponse() throws Exception {
+    void getMyAdvertisements_ShouldReturnPageResponse_Success() throws Exception {
         AdvertisementResponseDto dto = new AdvertisementResponseDto(
                 1L, "Ad Title", "Desc", new BigDecimal("100"), "ACTIVE",
                 false, LocalDateTime.now(), null, "Category", "url", List.of()
@@ -100,7 +100,7 @@ class ProfileActivityControllerTest {
     }
 
     @Test
-    void getUserAdvertisements_ShouldReturnPageResponse() throws Exception {
+    void getUserAdvertisements_ShouldReturnPageResponse_Success() throws Exception {
         given(advertisementService.findAdvertisementsByUsername("someUser", 0, 10)).willReturn(new  PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/someUser/advertisements"))
