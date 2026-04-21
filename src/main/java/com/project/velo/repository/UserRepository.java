@@ -3,6 +3,7 @@ package com.project.velo.repository;
 import com.project.velo.entity.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -27,6 +28,19 @@ public class UserRepository extends BaseRepository<User, Long>{
                 .setParameter("username", username)
                 .getSingleResult();
         return count>0;
+    }
+
+
+    public List<User> findAll(int page, int size) {
+        return entityManager.createQuery("SELECT u FROM User u ORDER BY u.id DESC", User.class)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    public long count() {
+        return entityManager.createQuery("SELECT COUNT(u) FROM User u", Long.class)
+                .getSingleResult();
     }
 
 }

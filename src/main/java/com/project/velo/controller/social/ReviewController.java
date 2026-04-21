@@ -32,6 +32,4 @@ public class ReviewController {
         log.info("POST /api/reviews/advertisement/{} - Review: {} was successfully posted by user: {}", adId, review, user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }
-
-
 }

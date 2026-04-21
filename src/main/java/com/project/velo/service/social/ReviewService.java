@@ -78,4 +78,27 @@ public class ReviewService {
 
         return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
+
+
+    @Transactional(readOnly = true)
+    public PageResponse<ReviewResponseDto> getAllReviews(int page, int size) {
+        List<Review> reviews = reviewRepository.findAll(page, size);
+
+        long totalElements = reviewRepository.countAll();
+
+        List<ReviewResponseDto> dtos = reviews.stream()
+                .map(mapper::toDto)
+                .toList();
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+
+        return new PageResponse<>(
+                dtos,
+                totalElements,
+                totalPages,
+                page,
+                size
+        );
+    }
 }

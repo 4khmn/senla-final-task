@@ -1,5 +1,6 @@
 package com.project.velo.service.profile;
 
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
@@ -10,13 +11,17 @@ import com.project.velo.repository.UserRepository;
 import com.project.velo.service.storage.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProfileService {
 
     private final UserRepository userRepository;
@@ -55,5 +60,43 @@ public class ProfileService {
         }
         profile.setAvatarUrl(newAvatarUrl);
         return newAvatarUrl;
+    }
+
+
+    @Transactional(readOnly = true)
+    public PageResponse<ProfileResponseDto> getAllProfiles(int page, int size) {
+        List<User> users = userRepository.findAll(page, size);
+
+        long totalElements = userRepository.count();
+
+        List<ProfileResponseDto> dtos = users.stream()
+                .map(userMapper::toProfileDto)
+                .toList();
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        return new PageResponse<>(
+                dtos,
+                totalElements,
+                totalPages,
+                page,
+                size
+        );
+
+
+    }
+
+    @Transactional
+    public void setUserStatus(String username, boolean enabled) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с именем " + username + " не найден"));
+
+        user.setEnabled(enabled);
+
+        if (enabled) {
+            log.info("Admin UNBANNED user: {}", username);
+        } else {
+            log.info("Admin BANNED user: {}", username);
+        }
     }
 }

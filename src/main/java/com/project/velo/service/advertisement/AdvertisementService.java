@@ -222,4 +222,26 @@ public class AdvertisementService {
 
         return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
+
+
+    @Transactional(readOnly = true)
+    public PageResponse<AdvertisementResponseDto> getAllForAdmin(int page, int size) {
+        List<Advertisement> entities = advertisementRepository.findAllForAdmin(page, size);
+
+        long totalElements = advertisementRepository.countAll();
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<AdvertisementResponseDto> dtos = entities.stream()
+                .map(mapper::toDto)
+                .toList();
+
+        return new PageResponse<>(
+                dtos,
+                totalElements,
+                totalPages,
+                page,
+                size
+        );
+    }
 }
