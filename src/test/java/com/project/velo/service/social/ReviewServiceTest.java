@@ -6,6 +6,8 @@ import com.project.velo.dto.response.ReviewResponseDto;
 import com.project.velo.entity.Review;
 import com.project.velo.entity.SalesHistory;
 import com.project.velo.entity.User;
+import com.project.velo.entity.enums.Role;
+import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.exception.ResourceAlreadyProcessedException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ReviewMapper;
@@ -224,5 +226,95 @@ public class ReviewServiceTest {
 
         verifyNoInteractions(reviewRepository);
         verifyNoInteractions(mapper);
+    }
+
+
+    @Test
+    void deleteReview_Author_Success() {
+        String username = "authorUsername";
+        Review review = new Review();
+        review.setId(1L);
+        User admin = new User();
+        admin.setUsername(username);
+
+        User author = new User();
+        author.setUsername("authorUsername");
+
+        User seller = new User();
+        seller.setUsername("sellerUsername");
+        review.setAuthor(author);
+        review.setSeller(seller);
+        admin.setRole(Role.ROLE_ADMIN);
+
+        given(reviewRepository.findById(1L)).willReturn(Optional.of(review));
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(admin));
+
+        reviewService.deleteReview(1L,  username);
+
+        verify(reviewRepository).delete(review);
+    }
+
+    @Test
+    void deleteReview_Admin_Success() {
+        String adminUsername = "adminUsername";
+        Review review = new Review();
+        review.setId(1L);
+        User seller = new User();
+        seller.setUsername("seller");
+        User admin = new User();
+        admin.setUsername(adminUsername);
+        admin.setRole(Role.ROLE_ADMIN);
+        User author = new User();
+        author.setUsername("authorUsername");
+        review.setAuthor(author);
+        review.setSeller(seller);
+
+        given(reviewRepository.findById(1L)).willReturn(Optional.of(review));
+        given(userRepository.findByUsername(adminUsername)).willReturn(Optional.of(admin));
+
+        reviewService.deleteReview(1L,  adminUsername);
+        verify(reviewRepository).delete(review);
+    }
+
+    @Test
+    void deleteReview_ShouldThrowENFException_WhenReviewDoesNotExist() {
+        given(reviewRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> reviewService.deleteReview(1L,  "nonExistent"));
+
+        verifyNoInteractions(userRepository);
+        verify(reviewRepository, never()).delete(any());
+    }
+
+    @Test
+    void deleteReview_ShouldThrowENFException_WhenUserDoesNotExist() {
+        Review review = new Review();
+        review.setId(1L);
+        given(reviewRepository.findById(1L)).willReturn(Optional.of(review));
+        given(userRepository.findByUsername("username")).willReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,
+                () -> reviewService.deleteReview(1L,  "username"));
+
+        verify(reviewRepository, never()).delete(any());
+    }
+
+    @Test
+    void deleteReview_ShouldThrowNotEnoughRightsException_WhenNotAdminOrAdmin() {
+        String username = "randomUser";
+        Review review = new Review();
+        review.setId(1L);
+        User randomUser = new User();
+        randomUser.setUsername(username);
+        User author = new User();
+        author.setUsername("authorUsername");
+        review.setAuthor(author);
+
+        given(reviewRepository.findById(1L)).willReturn(Optional.of(review));
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(randomUser));
+
+        assertThrows(NotEnoughRightsException.class,
+                () -> reviewService.deleteReview(1L,  username));
+        verify(reviewRepository, never()).delete(review);
     }
 }

@@ -10,6 +10,7 @@ import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.Comment;
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
+import com.project.velo.entity.enums.Role;
 import com.project.velo.exception.AdvertisementNotAvailableException;
 import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.mapper.CommentMapper;
@@ -210,7 +211,7 @@ public class CommentServiceTest {
     }
 
     @Test
-    void delete_Success() {
+    void delete_Author_Success() {
         Long commentId = 1L;
         String username = "authorUser";
 
@@ -226,7 +227,33 @@ public class CommentServiceTest {
         comment.setAdvertisement(ad);
 
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(author));
+        commentService.delete(commentId, username);
 
+        verify(commentRepository).delete(comment);
+    }
+
+    @Test
+    void delete_Admin_Success() {
+        Long commentId = 1L;
+        String username = "adminUser";
+
+        User author = new User();
+        author.setUsername("authorUser");
+
+        Advertisement ad = new Advertisement();
+        ad.setStatus(AdStatus.ACTIVE);
+
+        User admin = new User();
+        admin.setUsername(username);
+        admin.setRole(Role.ROLE_ADMIN);
+        Comment comment = new Comment();
+        comment.setId(commentId);
+        comment.setAuthor(author);
+        comment.setAdvertisement(ad);
+
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(admin));
         commentService.delete(commentId, username);
 
         verify(commentRepository).delete(comment);
@@ -249,6 +276,7 @@ public class CommentServiceTest {
         comment.setAdvertisement(ad);
 
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        given(userRepository.findByUsername(currentUsername)).willReturn(Optional.of(author));
 
         assertThrows(NotEnoughRightsException.class, () ->
                 commentService.delete(commentId, currentUsername)
@@ -273,6 +301,8 @@ public class CommentServiceTest {
         comment.setAdvertisement(ad);
 
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(author));
+
 
         assertThrows(AdvertisementNotAvailableException.class, () ->
                 commentService.delete(commentId, username)

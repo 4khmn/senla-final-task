@@ -39,7 +39,7 @@ public class ReviewController {
             @AuthenticationPrincipal UserDetails user
     ) {
         log.info("DELETE /api/reviews/{} - Delete attempt by user: {}", id, user.getUsername());
-        reviewService.delete(id, user.getUsername());
+        reviewService.deleteReview(id, user.getUsername());
         log.info("DELETE /api/reviews/{} - Review successfully deleted by user: {}", id, user.getUsername());
         return ResponseEntity.noContent().build();
     }

@@ -106,7 +106,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public void delete(Long id, String username) {
+    public void deleteReview(Long id, String username) {
         Review review = reviewRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Отзыва с id " + id + " не найдено")
         );
@@ -124,7 +124,7 @@ public class ReviewService {
 
         reviewRepository.delete(review);
 
-        if (isAdmin && !isAuthor) {
+        if (isAdmin) {
             log.info("ADMIN ACTION: Admin: {} deleted review: {} (Author: {}, Target Seller: {})",
                     username, id, review.getAuthor().getUsername(), review.getSeller().getUsername());
         } else {
