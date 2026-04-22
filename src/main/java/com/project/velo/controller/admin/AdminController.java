@@ -1,15 +1,19 @@
 package com.project.velo.controller.admin;
 
+import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.response.ReviewResponseDto;
 import com.project.velo.service.advertisement.AdvertisementService;
+import com.project.velo.service.auth.AuthService;
 import com.project.velo.service.profile.ProfileService;
 import com.project.velo.service.social.CommentService;
 import com.project.velo.service.social.ReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +26,7 @@ public class AdminController {
     private final ProfileService profileService;
     private final ReviewService reviewService;
     private final AdvertisementService advertisementService;
+    private final AuthService authService;
 
     @GetMapping("/users")
     public ResponseEntity<PageResponse<ProfileResponseDto>> getAllUsers(
@@ -65,5 +70,13 @@ public class AdminController {
         profileService.setUserStatus(username, enabled);
         log.info("PATCH /api/admin/users/{}/status - Status successfully updated to: {}", username, enabled);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/create-admin")
+    public ResponseEntity<ProfileResponseDto> createAdmin(@RequestBody @Valid UserCreateDto dto) {
+        log.info("POST /api/admin/create-admin - Admin is creating a new administrator: {}", dto.username());
+        ProfileResponseDto response = authService.addAdmin(dto);
+        log.info("POST /api/admin/create-admin - Admin created successfully with id: {}", response.id());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
