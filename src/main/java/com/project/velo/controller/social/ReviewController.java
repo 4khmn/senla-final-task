@@ -32,4 +32,16 @@ public class ReviewController {
         log.info("POST /api/reviews/advertisement/{} - Review: {} was successfully posted by user: {}", adId, review, user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        log.info("DELETE /api/reviews/{} - Delete attempt by user: {}", id, user.getUsername());
+        reviewService.delete(id, user.getUsername());
+        log.info("DELETE /api/reviews/{} - Review successfully deleted by user: {}", id, user.getUsername());
+        return ResponseEntity.noContent().build();
+    }
+
 }

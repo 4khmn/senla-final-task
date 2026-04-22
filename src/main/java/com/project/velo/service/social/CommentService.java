@@ -88,7 +88,7 @@ public class CommentService {
         boolean isAdmin = user.getRole().name().equals("ROLE_ADMIN");
         if (isAuthor || isAdmin) {
             commentRepository.delete(comment);
-            log.info("Comment {} deleted by {}", commentId, isAdmin ? "ADMIN" : "AUTHOR");
+            log.info("Comment: {} deleted by {}", commentId, isAdmin ? "ADMIN" : "AUTHOR");
         } else {
             throw new NotEnoughRightsException("Недостаточно прав для удаления чужого комментария");
         }

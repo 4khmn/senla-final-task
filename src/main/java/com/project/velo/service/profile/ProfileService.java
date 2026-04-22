@@ -5,6 +5,7 @@ import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
+import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ProfileMapper;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
@@ -90,6 +91,10 @@ public class ProfileService {
     public void setUserStatus(String username, boolean enabled) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с именем " + username + " не найден"));
+
+        if (user.isEnabled() == enabled) {
+            throw new ValidationException("Пользователь " + username + " уже имеет enabled " + enabled);
+        }
 
         user.setEnabled(enabled);
 

@@ -202,7 +202,7 @@ public class AdvertisementService {
         boolean isAdmin = currentUser.getRole().name().equals("ROLE_ADMIN");
 
         if (!isOwner && !isAdmin) {
-            log.warn("Security Alert! User {} tried to promote ad {} without rights", username, adId);
+            log.warn("Security Alert! User {} tried to promote advertisement: {} without rights", username, adId);
             throw new NotEnoughRightsException("У вас нет прав на продвижение этого объявления");
         }
 
@@ -221,10 +221,10 @@ public class AdvertisementService {
 
 
         if (isAdmin && !isOwner) {
-            log.info("ADMIN ACTION: Administrator '{}' manually promoted advertisement ID: {} for {} days (Seller: {})",
+            log.info("ADMIN ACTION: Administrator: {} manually promoted advertisement: {} for {} days (Seller: {})",
                     username, adId, dto.days(), advertisement.getSeller().getUsername());
         } else {
-            log.info("USER ACTION: Owner '{}' promoted their advertisement ID: {} for {} days",
+            log.info("USER ACTION: Owner: {} promoted their advertisement: {} for {} days",
                     username, adId, dto.days());
         }
     }
