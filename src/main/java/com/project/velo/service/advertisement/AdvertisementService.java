@@ -20,6 +20,7 @@ import com.project.velo.repository.UserRepository;
 import com.project.velo.service.storage.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +31,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdvertisementService {
 
     private final AdvertisementRepository advertisementRepository;
@@ -192,9 +194,18 @@ public class AdvertisementService {
                 () -> new EntityNotFoundException("Объявления с id " + adId + " не найдено")
         );
 
-        if (!advertisement.getSeller().getUsername().equals(username)) {
-            throw new ValidationException("У вас нет прав на продвижение этого объявления");
+        User currentUser = userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователь не найден")
+        );
+
+        boolean isOwner = advertisement.getSeller().getUsername().equals(username);
+        boolean isAdmin = currentUser.getRole().name().equals("ROLE_ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            log.warn("Security Alert! User {} tried to promote ad {} without rights", username, adId);
+            throw new NotEnoughRightsException("У вас нет прав на продвижение этого объявления");
         }
+
 
         if (advertisement.getStatus() !=AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + adId + " не доступно");
@@ -207,6 +218,15 @@ public class AdvertisementService {
 
         advertisement.setTopUntil(baseTime.plusDays(dto.days()));
         advertisement.setTop(true);
+
+
+        if (isAdmin && !isOwner) {
+            log.info("ADMIN ACTION: Administrator '{}' manually promoted advertisement ID: {} for {} days (Seller: {})",
+                    username, adId, dto.days(), advertisement.getSeller().getUsername());
+        } else {
+            log.info("USER ACTION: Owner '{}' promoted their advertisement ID: {} for {} days",
+                    username, adId, dto.days());
+        }
     }
 
     @Transactional(readOnly = true)
