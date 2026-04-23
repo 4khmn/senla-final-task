@@ -47,18 +47,25 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
         cq.where(buildPredicates(cb, root, query, category));
 
-        Expression<Integer> relevance = buildRelevance(cb, root, query);
-
         Expression<Object> effectiveRating = cb.selectCase()
                 .when(cb.equal(authorJoin.get("rating"), BigDecimal.ZERO), new BigDecimal("3.5"))
                 .otherwise(authorJoin.get("rating"));
 
-        cq.orderBy(
-                cb.desc(root.get("top")),
-                cb.desc(relevance),
-                cb.desc(effectiveRating),
-                cb.desc(root.get("createdAt"))
-        );
+        Expression<Boolean> trueTop = cb.selectCase()
+                .when(cb.isTrue(root.get("top")), cb.greaterThan(root.get("topUntil"), LocalDateTime.now()))
+                .otherwise(false)
+                .as(Boolean.class);
+
+        List<Order> orders = new ArrayList<>();
+        orders.add(cb.desc(trueTop));
+
+        if (query != null && !query.isBlank()) {
+            orders.add(cb.desc(buildRelevance(cb, root, query)));
+        }
+        orders.add(cb.desc(effectiveRating));
+        orders.add(cb.desc(root.get("createdAt")));
+
+        cq.orderBy(orders);
 
         TypedQuery<Advertisement> typedQuery = entityManager.createQuery(cq);
         return applyPagination(typedQuery, page, size).getResultList();
