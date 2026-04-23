@@ -1,7 +1,8 @@
 package com.project.velo.service.profile;
 
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.response.ProfileFullResponseDto;
+import com.project.velo.dto.response.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
@@ -31,22 +32,30 @@ public class ProfileService {
     private final FileStorageService storageService;
 
     @Transactional(readOnly = true)
-    public ProfileResponseDto getByUsername(String username) {
+    public ProfilePublicResponseDto getPublicByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
-        return userMapper.toProfileDto(user);
+        return userMapper.toPublicProfileDto(user);
+    }
+
+    @Transactional(readOnly = true)
+    public ProfileFullResponseDto getFullByUsername(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
+        );
+        return userMapper.toFullProfileDto(user);
     }
 
 
     @Transactional
-    public ProfileResponseDto update(ProfileUpdateDto dto, String username) {
+    public ProfileFullResponseDto update(ProfileUpdateDto dto, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         profileMapper.updateEntityFromDto(dto, user.getProfile());
 
-        return userMapper.toProfileDto(user);
+        return userMapper.toFullProfileDto(user);
     }
 
     @Transactional
@@ -65,13 +74,13 @@ public class ProfileService {
 
 
     @Transactional(readOnly = true)
-    public PageResponse<ProfileResponseDto> getAllProfiles(int page, int size) {
+    public PageResponse<ProfileFullResponseDto> getAllProfiles(int page, int size) {
         List<User> users = userRepository.findAll(page, size);
 
         long totalElements = userRepository.count();
 
-        List<ProfileResponseDto> dtos = users.stream()
-                .map(userMapper::toProfileDto)
+        List<ProfileFullResponseDto> dtos = users.stream()
+                .map(userMapper::toFullProfileDto)
                 .toList();
 
         int totalPages = (int) Math.ceil((double) totalElements / size);

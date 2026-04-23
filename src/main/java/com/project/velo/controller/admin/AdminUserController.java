@@ -2,7 +2,8 @@ package com.project.velo.controller.admin;
 
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.response.ProfileFullResponseDto;
+import com.project.velo.dto.response.ProfilePublicResponseDto;
 import com.project.velo.service.auth.AuthService;
 import com.project.velo.service.profile.ProfileService;
 import jakarta.validation.Valid;
@@ -22,12 +23,12 @@ public class AdminUserController {
     private final AuthService authService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<ProfileResponseDto>> getAllUsers(
+    public ResponseEntity<PageResponse<ProfileFullResponseDto>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
         log.info("GET /api/admin/users - Admin fetching all users, page: {}, size: {}", page, size);
-        PageResponse<ProfileResponseDto> users = profileService.getAllProfiles(page, size);
+        PageResponse<ProfileFullResponseDto> users = profileService.getAllProfiles(page, size);
         log.info("GET /api/admin/users - Found: {} users, page: {}, size: {}", users.size(), page, size);
         return ResponseEntity.ok(users);
     }
@@ -44,9 +45,9 @@ public class AdminUserController {
     }
 
     @PostMapping
-    public ResponseEntity<ProfileResponseDto> createAdmin(@RequestBody @Valid UserCreateDto dto) {
+    public ResponseEntity<ProfileFullResponseDto> createAdmin(@RequestBody @Valid UserCreateDto dto) {
         log.info("POST /api/admin/users - Admin is creating a new administrator: {}", dto.username());
-        ProfileResponseDto response = authService.addAdmin(dto);
+        ProfileFullResponseDto response = authService.addAdmin(dto);
         log.info("POST /api/admin/users - Admin created successfully with id: {}", response.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

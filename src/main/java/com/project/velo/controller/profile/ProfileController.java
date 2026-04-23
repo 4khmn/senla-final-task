@@ -25,28 +25,28 @@ public class ProfileController {
 
 
     @GetMapping("/my")
-    public ResponseEntity<ProfileResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ProfileFullResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
         log.info("GET /api/profiles/my - Fetching profile for username = {}", user.getUsername());
-        ProfileResponseDto profile = profileService.getByUsername(user.getUsername());
+        ProfileFullResponseDto profile = profileService.getFullByUsername(user.getUsername());
         log.info("GET /api/profiles/my - Profile for username: {} was successfully retrieved", user.getUsername());
         return ResponseEntity.ok(profile);
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<ProfileResponseDto> getProfile(@PathVariable String username) {
+    public ResponseEntity<ProfilePublicResponseDto> getProfile(@PathVariable String username) {
         log.info("GET /api/profiles/{} - Fetching profile for user: {}", username, username);
-        ProfileResponseDto profile = profileService.getByUsername(username);
+        ProfilePublicResponseDto profile = profileService.getPublicByUsername(username);
         log.info("GET /api/profiles/{} - Profile for user: {} was successfully retrieved", username, username);
         return ResponseEntity.ok(profile);
     }
 
     @PatchMapping("/my")
-    public ResponseEntity<ProfileResponseDto> updateProfileInfo(
+    public ResponseEntity<ProfileFullResponseDto> updateProfileInfo(
             @RequestBody @Valid ProfileUpdateDto dto,
             @AuthenticationPrincipal UserDetails user
     ) {
         log.info("PATCH /api/profiles/my - Fetching profile for username: {}", user.getUsername());
-        ProfileResponseDto updated = profileService.update(dto, user.getUsername());
+        ProfileFullResponseDto updated = profileService.update(dto, user.getUsername());
         log.info("PATCH /api/profiles/my - Profile for username: {} was successfully updated", user.getUsername());
         return ResponseEntity.ok(updated);
     }
