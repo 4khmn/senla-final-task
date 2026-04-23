@@ -8,7 +8,6 @@ import com.project.velo.dto.response.ReviewResponseDto;
 import com.project.velo.service.advertisement.AdvertisementService;
 import com.project.velo.service.auth.AuthService;
 import com.project.velo.service.profile.ProfileService;
-import com.project.velo.service.social.CommentService;
 import com.project.velo.service.social.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

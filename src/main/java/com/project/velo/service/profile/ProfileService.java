@@ -83,8 +83,6 @@ public class ProfileService {
                 page,
                 size
         );
-
-
     }
 
     @Transactional

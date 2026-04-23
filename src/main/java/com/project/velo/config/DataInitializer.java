@@ -27,6 +27,10 @@ public class DataInitializer implements CommandLineRunner {
     @Value("${app.init.admin.password}")
     private String adminPassword;
 
+    @Value("${app.init.admin.email}")
+    private String email;
+
+
     @Override
     @Transactional
     public void run(String... args) {
@@ -36,6 +40,7 @@ public class DataInitializer implements CommandLineRunner {
             User admin = new User();
             admin.setUsername(adminUsername);
             admin.setPassword(passwordEncoder.encode(adminPassword));
+            admin.setEmail(email);
             admin.setRole(Role.ROLE_ADMIN);
             admin.setEnabled(true);
 

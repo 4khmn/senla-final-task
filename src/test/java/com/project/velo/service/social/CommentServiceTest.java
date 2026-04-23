@@ -323,6 +323,18 @@ public class CommentServiceTest {
         verify(commentRepository, never()).delete(any());
     }
 
+    @Test
+    void delete_ShouldThrowENFException_WhenUserDoesNotExist() {
+        Comment comment = new Comment();
+        given(commentRepository.findById(1L)).willReturn(Optional.of(comment));
+        given(userRepository.findByUsername("anyUser")).willReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class, () ->
+                commentService.delete(1L, "anyUser")
+        );
+
+        verify(commentRepository, never()).delete(any());
+    }
+
 
     @Test
     void getCommentsByUser_ShouldReturnPageResponse_Success() {

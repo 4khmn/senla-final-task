@@ -317,4 +317,50 @@ public class ReviewServiceTest {
                 () -> reviewService.deleteReview(1L,  username));
         verify(reviewRepository, never()).delete(review);
     }
+
+    @Test
+    void getAllReviews_ShouldReturnPageResponse_Success() {
+        int page = 0;
+        int size = 5;
+        List<Review> reviews = List.of(new Review(), new Review());
+
+        when(reviewRepository.findAll(page, size)).thenReturn(reviews);
+        when(reviewRepository.countAll()).thenReturn(10L);
+        when(mapper.toDto(any(Review.class))).thenReturn(new ReviewResponseDto(
+                1L,
+                "title",
+                1L,
+                "username",
+                new BigDecimal("5"),
+                "content",
+                LocalDateTime.now())
+        );
+
+        PageResponse<ReviewResponseDto> result = reviewService.getAllReviews(page, size);
+
+        assertEquals(10L, result.totalElements());
+        assertEquals(2, result.totalPages());
+        assertEquals(2, result.content().size());
+        assertEquals(page, result.page());
+        assertEquals(size, result.size());
+
+        verify(reviewRepository).findAll(page, size);
+        verify(reviewRepository).countAll();
+        verify(mapper, times(2)).toDto(any());
+    }
+
+    @Test
+    void getAllReviews_ShouldReturnEmptyPage_WhenNoReviewsExist() {
+        int page = 0;
+        int size = 10;
+
+        when(reviewRepository.findAll(page, size)).thenReturn(List.of());
+        when(reviewRepository.countAll()).thenReturn(0L);
+
+        PageResponse<ReviewResponseDto> result = reviewService.getAllReviews(page, size);
+
+        assertTrue(result.content().isEmpty());
+        assertEquals(0, result.totalElements());
+        assertEquals(0, result.totalPages());
+    }
 }

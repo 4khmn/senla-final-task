@@ -36,6 +36,12 @@ public class AuthService {
 
     @Transactional
     public ProfileResponseDto addUser(UserCreateDto dto) {
+        if (userRepository.existsByUsername(dto.username())) {
+            throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
+        }
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ValidationException("Пользователь с почтой " + dto.email() + " уже существует");
+        }
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
 
@@ -69,6 +75,9 @@ public class AuthService {
     public ProfileResponseDto addAdmin(UserCreateDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
             throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
+        }
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ValidationException("Пользователь с почтой " + dto.email() + " уже существует");
         }
 
         User user = mapper.toEntity(dto);

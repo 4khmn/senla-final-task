@@ -5,6 +5,7 @@ import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
+import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
 import com.project.velo.security.JwtUtil;
@@ -70,7 +71,8 @@ public class AuthServiceTest {
         given(mapper.toEntity(request)).willReturn(userFromMapper);
         given(passwordEncoder.encode(anyString())).willReturn("encoded_pass");
         given(userRepository.save(any(User.class))).willReturn(savedUser);
-
+        given(userRepository.existsByUsername(request.username())).willReturn(false);
+        given(userRepository.existsByEmail(request.email())).willReturn(false);
         authService.addUser(request);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -81,10 +83,43 @@ public class AuthServiceTest {
 
         assertEquals("encoded_pass", capturedUser.getPassword());
 
-        assertNotNull(capturedUser.getProfile(), "Профиль должен быть привязан к юзеру");
+        assertNotNull(capturedUser.getProfile());
         assertEquals("Ivan", capturedUser.getProfile().getFirstName());
         assertEquals("Ivanov", capturedUser.getProfile().getLastName());
-        assertEquals(capturedUser, capturedUser.getProfile().getUser(), "Связь должна быть двусторонней");
+        assertEquals("ROLE_USER", capturedUser.getRole().name());
+        assertEquals(capturedUser, capturedUser.getProfile().getUser());
+    }
+
+    @Test
+    void addUser_ShouldThrowValidationException_WhenUsernameAlreadyTaken() {
+        UserCreateDto request = new UserCreateDto(
+                "username", "password", "email@test.com", "Ivan", "Ivanov"
+        );
+
+        given(userRepository.existsByUsername(request.username())).willReturn(false);
+        given(userRepository.existsByEmail(request.email())).willReturn(true);
+
+        assertThrows(ValidationException.class, () -> authService.addUser(request));
+
+        verifyNoInteractions(passwordEncoder);
+        verifyNoInteractions(mapper);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void addUser_ShouldThrowValidationException_WhenEmailAlreadyTaken() {
+        UserCreateDto request = new UserCreateDto(
+                "username", "password", "email@test.com", "Ivan", "Ivanov"
+        );
+
+        given(userRepository.existsByUsername(request.username())).willReturn(false);
+        given(userRepository.existsByEmail(request.email())).willReturn(true);
+
+        assertThrows(ValidationException.class, () -> authService.addUser(request));
+
+        verifyNoInteractions(passwordEncoder);
+        verifyNoInteractions(mapper);
+        verify(userRepository, never()).save(any(User.class));
     }
 
 
@@ -136,4 +171,77 @@ public class AuthServiceTest {
 
         verifyNoInteractions(jwtUtil);
     }
+
+    @Test
+    void addAdmin_WithProfile_Success() {
+        UserCreateDto request = new UserCreateDto(
+                "username", "password", "email@test.com", "Ivan", "Ivanov"
+        );
+
+        User userFromMapper = new User();
+        Profile profileFromMapper = Profile.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .build();
+        userFromMapper.setProfile(profileFromMapper);
+        profileFromMapper.setUser(userFromMapper);
+
+        User savedUser = new User();
+        savedUser.setId(1L);
+
+        given(mapper.toEntity(request)).willReturn(userFromMapper);
+        given(userRepository.existsByUsername(request.username())).willReturn(false);
+        given(userRepository.existsByEmail(request.email())).willReturn(false);
+        given(passwordEncoder.encode(anyString())).willReturn("encoded_pass");
+        given(userRepository.save(any(User.class))).willReturn(savedUser);
+
+        authService.addAdmin(request);
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+
+        verify(userRepository).save(userCaptor.capture());
+
+        User capturedUser = userCaptor.getValue();
+
+        assertEquals("encoded_pass", capturedUser.getPassword());
+
+        assertNotNull(capturedUser.getProfile());
+        assertEquals("Ivan", capturedUser.getProfile().getFirstName());
+        assertEquals("Ivanov", capturedUser.getProfile().getLastName());
+        assertEquals("ROLE_ADMIN", capturedUser.getRole().name());
+        assertEquals(capturedUser, capturedUser.getProfile().getUser());
+    }
+
+    @Test
+    void addAdmin_ShouldThrowValidationException_WhenUsernameAlreadyTaken() {
+        UserCreateDto request = new UserCreateDto(
+                "username", "password", "email@test.com", "Ivan", "Ivanov"
+        );
+
+        given(userRepository.existsByUsername(request.username())).willReturn(true);
+
+        assertThrows(ValidationException.class, () -> authService.addAdmin(request));
+
+        verifyNoInteractions(passwordEncoder);
+        verifyNoInteractions(mapper);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void addAdmin_ShouldThrowValidationException_WhenEmailAlreadyTaken() {
+        UserCreateDto request = new UserCreateDto(
+                "username", "password", "email@test.com", "Ivan", "Ivanov"
+        );
+
+        given(userRepository.existsByUsername(request.username())).willReturn(false);
+        given(userRepository.existsByEmail(request.email())).willReturn(true);
+
+        assertThrows(ValidationException.class, () -> authService.addAdmin(request));
+
+        verifyNoInteractions(passwordEncoder);
+        verifyNoInteractions(mapper);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+
 }

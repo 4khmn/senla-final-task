@@ -406,6 +406,18 @@ public class AdvertisementServiceTest {
     }
 
     @Test
+    void delete_ShouldThrowENFException_WhenAdvertisementDoesNotExist() {
+        Long id = 1L;
+        given(advertisementRepository.findById(id)).willReturn(Optional.empty());
+
+        EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
+                () -> advertisementService.delete(id, anyString())
+        );
+
+        assertEquals("Объявления с id " + id + " не найдено", result.getMessage());
+    }
+
+    @Test
     void processPurchase_Success() {
         Long adId = 1L;
         String buyerName = "buyerUser";
@@ -475,15 +487,34 @@ public class AdvertisementServiceTest {
         assertThrows(ResourceAlreadyProcessedException.class,
                 () -> advertisementService.processPurchase(adId, buyerName)
         );
+        verify(salesHistoryRepository, never()).save(any(SalesHistory.class));
     }
 
     @Test
-    void processPurchase_ShouldThrowNotFound_WhenAdvertisementDoesNotExist() {
+    void processPurchase_ShouldThrowENFException_WhenAdvertisementDoesNotExist() {
         given(advertisementRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
                 () -> advertisementService.processPurchase(1L, "anyUser")
         );
+        verify(salesHistoryRepository, never()).save(any(SalesHistory.class));
+    }
+
+    @Test
+    void processPurchase_ShouldThrowENFException_WhenBuyerDoesNotExist() {
+        Long adId = 1L;
+        String username = "ghost";
+
+        Advertisement ad = new Advertisement();
+
+        given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
+        given(userRepository.findByUsername(username)).willReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> advertisementService.processPurchase(adId, username)
+        );
+
+        verify(salesHistoryRepository, never()).save(any(SalesHistory.class));
     }
 
     @Test
@@ -572,6 +603,30 @@ public class AdvertisementServiceTest {
     }
 
     @Test
+    void promote_ShouldThrowNotENFException_WhenAdvertisementDoesNotExist() {
+       Long adId = 1L;
+        given(advertisementRepository.findById(adId)).willReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,
+                () -> advertisementService.promote(adId, new AdvertisementPromoteDto(5), "username")
+        );
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void promote_ShouldThrowNotENFException_WhenUserDoesNotExist() {
+        Long adId = 1L;
+        Advertisement advertisement = new Advertisement();
+        given(advertisementRepository.findById(adId)).willReturn(Optional.of(advertisement));
+        given(userRepository.findByUsername(any())).willReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,
+                () -> advertisementService.promote(adId, new AdvertisementPromoteDto(5), "username")
+        );
+    }
+
+
+
+
+    @Test
     void promote_ShouldThrowAdvertisementNotAvailableException_WhenStatusNotActive() {
         Long adId = 1L;
         User seller = new User();
@@ -635,5 +690,45 @@ public class AdvertisementServiceTest {
 
         assertTrue(ex.getMessage().contains(username));
         verify(advertisementRepository, never()).findAllByUsername(anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void getAllForAdmin_ShouldReturnPageResponse_Success() {
+        int page = 0;
+        int size = 10;
+        List<Advertisement> entities = List.of(new Advertisement());
+        AdvertisementResponseDto expectedDto = new AdvertisementResponseDto(
+                1L, "Title", "Desc", BigDecimal.TEN, "ACTIVE",
+                false, LocalDateTime.now(), null, "Category", "img", List.of()
+        );
+        when(advertisementRepository.findAllForAdmin(page, size)).thenReturn(entities);
+        when(advertisementRepository.countAll()).thenReturn(25L);
+        when(mapper.toDto(any(Advertisement.class))).thenReturn(expectedDto);
+
+        PageResponse<AdvertisementResponseDto> result = advertisementService.getAllForAdmin(page, size);
+
+        assertEquals(25L, result.totalElements());
+        assertEquals(3, result.totalPages());
+        assertEquals(1, result.content().size());
+        assertEquals(page, result.page());
+
+        verify(advertisementRepository).findAllForAdmin(page, size);
+        verify(advertisementRepository).countAll();
+        verify(mapper, times(1)).toDto(any());
+    }
+
+    @Test
+    void getAllForAdmin_ShouldReturnEmptyList_WhenPageIsOutOfBounds() {
+        int page = 5;
+        int size = 10;
+
+        when(advertisementRepository.findAllForAdmin(page, size)).thenReturn(List.of());
+        when(advertisementRepository.countAll()).thenReturn(25L);
+
+        PageResponse<AdvertisementResponseDto> result = advertisementService.getAllForAdmin(page, size);
+
+        assertTrue(result.content().isEmpty());
+        assertEquals(3, result.totalPages());
+        assertEquals(25L, result.totalElements());
     }
 }
