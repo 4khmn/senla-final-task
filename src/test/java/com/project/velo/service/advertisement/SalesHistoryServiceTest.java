@@ -91,7 +91,13 @@ public class SalesHistoryServiceTest {
 
         SalesHistory salesHistory = new SalesHistory();
         SalesPrivateHistoryResponseDto dto = new SalesPrivateHistoryResponseDto(
-                1L, "Bike", 1L, new BigDecimal("120.00"), "buyer-username", LocalDateTime.now()
+                1L,
+                "Bike",
+                1L,
+                new BigDecimal("120.00"),
+                "buyer-username",
+                LocalDateTime.now(),
+                true
         );
 
         given(userRepository.existsByUsername(username)).willReturn(true);

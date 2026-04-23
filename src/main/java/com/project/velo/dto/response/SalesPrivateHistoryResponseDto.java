@@ -9,5 +9,6 @@ public record SalesPrivateHistoryResponseDto(
         Long advertisementId,
         BigDecimal price,
         String buyerUsername,
-        LocalDateTime soldAt
+        LocalDateTime soldAt,
+        boolean wasTop
 ) { }
