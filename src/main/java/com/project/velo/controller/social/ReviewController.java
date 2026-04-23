@@ -33,5 +33,15 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        log.info("DELETE /api/reviews/{} - Delete attempt by user: {}", id, user.getUsername());
+        reviewService.deleteReview(id, user.getUsername());
+        log.info("DELETE /api/reviews/{} - Review successfully deleted by user: {}", id, user.getUsername());
+        return ResponseEntity.noContent().build();
+    }
 
 }

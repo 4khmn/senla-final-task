@@ -1,9 +1,11 @@
 package com.project.velo.service.profile;
 
+import com.project.velo.dto.response.PageResponse;
 import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
+import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ProfileMapper;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -171,5 +174,63 @@ public class ProfileServiceTest {
                 () -> profileService.updateAvatar(username, file));
 
         verifyNoInteractions(storageService);
+    }
+
+    @Test
+    void getAllProfiles_ShouldReturnCorrectPageResponse() {
+        int page = 0;
+        int size = 2;
+        User user1 = new User();
+        List<User> users = List.of(user1);
+        ProfileResponseDto profileResponseDto = new ProfileResponseDto(1L, "username", "", BigDecimal.ZERO, "", "", "", "");
+
+        when(userRepository.findAll(page, size)).thenReturn(users);
+        when(userRepository.count()).thenReturn(10L);
+        when(userMapper.toProfileDto(any())).thenReturn(profileResponseDto);
+
+        PageResponse<ProfileResponseDto> result = profileService.getAllProfiles(page, size);
+
+        assertEquals(10L, result.totalElements());
+        assertEquals(5, result.totalPages());
+        assertEquals(1, result.content().size());
+        verify(userRepository).findAll(page, size);
+    }
+
+
+    @Test
+    void setUserStatus_ShouldChangeStatus_WhenStatusIsDifferent() {
+        String username = "testUser";
+        User user = new User();
+        user.setUsername(username);
+        user.setEnabled(true);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
+        profileService.setUserStatus(username, false);
+
+        assertFalse(user.isEnabled());
+        verify(userRepository).findByUsername(username);
+    }
+
+    @Test
+    void setUserStatus_ShouldThrowException_WhenStatusIsSame() {
+        String username = "testUser";
+        User user = new User();
+        user.setEnabled(true);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+
+        ValidationException result = assertThrows(ValidationException.class,
+                () -> profileService.setUserStatus(username, true));
+
+        assertTrue(result.getMessage().contains("уже имеет enabled true"));
+    }
+
+    @Test
+    void setUserStatus_ShouldThrowENFException_WhenUserDoesNotExist() {
+        when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> profileService.setUserStatus("unknown", false));
     }
 }

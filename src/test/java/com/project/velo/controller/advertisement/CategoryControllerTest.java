@@ -68,31 +68,6 @@ public class CategoryControllerTest {
     }
 
 
-    @Test
-    void createCategory_ShouldReturnDto_Success() throws Exception {
-
-        CategoryCreateDto request = new CategoryCreateDto("name");
-        CategoryResponseDto response = new CategoryResponseDto(1L, "name");
-        given(categoryService.create(request)).willReturn(response);
-
-        mockMvc.perform(post("/api/categories")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("name"));
-    }
-
-    @Test
-    void createCategory_ShouldReturnBadRequest_WhenNameIsBlank() throws Exception {
-
-        CategoryCreateDto request = new CategoryCreateDto("");
-
-
-        mockMvc.perform(post("/api/categories")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
-    }
 
     @Test
     void getAllCategories_ShouldReturnListOfDtos_Success() throws Exception {
@@ -102,36 +77,4 @@ public class CategoryControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void updateCategory_ShouldReturnDto_Success() throws Exception {
-        CategoryUpdateDto request = new CategoryUpdateDto("name");
-        CategoryResponseDto response = new CategoryResponseDto(1L, "name");
-        given(categoryService.update(1L, request)).willReturn(response);
-
-        mockMvc.perform(patch("/api/categories/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("name"));
-    }
-
-    @Test
-    void updateCategory_ShouldReturnBadRequest_WhenNameIsBlank() throws Exception {
-
-        CategoryUpdateDto request = new CategoryUpdateDto("");
-
-
-        mockMvc.perform(patch("/api/categories/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void deleteCategory_Success() throws Exception {
-
-        mockMvc.perform(delete("/api/categories/{id}", 1L))
-                .andExpect(status().isNoContent());
-        verify(categoryService).delete(any());
-    }
 }

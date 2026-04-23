@@ -406,6 +406,18 @@ public class AdvertisementServiceTest {
     }
 
     @Test
+    void delete_ShouldThrowENFException_WhenAdvertisementDoesNotExist() {
+        Long id = 1L;
+        given(advertisementRepository.findById(id)).willReturn(Optional.empty());
+
+        EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
+                () -> advertisementService.delete(id, anyString())
+        );
+
+        assertEquals("Объявления с id " + id + " не найдено", result.getMessage());
+    }
+
+    @Test
     void processPurchase_Success() {
         Long adId = 1L;
         String buyerName = "buyerUser";
@@ -475,19 +487,38 @@ public class AdvertisementServiceTest {
         assertThrows(ResourceAlreadyProcessedException.class,
                 () -> advertisementService.processPurchase(adId, buyerName)
         );
+        verify(salesHistoryRepository, never()).save(any(SalesHistory.class));
     }
 
     @Test
-    void processPurchase_ShouldThrowNotFound_WhenAdvertisementDoesNotExist() {
+    void processPurchase_ShouldThrowENFException_WhenAdvertisementDoesNotExist() {
         given(advertisementRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
                 () -> advertisementService.processPurchase(1L, "anyUser")
         );
+        verify(salesHistoryRepository, never()).save(any(SalesHistory.class));
     }
 
     @Test
-    void promote_Success_FirstTime() {
+    void processPurchase_ShouldThrowENFException_WhenBuyerDoesNotExist() {
+        Long adId = 1L;
+        String username = "ghost";
+
+        Advertisement ad = new Advertisement();
+
+        given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
+        given(userRepository.findByUsername(username)).willReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> advertisementService.processPurchase(adId, username)
+        );
+
+        verify(salesHistoryRepository, never()).save(any(SalesHistory.class));
+    }
+
+    @Test
+    void promote_Author_Success_FirstTime() {
         Long adId = 1L;
         String username = "seller";
         AdvertisementPromoteDto dto = new AdvertisementPromoteDto(7);
@@ -501,7 +532,7 @@ public class AdvertisementServiceTest {
         ad.setTopUntil(null);
 
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
-
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(seller));
         advertisementService.promote(adId, dto, username);
 
         assertTrue(ad.isTop());
@@ -510,7 +541,7 @@ public class AdvertisementServiceTest {
     }
 
     @Test
-    void promote_Success_Extension() {
+    void promote_Author_Success_Extension() {
         Long adId = 1L;
         String username = "seller";
         AdvertisementPromoteDto dto = new AdvertisementPromoteDto(3);
@@ -524,7 +555,7 @@ public class AdvertisementServiceTest {
         ad.setTopUntil(futureDate);
 
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
-
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(new User()));
         advertisementService.promote(adId, dto, username);
 
         assertEquals(futureDate.plusDays(3), ad.getTopUntil());
@@ -532,18 +563,68 @@ public class AdvertisementServiceTest {
     }
 
     @Test
-    void promote_ShouldThrowValidationException_WhenNotOwner() {
+    void promote_Admin_Success_FirstTime() {
+        Long adId = 1L;
+        String username = "adminUsername";
+        AdvertisementPromoteDto dto = new AdvertisementPromoteDto(7);
+
+        User admin = new User();
+        admin.setUsername(username);
+        admin.setRole(Role.ROLE_ADMIN);
+        User seller = new User();
+        seller.setUsername(username);
+
+        Advertisement ad = new Advertisement();
+        ad.setSeller(seller);
+        ad.setStatus(AdStatus.ACTIVE);
+        ad.setTopUntil(null);
+
+        given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(admin));
+        advertisementService.promote(adId, dto, username);
+
+        assertTrue(ad.isTop());
+        assertNotNull(ad.getTopUntil());
+        assertTrue(ad.getTopUntil().isAfter(LocalDateTime.now().plusDays(6)));
+    }
+
+    @Test
+    void promote_ShouldThrowNotEnoughRightsException_WhenNotOwner() {
         Long adId = 1L;
         Advertisement advertisement = new Advertisement();
         User seller = new User();
         seller.setUsername("seller");
         advertisement.setSeller(seller);
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(advertisement));
-
-        assertThrows(ValidationException.class,
+        given(userRepository.findByUsername(any())).willReturn(Optional.of(seller));
+        assertThrows(NotEnoughRightsException.class,
                 () -> advertisementService.promote(adId, new AdvertisementPromoteDto(5), "hacker")
         );
     }
+
+    @Test
+    void promote_ShouldThrowNotENFException_WhenAdvertisementDoesNotExist() {
+       Long adId = 1L;
+        given(advertisementRepository.findById(adId)).willReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,
+                () -> advertisementService.promote(adId, new AdvertisementPromoteDto(5), "username")
+        );
+        verifyNoInteractions(userRepository);
+    }
+
+    @Test
+    void promote_ShouldThrowNotENFException_WhenUserDoesNotExist() {
+        Long adId = 1L;
+        Advertisement advertisement = new Advertisement();
+        given(advertisementRepository.findById(adId)).willReturn(Optional.of(advertisement));
+        given(userRepository.findByUsername(any())).willReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,
+                () -> advertisementService.promote(adId, new AdvertisementPromoteDto(5), "username")
+        );
+    }
+
+
+
 
     @Test
     void promote_ShouldThrowAdvertisementNotAvailableException_WhenStatusNotActive() {
@@ -556,7 +637,7 @@ public class AdvertisementServiceTest {
         ad.setStatus(AdStatus.SOLD);
 
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
-
+        given(userRepository.findByUsername(any())).willReturn(Optional.of(seller));
         assertThrows(AdvertisementNotAvailableException.class,
                 () -> advertisementService.promote(adId, new AdvertisementPromoteDto(1), "owner")
         );
@@ -609,5 +690,45 @@ public class AdvertisementServiceTest {
 
         assertTrue(ex.getMessage().contains(username));
         verify(advertisementRepository, never()).findAllByUsername(anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void getAllForAdmin_ShouldReturnPageResponse_Success() {
+        int page = 0;
+        int size = 10;
+        List<Advertisement> entities = List.of(new Advertisement());
+        AdvertisementResponseDto expectedDto = new AdvertisementResponseDto(
+                1L, "Title", "Desc", BigDecimal.TEN, "ACTIVE",
+                false, LocalDateTime.now(), null, "Category", "img", List.of()
+        );
+        when(advertisementRepository.findAllForAdmin(page, size)).thenReturn(entities);
+        when(advertisementRepository.countAll()).thenReturn(25L);
+        when(mapper.toDto(any(Advertisement.class))).thenReturn(expectedDto);
+
+        PageResponse<AdvertisementResponseDto> result = advertisementService.getAllForAdmin(page, size);
+
+        assertEquals(25L, result.totalElements());
+        assertEquals(3, result.totalPages());
+        assertEquals(1, result.content().size());
+        assertEquals(page, result.page());
+
+        verify(advertisementRepository).findAllForAdmin(page, size);
+        verify(advertisementRepository).countAll();
+        verify(mapper, times(1)).toDto(any());
+    }
+
+    @Test
+    void getAllForAdmin_ShouldReturnEmptyList_WhenPageIsOutOfBounds() {
+        int page = 5;
+        int size = 10;
+
+        when(advertisementRepository.findAllForAdmin(page, size)).thenReturn(List.of());
+        when(advertisementRepository.countAll()).thenReturn(25L);
+
+        PageResponse<AdvertisementResponseDto> result = advertisementService.getAllForAdmin(page, size);
+
+        assertTrue(result.content().isEmpty());
+        assertEquals(3, result.totalPages());
+        assertEquals(25L, result.totalElements());
     }
 }

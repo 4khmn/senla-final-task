@@ -78,4 +78,16 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
         cq.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
         return entityManager.createQuery(cq).getSingleResult();
     }
+
+    public List<Review> findAll(int page, int size) {
+        return entityManager.createQuery("SELECT r FROM Review r ORDER BY r.createdAt DESC", Review.class)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    public long countAll() {
+        return entityManager.createQuery("SELECT COUNT(r) FROM Review r", Long.class)
+                .getSingleResult();
+    }
 }

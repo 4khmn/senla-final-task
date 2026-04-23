@@ -6,9 +6,12 @@ import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.entity.User;
+import com.project.velo.entity.enums.Role;
+import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
 import com.project.velo.security.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +36,12 @@ public class AuthService {
 
     @Transactional
     public ProfileResponseDto addUser(UserCreateDto dto) {
+        if (userRepository.existsByUsername(dto.username())) {
+            throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
+        }
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ValidationException("Пользователь с почтой " + dto.email() + " уже существует");
+        }
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
 
@@ -60,5 +69,24 @@ public class AuthService {
                 roles);
 
         return new AuthResponseDto(token);
+    }
+
+    @Transactional
+    public ProfileResponseDto addAdmin(UserCreateDto dto) {
+        if (userRepository.existsByUsername(dto.username())) {
+            throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
+        }
+        if (userRepository.existsByEmail(dto.email())) {
+            throw new ValidationException("Пользователь с почтой " + dto.email() + " уже существует");
+        }
+
+        User user = mapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(dto.password()));
+
+        user.setRole(Role.ROLE_ADMIN);
+        User savedUser = userRepository.save(user);
+
+        return mapper.toProfileDto(savedUser);
+
     }
 }

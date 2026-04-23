@@ -84,6 +84,21 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         return applyPagination(q, page, size).getResultList();
     }
 
+    public List<Advertisement> findAllForAdmin(int page, int size) {
+        return entityManager.createQuery(
+                        "SELECT a FROM Advertisement a ORDER BY a.createdAt DESC", Advertisement.class)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    public long countAll() {
+        return entityManager.createQuery(
+                        "SELECT COUNT(a) FROM Advertisement a", Long.class)
+                .getSingleResult();
+    }
+
+
     private Predicate[] buildPredicates(CriteriaBuilder cb, Root<Advertisement> root, String query, String category) {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("status"), AdStatus.ACTIVE));

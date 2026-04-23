@@ -70,7 +70,10 @@ public class AdvertisementController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAdvertisement(@PathVariable Long id, @AuthenticationPrincipal UserDetails user) {
+    public ResponseEntity<Void> deleteAdvertisement(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails user
+    ) {
         log.info("DELETE /api/advertisements/{} - Deleting advertisement with id: {}", id, id);
         advertisementService.delete(id, user.getUsername());
         log.info("DELETE /api/advertisements/{} - Advertisement with id: {} was successfully deleted", id, id);
