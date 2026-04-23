@@ -1,16 +1,16 @@
 package com.project.velo.controller.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.velo.dto.create.UserCreateDto;
+import com.project.velo.dto.create.CategoryCreateDto;
 import com.project.velo.dto.response.AdvertisementResponseDto;
+import com.project.velo.dto.response.CategoryResponseDto;
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfileResponseDto;
 import com.project.velo.dto.response.ReviewResponseDto;
+import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.security.JwtUtil;
 import com.project.velo.security.SecurityConfig;
 import com.project.velo.service.advertisement.AdvertisementService;
-import com.project.velo.service.auth.AuthService;
-import com.project.velo.service.profile.ProfileService;
+import com.project.velo.service.advertisement.CategoryService;
 import com.project.velo.service.social.ReviewService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,21 +31,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AdminController.class)
+@WebMvcTest(AdminContentController.class)
 @Import(SecurityConfig.class)
-public class AdminControllerTest {
+public class AdminContentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ProfileService profileService;
-    @MockitoBean
     private ReviewService reviewService;
+
     @MockitoBean
     private AdvertisementService advertisementService;
+
     @MockitoBean
-    private AuthService authService;
+    private CategoryService categoryService;
 
     @MockitoBean
     private JwtUtil jwtUtil;
@@ -54,26 +53,8 @@ public class AdminControllerTest {
     @MockitoBean
     private UserDetailsService userDetailsService;
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void getAllUsers_ShouldReturnOk() throws Exception {
-        PageResponse<ProfileResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-        given(profileService.getAllProfiles(0, 20)).willReturn(pageResponse);
-
-        mockMvc.perform(get("/api/admin/users")
-                        .param("page", "0")
-                        .param("size", "20"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
-    }
-
-    @Test
-    @WithMockUser(roles = "USER")
-    void getAllUsers_ShouldReturnForbidden_WhenUserIsNotAdmin() throws Exception {
-        mockMvc.perform(get("/api/admin/users"))
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -81,7 +62,7 @@ public class AdminControllerTest {
         PageResponse<ReviewResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
         given(reviewService.getAllReviews(0, 20)).willReturn(pageResponse);
 
-        mockMvc.perform(get("/api/admin/reviews")
+        mockMvc.perform(get("/api/admin/content/reviews")
                         .param("page", "0")
                         .param("size", "20"))
                 .andExpect(status().isOk())
@@ -91,7 +72,7 @@ public class AdminControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void getAllReviews_ShouldReturnForbidden_WhenUserIsNotAdmin() throws Exception {
-        mockMvc.perform(get("/api/admin/reviews"))
+        mockMvc.perform(get("/api/admin/content/reviews"))
                 .andExpect(status().isForbidden());
     }
 
@@ -101,7 +82,7 @@ public class AdminControllerTest {
         PageResponse<AdvertisementResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
         given(advertisementService.getAllForAdmin(0, 20)).willReturn(pageResponse);
 
-        mockMvc.perform(get("/api/admin/advertisements")
+        mockMvc.perform(get("/api/admin/content/advertisements")
                         .param("page", "0")
                         .param("size", "20"))
                 .andExpect(status().isOk())
@@ -111,55 +92,72 @@ public class AdminControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void getAllAdvertisements_ShouldReturnForbidden_WhenUserIsNotAdmin() throws Exception {
-        mockMvc.perform(get("/api/admin/advertisements"))
+        mockMvc.perform(get("/api/admin/content/advertisements"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void updateUserStatus_ShouldReturnNoContent() throws Exception {
-        String username = "testuser";
-        boolean enabled = false;
+    void updateCategory_ShouldReturnDto_Success() throws Exception {
+        CategoryUpdateDto request = new CategoryUpdateDto("name");
+        CategoryResponseDto response = new CategoryResponseDto(1L, "name");
+        given(categoryService.update(1L, request)).willReturn(response);
 
-        mockMvc.perform(patch("/api/admin/users/{username}/status", username)
-                        .param("enabled", String.valueOf(enabled)))
+        mockMvc.perform(patch("/api/admin/content/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("name"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateCategory_ShouldReturnBadRequest_WhenNameIsBlank() throws Exception {
+
+        CategoryUpdateDto request = new CategoryUpdateDto("");
+
+
+        mockMvc.perform(patch("/api/admin/content/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deleteCategory_Success() throws Exception {
+
+        mockMvc.perform(delete("/api/admin/content/categories/{id}", 1L))
                 .andExpect(status().isNoContent());
-
-        verify(profileService).setUserStatus(username, enabled);
+        verify(categoryService).delete(any());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void createAdmin_ShouldReturnCreated() throws Exception {
-        UserCreateDto dto = new UserCreateDto("new_admin", "Password123!", "admin@velo.com", "Admin", "Adminov");
-        ProfileResponseDto responseDto = new ProfileResponseDto(
-                1L,
-                "new_admin",
-                "admin@velo.com",
-                new BigDecimal("0"),
-                "admin",
-                "adminov",
-                null,
-                null);
+    void createCategory_ShouldReturnDto_Success() throws Exception {
 
-        given(authService.addAdmin(any(UserCreateDto.class))).willReturn(responseDto);
+        CategoryCreateDto request = new CategoryCreateDto("name");
+        CategoryResponseDto response = new CategoryResponseDto(1L, "name");
+        given(categoryService.create(request)).willReturn(response);
 
-        mockMvc.perform(post("/api/admin/create-admin")
+        mockMvc.perform(post("/api/admin/content/categories")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(dto)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("new_admin"))
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.name").value("name"));
     }
 
     @Test
-    @WithMockUser(roles = "USER")
-    void createAdmin_ShouldReturnForbidden_WhenUserIsNotAdmin() throws Exception {
-        UserCreateDto dto = new UserCreateDto("hacker", "Pass123!", "h@h.com", "H", "H");
+    @WithMockUser(roles = "ADMIN")
+    void createCategory_ShouldReturnBadRequest_WhenNameIsBlank() throws Exception {
 
-        mockMvc.perform(post("/api/admin/create-admin")
+        CategoryCreateDto request = new CategoryCreateDto("");
+
+
+        mockMvc.perform(post("/api/admin/content/categories")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(dto)))
-                .andExpect(status().isForbidden());
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
+
 }
