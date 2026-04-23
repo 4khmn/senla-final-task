@@ -1,7 +1,7 @@
 package com.project.velo.service.profile;
 
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfileFullResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.dto.response.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
@@ -40,22 +40,22 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public ProfileFullResponseDto getFullByUsername(String username) {
+    public ProfilePrivateResponseDto getPrivateByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
-        return userMapper.toFullProfileDto(user);
+        return userMapper.toPrivateProfileDto(user);
     }
 
 
     @Transactional
-    public ProfileFullResponseDto update(ProfileUpdateDto dto, String username) {
+    public ProfilePrivateResponseDto update(ProfileUpdateDto dto, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         profileMapper.updateEntityFromDto(dto, user.getProfile());
 
-        return userMapper.toFullProfileDto(user);
+        return userMapper.toPrivateProfileDto(user);
     }
 
     @Transactional
@@ -74,13 +74,13 @@ public class ProfileService {
 
 
     @Transactional(readOnly = true)
-    public PageResponse<ProfileFullResponseDto> getAllProfiles(int page, int size) {
+    public PageResponse<ProfilePrivateResponseDto> getAllProfiles(int page, int size) {
         List<User> users = userRepository.findAll(page, size);
 
         long totalElements = userRepository.count();
 
-        List<ProfileFullResponseDto> dtos = users.stream()
-                .map(userMapper::toFullProfileDto)
+        List<ProfilePrivateResponseDto> dtos = users.stream()
+                .map(userMapper::toPrivateProfileDto)
                 .toList();
 
         int totalPages = (int) Math.ceil((double) totalElements / size);

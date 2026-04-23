@@ -1,7 +1,7 @@
 package com.project.velo.controller.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.velo.dto.response.ProfileFullResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.dto.response.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.exception.GlobalExceptionHandler;
@@ -68,7 +68,7 @@ class ProfileControllerTest {
 
     @Test
     void getMyProfile_Success() throws Exception {
-        ProfileFullResponseDto profileFullResponseDto = new ProfileFullResponseDto(1L,
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
                 "denis",
                 "email",
                 "phone",
@@ -81,7 +81,7 @@ class ProfileControllerTest {
                 true,
                 LocalDateTime.now()
         );
-        when(profileService.getFullByUsername(any())).thenReturn(profileFullResponseDto);
+        when(profileService.getPrivateByUsername(any())).thenReturn(profilePrivateResponseDto);
 
         mockMvc.perform(get("/api/profiles/my"))
                 .andExpect(status().isOk())
@@ -92,7 +92,7 @@ class ProfileControllerTest {
     @Test
     void getProfile_Success() throws Exception {
         ProfilePublicResponseDto response = new ProfilePublicResponseDto(
-                2L, "maxim", BigDecimal.ZERO, "firstName", "lastName", "bio", "avatar"
+                2L, "maxim", BigDecimal.ZERO, "firstName", "lastName", "bio", "avatar", LocalDateTime.now()
         );
         when(profileService.getPublicByUsername("maxim")).thenReturn(response);
 
@@ -106,7 +106,7 @@ class ProfileControllerTest {
     @Test
     void updateProfileInfo_Success() throws Exception {
         ProfileUpdateDto updateDto = new ProfileUpdateDto("firstName2", null, "+79998888776", null);
-        ProfileFullResponseDto profileFullResponseDto = new ProfileFullResponseDto(1L,
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
                 "denis",
                 "email",
                 "+79998888776",
@@ -120,7 +120,7 @@ class ProfileControllerTest {
                 LocalDateTime.now()
         );
 
-        when(profileService.update(any(ProfileUpdateDto.class), any())).thenReturn(profileFullResponseDto);
+        when(profileService.update(any(ProfileUpdateDto.class), any())).thenReturn(profilePrivateResponseDto);
 
         mockMvc.perform(patch("/api/profiles/my")
                         .contentType(MediaType.APPLICATION_JSON)

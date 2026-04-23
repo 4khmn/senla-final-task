@@ -1,8 +1,7 @@
 package com.project.velo.service.auth;
 
 
-import com.project.velo.dto.response.ProfileFullResponseDto;
-import com.project.velo.dto.response.ProfilePublicResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
@@ -35,7 +34,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public ProfileFullResponseDto addUser(UserCreateDto dto) {
+    public ProfilePrivateResponseDto addUser(UserCreateDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
             throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
         }
@@ -47,7 +46,7 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        return mapper.toFullProfileDto(savedUser);
+        return mapper.toPrivateProfileDto(savedUser);
     }
 
     @Transactional(readOnly = true)
@@ -72,7 +71,7 @@ public class AuthService {
     }
 
     @Transactional
-    public ProfileFullResponseDto addAdmin(UserCreateDto dto) {
+    public ProfilePrivateResponseDto addAdmin(UserCreateDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
             throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
         }
@@ -86,7 +85,7 @@ public class AuthService {
         user.setRole(Role.ROLE_ADMIN);
         User savedUser = userRepository.save(user);
 
-        return mapper.toFullProfileDto(savedUser);
+        return mapper.toPrivateProfileDto(savedUser);
 
     }
 }

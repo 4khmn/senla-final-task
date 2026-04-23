@@ -3,7 +3,7 @@ package com.project.velo.controller.admin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfileFullResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.security.JwtUtil;
 import com.project.velo.security.SecurityConfig;
 import com.project.velo.service.auth.AuthService;
@@ -51,7 +51,7 @@ public class AdminUsersControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void getAllUsers_ShouldReturnOk() throws Exception {
-        PageResponse<ProfileFullResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
+        PageResponse<ProfilePrivateResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
 
         given(profileService.getAllProfiles(0, 20)).willReturn(pageResponse);
 
@@ -87,7 +87,7 @@ public class AdminUsersControllerTest {
     @WithMockUser(roles = "ADMIN")
     void createAdmin_ShouldReturnCreated() throws Exception {
         UserCreateDto dto = new UserCreateDto("new_admin", "Password123!", "admin@velo.com", "Admin", "Adminov");
-        ProfileFullResponseDto profileFullResponseDto = new ProfileFullResponseDto(1L,
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
                 "new_admin",
                 "admin@velo.com",
                 "phone",
@@ -101,7 +101,7 @@ public class AdminUsersControllerTest {
                 LocalDateTime.now()
         );
 
-        given(authService.addAdmin(any(UserCreateDto.class))).willReturn(profileFullResponseDto);
+        given(authService.addAdmin(any(UserCreateDto.class))).willReturn(profilePrivateResponseDto);
 
         mockMvc.perform(post("/api/admin/users")
                         .contentType(MediaType.APPLICATION_JSON)

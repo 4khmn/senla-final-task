@@ -3,7 +3,7 @@ package com.project.velo.dto.response;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record ProfileFullResponseDto(
+public record ProfilePrivateResponseDto(
         Long id,
         String username,
         String email,

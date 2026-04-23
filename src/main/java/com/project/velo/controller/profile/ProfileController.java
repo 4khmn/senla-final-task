@@ -25,9 +25,9 @@ public class ProfileController {
 
 
     @GetMapping("/my")
-    public ResponseEntity<ProfileFullResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ProfilePrivateResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
         log.info("GET /api/profiles/my - Fetching profile for username = {}", user.getUsername());
-        ProfileFullResponseDto profile = profileService.getFullByUsername(user.getUsername());
+        ProfilePrivateResponseDto profile = profileService.getPrivateByUsername(user.getUsername());
         log.info("GET /api/profiles/my - Profile for username: {} was successfully retrieved", user.getUsername());
         return ResponseEntity.ok(profile);
     }
@@ -41,12 +41,12 @@ public class ProfileController {
     }
 
     @PatchMapping("/my")
-    public ResponseEntity<ProfileFullResponseDto> updateProfileInfo(
+    public ResponseEntity<ProfilePrivateResponseDto> updateProfileInfo(
             @RequestBody @Valid ProfileUpdateDto dto,
             @AuthenticationPrincipal UserDetails user
     ) {
         log.info("PATCH /api/profiles/my - Fetching profile for username: {}", user.getUsername());
-        ProfileFullResponseDto updated = profileService.update(dto, user.getUsername());
+        ProfilePrivateResponseDto updated = profileService.update(dto, user.getUsername());
         log.info("PATCH /api/profiles/my - Profile for username: {} was successfully updated", user.getUsername());
         return ResponseEntity.ok(updated);
     }

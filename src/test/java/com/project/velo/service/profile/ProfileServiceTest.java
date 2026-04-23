@@ -1,7 +1,7 @@
 package com.project.velo.service.profile;
 
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfileFullResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.dto.response.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
@@ -48,14 +48,14 @@ public class ProfileServiceTest {
     private ProfileService profileService;
 
     @Test
-    void getByUsername_Success() {
+    void getPrivateByUsername_Success() {
         String username = "username";
 
         User user = new User();
         user.setId(1L);
         user.setUsername(username);
 
-        ProfileFullResponseDto profileFullResponseDto = new ProfileFullResponseDto(1L,
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
                 "username",
                 "email",
                 "phone",
@@ -69,24 +69,63 @@ public class ProfileServiceTest {
                 LocalDateTime.now()
         );
         given(userRepository.findByUsername("username")).willReturn(Optional.of(user));
-        given(userMapper.toFullProfileDto(user)).willReturn(profileFullResponseDto);
+        given(userMapper.toPrivateProfileDto(user)).willReturn(profilePrivateResponseDto);
 
-        ProfileFullResponseDto result = profileService.getFullByUsername(username);
+        ProfilePrivateResponseDto result = profileService.getPrivateByUsername(username);
 
         assertNotNull(result);
-        assertEquals(profileFullResponseDto, result);
+        assertEquals(profilePrivateResponseDto, result);
 
-        verify(userMapper).toFullProfileDto(any());
+        verify(userMapper).toPrivateProfileDto(any());
     }
 
-
     @Test
-    void getByUsername_ShouldThrowEntityNotFoundException_WhenUsernameDoesNotExist() {
+    void getPrivateByUsername_ShouldThrowEntityNotFoundException_WhenUsernameDoesNotExist() {
 
         String username = "username";
         given(userRepository.findByUsername(username)).willReturn(Optional.empty());
         EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
-                () -> profileService.getFullByUsername("username"));
+                () -> profileService.getPrivateByUsername("username"));
+
+        assertEquals("Пользователя с username " + username + " не найдено", result.getMessage());
+        verifyNoInteractions(userMapper);
+    }
+
+    @Test
+    void getPublicByUsername_Success() {
+        String username = "username";
+
+        User user = new User();
+        user.setId(1L);
+        user.setUsername(username);
+
+        ProfilePublicResponseDto profilePublicResponseDto = new ProfilePublicResponseDto(1L,
+                "username",
+                new BigDecimal("0"),
+                "firstName",
+                "lastName",
+                "bio",
+                "avatarUrl",
+                LocalDateTime.now()
+        );
+        given(userRepository.findByUsername("username")).willReturn(Optional.of(user));
+        given(userMapper.toPublicProfileDto(user)).willReturn(profilePublicResponseDto);
+
+        ProfilePublicResponseDto result = profileService.getPublicByUsername(username);
+
+        assertNotNull(result);
+        assertEquals(profilePublicResponseDto, result);
+
+        verify(userMapper).toPublicProfileDto(any());
+    }
+
+    @Test
+    void getPublicByUsername_ShouldThrowEntityNotFoundException_WhenUsernameDoesNotExist() {
+
+        String username = "username";
+        given(userRepository.findByUsername(username)).willReturn(Optional.empty());
+        EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
+                () -> profileService.getPublicByUsername("username"));
 
         assertEquals("Пользователя с username " + username + " не найдено", result.getMessage());
         verifyNoInteractions(userMapper);
@@ -105,7 +144,7 @@ public class ProfileServiceTest {
         user.setProfile(profile);
         ProfileUpdateDto dto = new ProfileUpdateDto("", "newLastName", "", "");
 
-        ProfileFullResponseDto profileFullResponseDto = new ProfileFullResponseDto(1L,
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
                 "denis",
                 "email",
                 "phone",
@@ -119,12 +158,12 @@ public class ProfileServiceTest {
                 LocalDateTime.now()
         );
         given(userRepository.findByUsername("username")).willReturn(Optional.of(user));
-        given(userMapper.toFullProfileDto(user)).willReturn(profileFullResponseDto);
+        given(userMapper.toPrivateProfileDto(user)).willReturn(profilePrivateResponseDto);
 
-        ProfileFullResponseDto result = profileService.update(dto, username);
+        ProfilePrivateResponseDto result = profileService.update(dto, username);
 
         assertNotNull(result);
-        assertEquals(profileFullResponseDto, result);
+        assertEquals(profilePrivateResponseDto, result);
         verify(profileMapper).updateEntityFromDto(dto, user.getProfile());
         verify(userRepository).findByUsername(username);
     }
@@ -208,7 +247,7 @@ public class ProfileServiceTest {
         int size = 2;
         User user1 = new User();
         List<User> users = List.of(user1);
-        ProfileFullResponseDto profileFullResponseDto = new ProfileFullResponseDto(1L,
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
                 "denis",
                 "email",
                 "phone",
@@ -223,9 +262,9 @@ public class ProfileServiceTest {
         );
         when(userRepository.findAll(page, size)).thenReturn(users);
         when(userRepository.count()).thenReturn(10L);
-        when(userMapper.toFullProfileDto(any())).thenReturn(profileFullResponseDto);
+        when(userMapper.toPrivateProfileDto(any())).thenReturn(profilePrivateResponseDto);
 
-        PageResponse<ProfileFullResponseDto> result = profileService.getAllProfiles(page, size);
+        PageResponse<ProfilePrivateResponseDto> result = profileService.getAllProfiles(page, size);
 
         assertEquals(10L, result.totalElements());
         assertEquals(5, result.totalPages());

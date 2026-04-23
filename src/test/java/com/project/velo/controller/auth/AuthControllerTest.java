@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.dto.create.UserCreateDto;
-import com.project.velo.dto.response.ProfileFullResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.auth.AuthService;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +57,7 @@ class AuthControllerTest {
                 "lastName"
         );
 
-        ProfileFullResponseDto responseDto = new ProfileFullResponseDto(
+        ProfilePrivateResponseDto responseDto = new ProfilePrivateResponseDto(
                 1L, "denis1", "ROLE_USER", "phone", "ROLE_USER", BigDecimal.ZERO,
                 "firstName", "lastName", null, null, true, LocalDateTime.now()
         );
