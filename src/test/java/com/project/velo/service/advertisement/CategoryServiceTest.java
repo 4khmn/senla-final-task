@@ -1,7 +1,7 @@
 package com.project.velo.service.advertisement;
 
 import com.project.velo.dto.create.CategoryCreateDto;
-import com.project.velo.dto.response.CategoryResponseDto;
+import com.project.velo.dto.response.advertisement.CategoryResponseDto;
 import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.entity.Category;
 import com.project.velo.exception.NotUniqueRecordException;

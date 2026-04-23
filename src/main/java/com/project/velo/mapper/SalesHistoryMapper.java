@@ -1,7 +1,7 @@
 package com.project.velo.mapper;
 
-import com.project.velo.dto.response.SalesPrivateHistoryResponseDto;
-import com.project.velo.dto.response.SalesPublicHistoryResponseDto;
+import com.project.velo.dto.response.salesHistory.SalesHistoryPrivateResponseDto;
+import com.project.velo.dto.response.salesHistory.SalesHistoryPublicResponseDto;
 import com.project.velo.entity.SalesHistory;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,8 +13,8 @@ public interface SalesHistoryMapper {
     @Mapping(target = "price", source = "finalPrice")
     @Mapping(target = "buyerUsername", source = "salesHistory.buyer.username")
     @Mapping(target = "advertisementId", source = "salesHistory.advertisement.id")
-    SalesPrivateHistoryResponseDto toPrivateDto(SalesHistory salesHistory);
+    SalesHistoryPrivateResponseDto toPrivateDto(SalesHistory salesHistory);
 
     @Mapping(target = "advertisementTitle", source = "salesHistory.advertisement.title")
-    SalesPublicHistoryResponseDto toPublicDto(SalesHistory salesHistory);
+    SalesHistoryPublicResponseDto toPublicDto(SalesHistory salesHistory);
 }

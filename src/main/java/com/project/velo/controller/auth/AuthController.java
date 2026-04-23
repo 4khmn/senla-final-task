@@ -1,6 +1,6 @@
 package com.project.velo.controller.auth;
 
-import com.project.velo.dto.response.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;

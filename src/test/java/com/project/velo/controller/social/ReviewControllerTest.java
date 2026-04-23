@@ -2,7 +2,7 @@ package com.project.velo.controller.social;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.ReviewCreateDto;
-import com.project.velo.dto.response.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewResponseDto;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.social.ReviewService;
 import org.junit.jupiter.api.BeforeEach;

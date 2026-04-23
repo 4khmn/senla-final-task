@@ -1,6 +1,7 @@
 package com.project.velo.controller.profile;
 
-import com.project.velo.dto.response.*;
+import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.profile.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.User;
 import com.project.velo.service.profile.ProfileService;

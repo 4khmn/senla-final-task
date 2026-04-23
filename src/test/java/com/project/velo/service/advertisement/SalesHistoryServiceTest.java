@@ -1,8 +1,8 @@
 package com.project.velo.service.advertisement;
 
-import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.SalesPrivateHistoryResponseDto;
-import com.project.velo.dto.response.SalesPublicHistoryResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
+import com.project.velo.dto.response.salesHistory.SalesHistoryPrivateResponseDto;
+import com.project.velo.dto.response.salesHistory.SalesHistoryPublicResponseDto;
 import com.project.velo.entity.SalesHistory;
 import com.project.velo.mapper.SalesHistoryMapper;
 import com.project.velo.repository.SalesHistoryRepository;
@@ -45,7 +45,7 @@ public class SalesHistoryServiceTest {
         int size = 5;
 
         SalesHistory salesHistory = new SalesHistory();
-        SalesPublicHistoryResponseDto dto = new SalesPublicHistoryResponseDto(
+        SalesHistoryPublicResponseDto dto = new SalesHistoryPublicResponseDto(
                 1L, "Bike", LocalDateTime.now()
         );
 
@@ -55,7 +55,7 @@ public class SalesHistoryServiceTest {
         given(salesHistoryRepository.countSalesBySeller(username)).willReturn(12L);
         given(mapper.toPublicDto(salesHistory)).willReturn(dto);
 
-        PageResponse<SalesPublicHistoryResponseDto> result = salesHistoryService.getPublicSales(username, page, size);
+        PageResponse<SalesHistoryPublicResponseDto> result = salesHistoryService.getPublicSales(username, page, size);
 
         assertNotNull(result);
         assertEquals(1, result.content().size());
@@ -90,7 +90,7 @@ public class SalesHistoryServiceTest {
         int size = 5;
 
         SalesHistory salesHistory = new SalesHistory();
-        SalesPrivateHistoryResponseDto dto = new SalesPrivateHistoryResponseDto(
+        SalesHistoryPrivateResponseDto dto = new SalesHistoryPrivateResponseDto(
                 1L,
                 "Bike",
                 1L,
@@ -106,7 +106,7 @@ public class SalesHistoryServiceTest {
         given(salesHistoryRepository.countSalesBySeller(username)).willReturn(12L);
         given(mapper.toPrivateDto(salesHistory)).willReturn(dto);
 
-        PageResponse<SalesPrivateHistoryResponseDto> result = salesHistoryService.getPrivateSales(username, page, size);
+        PageResponse<SalesHistoryPrivateResponseDto> result = salesHistoryService.getPrivateSales(username, page, size);
 
         assertNotNull(result);
         assertEquals(1, result.content().size());

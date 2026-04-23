@@ -1,8 +1,8 @@
 package com.project.velo.controller.profile;
 
-import com.project.velo.dto.response.AdvertisementResponseDto;
-import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.SalesPrivateHistoryResponseDto;
+import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
+import com.project.velo.dto.response.salesHistory.SalesHistoryPrivateResponseDto;
 import com.project.velo.service.advertisement.AdvertisementService;
 import com.project.velo.service.advertisement.SalesHistoryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +63,7 @@ class ProfileActivityControllerTest {
 
     @Test
     void getMySales_ShouldReturnPageResponse_Success() throws Exception {
-        SalesPrivateHistoryResponseDto dto = new SalesPrivateHistoryResponseDto(
+        SalesHistoryPrivateResponseDto dto = new SalesHistoryPrivateResponseDto(
                 1L,
                 "Bike",
                 10L,
@@ -72,7 +72,7 @@ class ProfileActivityControllerTest {
                 LocalDateTime.now(),
                 false
         );
-        PageResponse<SalesPrivateHistoryResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+        PageResponse<SalesHistoryPrivateResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
         given(salesHistoryService.getPrivateSales("testUser", 0, 10)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/profiles/my/sales"))

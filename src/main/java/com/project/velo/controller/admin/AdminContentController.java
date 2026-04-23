@@ -1,7 +1,10 @@
 package com.project.velo.controller.admin;
 
 import com.project.velo.dto.create.CategoryCreateDto;
-import com.project.velo.dto.response.*;
+import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
+import com.project.velo.dto.response.advertisement.CategoryResponseDto;
+import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.service.advertisement.AdvertisementService;
 import com.project.velo.service.advertisement.CategoryService;

@@ -1,9 +1,9 @@
 package com.project.velo.controller.advertisement;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
-import com.project.velo.dto.response.AdvertisementResponseDto;
-import com.project.velo.dto.response.AdvertisementShortResponseDto;
-import com.project.velo.dto.response.PageResponse;
+import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
+import com.project.velo.dto.response.advertisement.AdvertisementShortResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.service.advertisement.AdvertisementService;

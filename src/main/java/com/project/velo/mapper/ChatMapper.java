@@ -1,7 +1,7 @@
 package com.project.velo.mapper;
 
-import com.project.velo.dto.response.ChatListResponseDto;
-import com.project.velo.dto.response.ChatResponseDto;
+import com.project.velo.dto.response.chat.ChatListResponseDto;
+import com.project.velo.dto.response.chat.ChatResponseDto;
 import com.project.velo.entity.Chat;
 import com.project.velo.entity.Message;
 import com.project.velo.entity.User;

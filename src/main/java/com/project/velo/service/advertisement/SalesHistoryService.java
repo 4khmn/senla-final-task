@@ -1,8 +1,8 @@
 package com.project.velo.service.advertisement;
 
-import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.SalesPrivateHistoryResponseDto;
-import com.project.velo.dto.response.SalesPublicHistoryResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
+import com.project.velo.dto.response.salesHistory.SalesHistoryPrivateResponseDto;
+import com.project.velo.dto.response.salesHistory.SalesHistoryPublicResponseDto;
 import com.project.velo.mapper.SalesHistoryMapper;
 import com.project.velo.repository.SalesHistoryRepository;
 import com.project.velo.repository.UserRepository;
@@ -22,11 +22,11 @@ public class SalesHistoryService {
     private final SalesHistoryMapper mapper;
 
     @Transactional(readOnly = true)
-    public PageResponse<SalesPrivateHistoryResponseDto> getPrivateSales(String username, int page, int size) {
+    public PageResponse<SalesHistoryPrivateResponseDto> getPrivateSales(String username, int page, int size) {
         if (!userRepository.existsByUsername(username)) {
             throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
         }
-        List<SalesPrivateHistoryResponseDto> entities = salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size)
+        List<SalesHistoryPrivateResponseDto> entities = salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size)
                 .stream().map(mapper::toPrivateDto).toList();
 
         long totalElements = salesHistoryRepository.countSalesBySeller(username);
@@ -36,11 +36,11 @@ public class SalesHistoryService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<SalesPublicHistoryResponseDto> getPublicSales(String username, int page, int size) {
+    public PageResponse<SalesHistoryPublicResponseDto> getPublicSales(String username, int page, int size) {
         if (!userRepository.existsByUsername(username)) {
             throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
         }
-        List<SalesPublicHistoryResponseDto> entities = salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size)
+        List<SalesHistoryPublicResponseDto> entities = salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size)
                 .stream().map(mapper::toPublicDto).toList();
 
         long totalElements = salesHistoryRepository.countSalesBySeller(username);

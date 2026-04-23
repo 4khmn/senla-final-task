@@ -2,10 +2,10 @@ package com.project.velo.controller.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.CategoryCreateDto;
-import com.project.velo.dto.response.AdvertisementResponseDto;
-import com.project.velo.dto.response.CategoryResponseDto;
-import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ReviewResponseDto;
+import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
+import com.project.velo.dto.response.advertisement.CategoryResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
+import com.project.velo.dto.response.review.ReviewResponseDto;
 import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.security.JwtUtil;
 import com.project.velo.security.SecurityConfig;

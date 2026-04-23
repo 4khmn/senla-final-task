@@ -1,7 +1,7 @@
 package com.project.velo.mapper;
 
 import com.project.velo.dto.create.ReviewCreateDto;
-import com.project.velo.dto.response.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewResponseDto;
 import com.project.velo.entity.Review;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

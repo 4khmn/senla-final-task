@@ -1,6 +1,6 @@
 package com.project.velo.controller.advertisement;
 
-import com.project.velo.dto.response.CategoryResponseDto;
+import com.project.velo.dto.response.advertisement.CategoryResponseDto;
 import com.project.velo.service.advertisement.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

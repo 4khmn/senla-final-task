@@ -1,8 +1,8 @@
 package com.project.velo.service.social;
 
-import com.project.velo.dto.response.ChatListResponseDto;
-import com.project.velo.dto.response.ChatResponseDto;
-import com.project.velo.dto.response.PageResponse;
+import com.project.velo.dto.response.chat.ChatListResponseDto;
+import com.project.velo.dto.response.chat.ChatResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.Chat;
 import com.project.velo.entity.User;

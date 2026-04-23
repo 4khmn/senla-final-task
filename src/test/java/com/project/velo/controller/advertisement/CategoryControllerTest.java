@@ -1,9 +1,6 @@
 package com.project.velo.controller.advertisement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.velo.dto.create.CategoryCreateDto;
-import com.project.velo.dto.response.CategoryResponseDto;
-import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.advertisement.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,12 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

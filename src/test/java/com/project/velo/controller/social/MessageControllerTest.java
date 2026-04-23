@@ -2,7 +2,7 @@ package com.project.velo.controller.social;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.MessageCreateDto;
-import com.project.velo.dto.response.MessageResponseDto;
+import com.project.velo.dto.response.chat.MessageResponseDto;
 import com.project.velo.dto.update.MessageUpdateDto;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.social.MessageService;
@@ -18,7 +18,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

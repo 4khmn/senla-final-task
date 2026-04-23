@@ -1,8 +1,8 @@
-package com.project.velo.dto.response;
+package com.project.velo.dto.response.salesHistory;
 
 import java.time.LocalDateTime;
 
-public record SalesPublicHistoryResponseDto(
+public record SalesHistoryPublicResponseDto(
         Long id,
         String advertisementTitle,
         LocalDateTime soldAt
