@@ -1,8 +1,8 @@
 package com.project.velo.service.social;
 
 import com.project.velo.dto.create.ReviewCreateDto;
-import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ReviewResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
+import com.project.velo.dto.response.review.ReviewResponseDto;
 import com.project.velo.entity.Review;
 import com.project.velo.entity.SalesHistory;
 import com.project.velo.entity.User;

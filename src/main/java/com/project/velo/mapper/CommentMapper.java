@@ -1,8 +1,8 @@
 package com.project.velo.mapper;
 
 import com.project.velo.dto.create.CommentCreateDto;
-import com.project.velo.dto.response.CommentDetailsResponseDto;
-import com.project.velo.dto.response.UserCommentResponseDto;
+import com.project.velo.dto.response.comment.CommentDetailsResponseDto;
+import com.project.velo.dto.response.profile.UserCommentResponseDto;
 import com.project.velo.entity.Comment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

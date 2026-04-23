@@ -1,4 +1,4 @@
-package com.project.velo.dto.response;
+package com.project.velo.dto.response.chat;
 
 public record ChatResponseDto(
         Long id,

@@ -1,5 +1,7 @@
-package com.project.velo.dto.response;
+package com.project.velo.dto.response.advertisement;
 
+
+import com.project.velo.dto.response.profile.AuthorResponseDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

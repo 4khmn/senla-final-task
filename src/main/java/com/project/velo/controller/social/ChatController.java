@@ -1,9 +1,9 @@
 package com.project.velo.controller.social;
 
-import com.project.velo.dto.response.ChatListResponseDto;
-import com.project.velo.dto.response.ChatResponseDto;
-import com.project.velo.dto.response.MessageResponseDto;
-import com.project.velo.dto.response.PageResponse;
+import com.project.velo.dto.response.chat.ChatListResponseDto;
+import com.project.velo.dto.response.chat.ChatResponseDto;
+import com.project.velo.dto.response.chat.MessageResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.service.social.ChatService;
 import com.project.velo.service.social.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

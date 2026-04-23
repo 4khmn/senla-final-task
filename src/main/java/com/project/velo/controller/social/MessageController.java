@@ -1,9 +1,8 @@
 package com.project.velo.controller.social;
 
 import com.project.velo.dto.create.MessageCreateDto;
-import com.project.velo.dto.response.MessageResponseDto;
+import com.project.velo.dto.response.chat.MessageResponseDto;
 import com.project.velo.dto.update.MessageUpdateDto;
-import com.project.velo.entity.User;
 import com.project.velo.service.social.MessageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

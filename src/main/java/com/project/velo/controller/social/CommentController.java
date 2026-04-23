@@ -1,10 +1,9 @@
 package com.project.velo.controller.social;
 
 import com.project.velo.dto.create.CommentCreateDto;
-import com.project.velo.dto.response.CommentDetailsResponseDto;
-import com.project.velo.dto.response.PageResponse;
+import com.project.velo.dto.response.comment.CommentDetailsResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.update.CommentUpdateDto;
-import com.project.velo.entity.User;
 import com.project.velo.service.social.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @Slf4j

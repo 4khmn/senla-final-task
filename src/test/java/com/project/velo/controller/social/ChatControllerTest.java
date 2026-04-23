@@ -1,6 +1,9 @@
 package com.project.velo.controller.social;
 
-import com.project.velo.dto.response.*;
+import com.project.velo.dto.response.chat.ChatListResponseDto;
+import com.project.velo.dto.response.chat.ChatResponseDto;
+import com.project.velo.dto.response.chat.MessageResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.social.ChatService;
 import com.project.velo.service.social.MessageService;

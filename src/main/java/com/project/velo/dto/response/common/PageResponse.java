@@ -1,4 +1,4 @@
-package com.project.velo.dto.response;
+package com.project.velo.dto.response.common;
 
 import java.util.List;
 

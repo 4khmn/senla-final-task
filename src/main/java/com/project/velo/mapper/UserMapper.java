@@ -1,9 +1,9 @@
 package com.project.velo.mapper;
 
-import com.project.velo.dto.response.AuthorResponseDto;
+import com.project.velo.dto.response.profile.AuthorResponseDto;
 import com.project.velo.dto.create.UserCreateDto;
-import com.project.velo.dto.response.ProfilePrivateResponseDto;
-import com.project.velo.dto.response.ProfilePublicResponseDto;
+import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.profile.ProfilePublicResponseDto;
 import com.project.velo.entity.User;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

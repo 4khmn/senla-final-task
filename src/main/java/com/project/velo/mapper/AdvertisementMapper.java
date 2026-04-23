@@ -1,8 +1,8 @@
 package com.project.velo.mapper;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
-import com.project.velo.dto.response.AdvertisementResponseDto;
-import com.project.velo.dto.response.AdvertisementShortResponseDto;
+import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
+import com.project.velo.dto.response.advertisement.AdvertisementShortResponseDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.entity.AdImage;
 import com.project.velo.entity.Advertisement;

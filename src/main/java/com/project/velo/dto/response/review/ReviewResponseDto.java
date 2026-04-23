@@ -1,4 +1,4 @@
-package com.project.velo.dto.response;
+package com.project.velo.dto.response.review;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

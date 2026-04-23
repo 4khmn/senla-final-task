@@ -1,8 +1,8 @@
 package com.project.velo.controller.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.velo.dto.response.ProfilePrivateResponseDto;
-import com.project.velo.dto.response.ProfilePublicResponseDto;
+import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.profile.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.profile.ProfileService;

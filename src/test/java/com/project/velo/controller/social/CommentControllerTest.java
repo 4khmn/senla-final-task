@@ -2,9 +2,9 @@ package com.project.velo.controller.social;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.CommentCreateDto;
-import com.project.velo.dto.response.AuthorResponseDto;
-import com.project.velo.dto.response.CommentDetailsResponseDto;
-import com.project.velo.dto.response.PageResponse;
+import com.project.velo.dto.response.profile.AuthorResponseDto;
+import com.project.velo.dto.response.comment.CommentDetailsResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.exception.AdvertisementNotAvailableException;
 import com.project.velo.exception.GlobalExceptionHandler;

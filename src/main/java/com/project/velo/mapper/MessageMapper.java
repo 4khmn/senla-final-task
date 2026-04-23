@@ -1,7 +1,7 @@
 package com.project.velo.mapper;
 
 import com.project.velo.dto.create.MessageCreateDto;
-import com.project.velo.dto.response.MessageResponseDto;
+import com.project.velo.dto.response.chat.MessageResponseDto;
 import com.project.velo.dto.update.MessageUpdateDto;
 import com.project.velo.entity.Message;
 import org.mapstruct.Context;

@@ -1,10 +1,10 @@
 package com.project.velo.service.social;
 
 import com.project.velo.dto.create.CommentCreateDto;
-import com.project.velo.dto.response.AuthorResponseDto;
-import com.project.velo.dto.response.CommentDetailsResponseDto;
-import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.UserCommentResponseDto;
+import com.project.velo.dto.response.profile.AuthorResponseDto;
+import com.project.velo.dto.response.comment.CommentDetailsResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
+import com.project.velo.dto.response.profile.UserCommentResponseDto;
 import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.Comment;

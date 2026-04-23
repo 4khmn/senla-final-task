@@ -2,8 +2,8 @@ package com.project.velo.controller.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.UserCreateDto;
-import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
+import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
 import com.project.velo.security.JwtUtil;
 import com.project.velo.security.SecurityConfig;
 import com.project.velo.service.auth.AuthService;

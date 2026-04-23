@@ -1,4 +1,6 @@
-package com.project.velo.dto.response;
+package com.project.velo.dto.response.comment;
+
+import com.project.velo.dto.response.profile.AuthorResponseDto;
 
 import java.time.LocalDateTime;
 

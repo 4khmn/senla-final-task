@@ -1,8 +1,8 @@
 package com.project.velo.service.profile;
 
-import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfilePrivateResponseDto;
-import com.project.velo.dto.response.ProfilePublicResponseDto;
+import com.project.velo.dto.response.common.PageResponse;
+import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.profile.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;

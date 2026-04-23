@@ -1,9 +1,9 @@
-package com.project.velo.dto.response;
+package com.project.velo.dto.response.salesHistory;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record SalesPrivateHistoryResponseDto(
+public record SalesHistoryPrivateResponseDto(
         Long id,
         String advertisementTitle,
         Long advertisementId,
