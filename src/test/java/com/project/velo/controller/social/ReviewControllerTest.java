@@ -66,7 +66,6 @@ public class ReviewControllerTest {
                 .build();
     }
 
-
     @Test
     void leaveReview_ShouldReturnDto_Success() throws Exception{
         ReviewCreateDto request = new ReviewCreateDto(BigDecimal.ONE, "content");
@@ -92,7 +91,6 @@ public class ReviewControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
-
 
     @Test
     void deleteReview_Success() throws Exception {
