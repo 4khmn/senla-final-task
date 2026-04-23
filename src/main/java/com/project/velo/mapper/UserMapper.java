@@ -2,7 +2,8 @@ package com.project.velo.mapper;
 
 import com.project.velo.dto.response.AuthorResponseDto;
 import com.project.velo.dto.create.UserCreateDto;
-import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.ProfilePublicResponseDto;
 import com.project.velo.entity.User;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -20,7 +21,14 @@ public interface UserMapper {
     @Mapping(target = "lastName", source = "profile.lastName")
     @Mapping(target = "bio", source = "profile.bio")
     @Mapping(target = "avatarUrl", source = "profile.avatarUrl")
-    ProfileResponseDto toProfileDto(User user);
+    ProfilePublicResponseDto toPublicProfileDto(User user);
+
+    @Mapping(target = "firstName", source = "profile.firstName")
+    @Mapping(target = "lastName", source = "profile.lastName")
+    @Mapping(target = "bio", source = "profile.bio")
+    @Mapping(target = "phone", source = "profile.phone")
+    @Mapping(target = "avatarUrl", source = "profile.avatarUrl")
+    ProfilePrivateResponseDto toPrivateProfileDto(User user);
 
 
     @Mapping(target = "password", ignore = true)

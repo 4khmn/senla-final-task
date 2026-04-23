@@ -3,7 +3,7 @@ package com.project.velo.controller.admin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.security.JwtUtil;
 import com.project.velo.security.SecurityConfig;
 import com.project.velo.service.auth.AuthService;
@@ -19,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +51,7 @@ public class AdminUsersControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void getAllUsers_ShouldReturnOk() throws Exception {
-        PageResponse<ProfileResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
+        PageResponse<ProfilePrivateResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
 
         given(profileService.getAllProfiles(0, 20)).willReturn(pageResponse);
 
@@ -86,24 +87,30 @@ public class AdminUsersControllerTest {
     @WithMockUser(roles = "ADMIN")
     void createAdmin_ShouldReturnCreated() throws Exception {
         UserCreateDto dto = new UserCreateDto("new_admin", "Password123!", "admin@velo.com", "Admin", "Adminov");
-        ProfileResponseDto responseDto = new ProfileResponseDto(
-                1L,
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
                 "new_admin",
                 "admin@velo.com",
+                "phone",
+                "ROLE_ADMIN",
                 new BigDecimal("0"),
-                "admin",
-                "adminov",
-                null,
-                null);
+                "Admin",
+                "Adminov",
+                "",
+                "",
+                true,
+                LocalDateTime.now()
+        );
 
-        given(authService.addAdmin(any(UserCreateDto.class))).willReturn(responseDto);
+        given(authService.addAdmin(any(UserCreateDto.class))).willReturn(profilePrivateResponseDto);
 
         mockMvc.perform(post("/api/admin/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("new_admin"))
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.role").value("ROLE_ADMIN"))
+                .andExpect(jsonPath("$.email").value("admin@velo.com"));
     }
 
     @Test

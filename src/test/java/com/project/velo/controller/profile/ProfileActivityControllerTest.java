@@ -2,7 +2,7 @@ package com.project.velo.controller.profile;
 
 import com.project.velo.dto.response.AdvertisementResponseDto;
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.SalesHistoryResponseDto;
+import com.project.velo.dto.response.SalesPrivateHistoryResponseDto;
 import com.project.velo.service.advertisement.AdvertisementService;
 import com.project.velo.service.advertisement.SalesHistoryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,11 +63,17 @@ class ProfileActivityControllerTest {
 
     @Test
     void getMySales_ShouldReturnPageResponse_Success() throws Exception {
-        SalesHistoryResponseDto dto = new SalesHistoryResponseDto(
-                1L, "Bike", 10L, new BigDecimal("500.00"), "buyer1", LocalDateTime.now()
+        SalesPrivateHistoryResponseDto dto = new SalesPrivateHistoryResponseDto(
+                1L,
+                "Bike",
+                10L,
+                new BigDecimal("500.00"),
+                "buyer1",
+                LocalDateTime.now(),
+                false
         );
-        PageResponse<SalesHistoryResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
-        given(salesHistoryService.getSales("testUser", 0, 10)).willReturn(pageResponse);
+        PageResponse<SalesPrivateHistoryResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+        given(salesHistoryService.getPrivateSales("testUser", 0, 10)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/profiles/my/sales"))
                 .andExpect(status().isOk())
@@ -77,7 +83,8 @@ class ProfileActivityControllerTest {
 
     @Test
     void getUserSales_ShouldReturnPageResponse_Success() throws Exception {
-        given(salesHistoryService.getSales("otherUser", 0, 10)).willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
+        given(salesHistoryService.getPublicSales("otherUser", 0, 10))
+                .willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/otherUser/sales"))
                 .andExpect(status().isOk())
@@ -101,7 +108,8 @@ class ProfileActivityControllerTest {
 
     @Test
     void getUserAdvertisements_ShouldReturnPageResponse_Success() throws Exception {
-        given(advertisementService.findAdvertisementsByUsername("someUser", 0, 10)).willReturn(new  PageResponse<>(List.of(), 1, 1, 0, 10));
+        given(advertisementService.findAdvertisementsByUsername("someUser", 0, 10))
+                .willReturn(new  PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/someUser/advertisements"))
                 .andExpect(status().isOk());

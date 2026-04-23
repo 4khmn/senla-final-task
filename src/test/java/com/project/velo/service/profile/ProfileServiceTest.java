@@ -1,7 +1,8 @@
 package com.project.velo.service.profile;
 
 import com.project.velo.dto.response.PageResponse;
-import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,33 +48,84 @@ public class ProfileServiceTest {
     private ProfileService profileService;
 
     @Test
-    void getByUsername_Success() {
+    void getPrivateByUsername_Success() {
         String username = "username";
 
         User user = new User();
         user.setId(1L);
         user.setUsername(username);
 
-        ProfileResponseDto profileResponseDto = new ProfileResponseDto(1L, "username", "", BigDecimal.ZERO, "", "", "", "");
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
+                "username",
+                "email",
+                "phone",
+                "ROLE_ANY",
+                new BigDecimal("0"),
+                "firstName",
+                "lastName",
+                "bio",
+                "avatarUrl",
+                true,
+                LocalDateTime.now()
+        );
         given(userRepository.findByUsername("username")).willReturn(Optional.of(user));
-        given(userMapper.toProfileDto(user)).willReturn(profileResponseDto);
+        given(userMapper.toPrivateProfileDto(user)).willReturn(profilePrivateResponseDto);
 
-        ProfileResponseDto result = profileService.getByUsername(username);
+        ProfilePrivateResponseDto result = profileService.getPrivateByUsername(username);
 
         assertNotNull(result);
-        assertEquals(profileResponseDto, result);
+        assertEquals(profilePrivateResponseDto, result);
 
-        verify(userMapper).toProfileDto(any());
+        verify(userMapper).toPrivateProfileDto(any());
     }
 
-
     @Test
-    void getByUsername_ShouldThrowEntityNotFoundException_WhenUsernameDoesNotExist() {
+    void getPrivateByUsername_ShouldThrowEntityNotFoundException_WhenUsernameDoesNotExist() {
 
         String username = "username";
         given(userRepository.findByUsername(username)).willReturn(Optional.empty());
         EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
-                () -> profileService.getByUsername("username"));
+                () -> profileService.getPrivateByUsername("username"));
+
+        assertEquals("Пользователя с username " + username + " не найдено", result.getMessage());
+        verifyNoInteractions(userMapper);
+    }
+
+    @Test
+    void getPublicByUsername_Success() {
+        String username = "username";
+
+        User user = new User();
+        user.setId(1L);
+        user.setUsername(username);
+
+        ProfilePublicResponseDto profilePublicResponseDto = new ProfilePublicResponseDto(1L,
+                "username",
+                new BigDecimal("0"),
+                "firstName",
+                "lastName",
+                "bio",
+                "avatarUrl",
+                LocalDateTime.now()
+        );
+        given(userRepository.findByUsername("username")).willReturn(Optional.of(user));
+        given(userMapper.toPublicProfileDto(user)).willReturn(profilePublicResponseDto);
+
+        ProfilePublicResponseDto result = profileService.getPublicByUsername(username);
+
+        assertNotNull(result);
+        assertEquals(profilePublicResponseDto, result);
+
+        verify(userMapper).toPublicProfileDto(any());
+    }
+
+    @Test
+    void getPublicByUsername_ShouldThrowEntityNotFoundException_WhenUsernameDoesNotExist() {
+
+        String username = "username";
+        given(userRepository.findByUsername(username)).willReturn(Optional.empty());
+        EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
+                () -> profileService.getPublicByUsername("username"));
 
         assertEquals("Пользователя с username " + username + " не найдено", result.getMessage());
         verifyNoInteractions(userMapper);
@@ -91,14 +144,26 @@ public class ProfileServiceTest {
         user.setProfile(profile);
         ProfileUpdateDto dto = new ProfileUpdateDto("", "newLastName", "", "");
 
-        ProfileResponseDto  profileResponseDto = new ProfileResponseDto(1L, "username", "", BigDecimal.ZERO, "firstName", "newLastName", "bio", "");
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
+                "denis",
+                "email",
+                "phone",
+                "ROLE_ANY",
+                new BigDecimal("0"),
+                "firstName",
+                "newLastName",
+                "bio",
+                "avatarUrl",
+                true,
+                LocalDateTime.now()
+        );
         given(userRepository.findByUsername("username")).willReturn(Optional.of(user));
-        given(userMapper.toProfileDto(user)).willReturn(profileResponseDto);
+        given(userMapper.toPrivateProfileDto(user)).willReturn(profilePrivateResponseDto);
 
-        ProfileResponseDto result = profileService.update(dto, username);
+        ProfilePrivateResponseDto result = profileService.update(dto, username);
 
         assertNotNull(result);
-        assertEquals(profileResponseDto, result);
+        assertEquals(profilePrivateResponseDto, result);
         verify(profileMapper).updateEntityFromDto(dto, user.getProfile());
         verify(userRepository).findByUsername(username);
     }
@@ -182,13 +247,24 @@ public class ProfileServiceTest {
         int size = 2;
         User user1 = new User();
         List<User> users = List.of(user1);
-        ProfileResponseDto profileResponseDto = new ProfileResponseDto(1L, "username", "", BigDecimal.ZERO, "", "", "", "");
-
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
+                "denis",
+                "email",
+                "phone",
+                "ROLE_ANY",
+                new BigDecimal("0"),
+                "firstName",
+                "lastName",
+                "bio",
+                "avatarUrl",
+                true,
+                LocalDateTime.now()
+        );
         when(userRepository.findAll(page, size)).thenReturn(users);
         when(userRepository.count()).thenReturn(10L);
-        when(userMapper.toProfileDto(any())).thenReturn(profileResponseDto);
+        when(userMapper.toPrivateProfileDto(any())).thenReturn(profilePrivateResponseDto);
 
-        PageResponse<ProfileResponseDto> result = profileService.getAllProfiles(page, size);
+        PageResponse<ProfilePrivateResponseDto> result = profileService.getAllProfiles(page, size);
 
         assertEquals(10L, result.totalElements());
         assertEquals(5, result.totalPages());

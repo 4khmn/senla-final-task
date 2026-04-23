@@ -1,7 +1,7 @@
 package com.project.velo.service.auth;
 
 
-import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
@@ -11,7 +11,6 @@ import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
 import com.project.velo.security.JwtUtil;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +34,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public ProfileResponseDto addUser(UserCreateDto dto) {
+    public ProfilePrivateResponseDto addUser(UserCreateDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
             throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
         }
@@ -47,7 +46,7 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        return mapper.toProfileDto(savedUser);
+        return mapper.toPrivateProfileDto(savedUser);
     }
 
     @Transactional(readOnly = true)
@@ -72,7 +71,7 @@ public class AuthService {
     }
 
     @Transactional
-    public ProfileResponseDto addAdmin(UserCreateDto dto) {
+    public ProfilePrivateResponseDto addAdmin(UserCreateDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
             throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
         }
@@ -86,7 +85,7 @@ public class AuthService {
         user.setRole(Role.ROLE_ADMIN);
         User savedUser = userRepository.save(user);
 
-        return mapper.toProfileDto(savedUser);
+        return mapper.toPrivateProfileDto(savedUser);
 
     }
 }

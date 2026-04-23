@@ -1,7 +1,8 @@
 package com.project.velo.controller.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
+import com.project.velo.dto.response.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.profile.ProfileService;
@@ -25,6 +26,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -66,37 +68,59 @@ class ProfileControllerTest {
 
     @Test
     void getMyProfile_Success() throws Exception {
-        ProfileResponseDto response = new ProfileResponseDto(
-                1L, "denis", "", BigDecimal.ZERO, "firstName", "lastName", "bio", "avatar"
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
+                "denis",
+                "email",
+                "phone",
+                "ROLE_ANY",
+                new BigDecimal("0"),
+                "firstName",
+                "lastName",
+                "bio",
+                "avatarUrl",
+                true,
+                LocalDateTime.now()
         );
-        when(profileService.getByUsername(any())).thenReturn(response);
+        when(profileService.getPrivateByUsername(any())).thenReturn(profilePrivateResponseDto);
 
         mockMvc.perform(get("/api/profiles/my"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("denis"));
+                .andExpect(jsonPath("$.username").value("denis"))
+                .andExpect(jsonPath("$.email").exists());
     }
 
     @Test
     void getProfile_Success() throws Exception {
-        ProfileResponseDto response = new ProfileResponseDto(
-                2L, "maxim", "", BigDecimal.ZERO, "firstName", "lastName", "bio", "avatar"
+        ProfilePublicResponseDto response = new ProfilePublicResponseDto(
+                2L, "maxim", BigDecimal.ZERO, "firstName", "lastName", "bio", "avatar", LocalDateTime.now()
         );
-        when(profileService.getByUsername("maxim")).thenReturn(response);
+        when(profileService.getPublicByUsername("maxim")).thenReturn(response);
 
         mockMvc.perform(get("/api/profiles/maxim"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("maxim"))
-                .andExpect(jsonPath("$.id").value(2));
+                .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.email").doesNotExist());
     }
 
     @Test
     void updateProfileInfo_Success() throws Exception {
         ProfileUpdateDto updateDto = new ProfileUpdateDto("firstName2", null, "+79998888776", null);
-        ProfileResponseDto response = new ProfileResponseDto(
-                1L, "denis", "", BigDecimal.ZERO, "firstName2", "lastName", "bio", "avatar"
+        ProfilePrivateResponseDto profilePrivateResponseDto = new ProfilePrivateResponseDto(1L,
+                "denis",
+                "email",
+                "+79998888776",
+                "ROLE_ANY",
+                new BigDecimal("0"),
+                "firstName2",
+                "lastName",
+                "bio",
+                "avatarUrl",
+                true,
+                LocalDateTime.now()
         );
 
-        when(profileService.update(any(ProfileUpdateDto.class), any())).thenReturn(response);
+        when(profileService.update(any(ProfileUpdateDto.class), any())).thenReturn(profilePrivateResponseDto);
 
         mockMvc.perform(patch("/api/profiles/my")
                         .contentType(MediaType.APPLICATION_JSON)

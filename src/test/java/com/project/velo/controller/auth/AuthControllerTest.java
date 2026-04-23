@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.dto.create.UserCreateDto;
-import com.project.velo.dto.response.ProfileResponseDto;
+import com.project.velo.dto.response.ProfilePrivateResponseDto;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.auth.AuthService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -47,7 +48,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("POST /api/auth/register - Успешная регистрация")
-    void register_ShouldReturnDto_Success() throws Exception {
+    void register_ShouldReturnFullDto_Success() throws Exception {
         UserCreateDto createDto = new UserCreateDto(
                 "denis1",
                 "Password123!",
@@ -56,9 +57,9 @@ class AuthControllerTest {
                 "lastName"
         );
 
-        ProfileResponseDto responseDto = new ProfileResponseDto(
-                1L, "denis1", "ROLE_USER", BigDecimal.ZERO,
-                "firstName", "lastName", null, null
+        ProfilePrivateResponseDto responseDto = new ProfilePrivateResponseDto(
+                1L, "denis1", "ROLE_USER", "phone", "ROLE_USER", BigDecimal.ZERO,
+                "firstName", "lastName", null, null, true, LocalDateTime.now()
         );
 
         given(authService.addUser(any(UserCreateDto.class))).willReturn(responseDto);
