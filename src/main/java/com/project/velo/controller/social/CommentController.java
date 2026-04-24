@@ -5,6 +5,10 @@ import com.project.velo.dto.response.comment.CommentDetailsResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.service.social.CommentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Comment", description = "Управление комментариями")
 @RestController
 @Slf4j
 @RequestMapping("/api/comments")
@@ -22,6 +27,14 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    @Operation(
+            summary = "Опубликовать комментарий",
+            description = "Опубликовать комментарий к объявлению по id",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @ApiResponse(responseCode = "404", description = "Объявление не найдено")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
+    @ApiResponse(responseCode = "201", description = "Комментарий успешно опубликован")
     @PostMapping("/advertisement/{adId}")
     public ResponseEntity<CommentDetailsResponseDto> postComment(
             @PathVariable Long adId,
@@ -34,6 +47,12 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
     }
 
+    @Operation(
+            summary = "Получить комментарии по объявлению",
+            description = "Получить список всех комментариев к объявлению по id"
+    )
+    @ApiResponse(responseCode = "404", description = "Объявление не найдено")
+    @ApiResponse(responseCode = "200")
     @GetMapping("/advertisement/{adId}")
     public ResponseEntity<PageResponse<CommentDetailsResponseDto>> getComments(
             @PathVariable Long adId,
@@ -48,6 +67,12 @@ public class CommentController {
     }
 
 
+    @Operation(
+            summary = "Удалить комментарий",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @ApiResponse(responseCode = "404", description = "Комментарий не найден")
+    @ApiResponse(responseCode = "204", description = "Комментарий успешно удален")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> delete(@PathVariable Long commentId, @AuthenticationPrincipal UserDetails user) {
         log.info("DELETE /api/comments/{} - User: {} trying to delete a comment with id: {}", commentId, user.getUsername(), commentId);
@@ -57,6 +82,13 @@ public class CommentController {
     }
 
 
+    @Operation(
+            summary = "Обновить комментарий",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @ApiResponse(responseCode = "404", description = "Комментарий не найден")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
+    @ApiResponse(responseCode = "200")
     @PatchMapping("/{commentId}")
     public ResponseEntity<CommentDetailsResponseDto> updateComment(
             @RequestBody @Valid CommentUpdateDto dto,
@@ -68,5 +100,4 @@ public class CommentController {
         log.info("PATCH /api/comments/{} - Comment: {} by user: {} was successfully updated", commentId, updated, user.getUsername());
         return ResponseEntity.ok(updated);
     }
-
 }

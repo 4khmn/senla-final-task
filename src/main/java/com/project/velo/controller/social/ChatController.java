@@ -6,6 +6,10 @@ import com.project.velo.dto.response.chat.MessageResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.service.social.ChatService;
 import com.project.velo.service.social.MessageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Chat", description = "Управление чатами")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -23,6 +28,12 @@ public class ChatController {
     private final ChatService chatService;
     private final MessageService messageService;
 
+    @Operation(
+            summary = "Получение чата",
+            description = "Проверяет существование чата, создает его при отсувствии",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @ApiResponse(responseCode = "201", description = "Чат успешно создан")
     @PostMapping
     public ResponseEntity<ChatResponseDto> getOrCreateChat(
             @RequestParam Long adId,
@@ -34,6 +45,7 @@ public class ChatController {
         return ResponseEntity.status(HttpStatus.CREATED).body(chat);
     }
 
+    @Operation(summary = "Получить список моих чатов", security = @SecurityRequirement(name = "JWT"))
     @GetMapping
     public ResponseEntity<PageResponse<ChatListResponseDto>> getMyChats(
             @AuthenticationPrincipal UserDetails user,
@@ -45,6 +57,9 @@ public class ChatController {
         return ResponseEntity.ok(chats);
     }
 
+    @Operation(summary = "Получить сообщения чата по его id", security = @SecurityRequirement(name = "JWT"))
+    @ApiResponse(responseCode = "404", description = "Чат не найден")
+    @ApiResponse(responseCode = "200")
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<PageResponse<MessageResponseDto>> getChatMessages(
             @PathVariable Long chatId,

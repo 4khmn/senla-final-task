@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
-@Tag(name = "Profile: Social", description = "Управление коментариями и отзывами")
+@Tag(name = "Profile: Social", description = "Управление коментариями и отзывами пользователя")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -44,7 +44,7 @@ public class ProfileSocialController {
     }
 
     @Operation(
-            summary = "Получение полученных отзывов текущего пользователя",
+            summary = "Список отзывов, оставленных другими пользователями о текущем пользователе",
             security = @SecurityRequirement(name = "JWT")
     )
     @GetMapping("/my/reviews")
@@ -60,7 +60,7 @@ public class ProfileSocialController {
         return ResponseEntity.ok(reviews);
     }
 
-    @Operation(summary = "Получение полученных отзывов пользователя по username")
+    @Operation(summary = "Список отзывов, оставленных другими пользователями о пользователе по username")
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     @ApiResponse(responseCode = "200")
     @GetMapping("/{username}/reviews")

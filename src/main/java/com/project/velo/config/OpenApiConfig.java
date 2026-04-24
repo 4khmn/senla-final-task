@@ -19,12 +19,23 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
+        final String securitySchemeName = "JWT";
         return new OpenAPI()
                 .info(new Info()
                         .title("Velo API")
                         .version("1.0")
                         .description("Документация API для сервиса размещения частных объявлений")
-                        .contact(new Contact().name("Denis Akhmin").email("denis-akhmin@yandex.ru")));
+                        .contact(new Contact().name("Denis Akhmin").email("denis-akhmin@yandex.ru")))
+
+                .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement()
+                        .addList(securitySchemeName))
+                .components(new io.swagger.v3.oas.models.Components()
+                        .addSecuritySchemes(securitySchemeName,
+                                new io.swagger.v3.oas.models.security.SecurityScheme()
+                                        .name(securitySchemeName)
+                                        .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
     }
 
     @Bean
