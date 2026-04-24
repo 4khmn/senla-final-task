@@ -12,6 +12,7 @@ import com.project.velo.service.social.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Admin: Content Management", description = "Управление объявлениями, отзывами и категориями")
+@Tag(name = "Admin: Content", description = "Управление объявлениями, отзывами и категориями")
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/admin/content")
 @RequiredArgsConstructor
@@ -31,7 +33,10 @@ public class AdminContentController {
     private final AdvertisementService advertisementService;
     private final CategoryService categoryService;
 
-    @Operation(summary = "Список всех отзывов", description = "Позволяет админу просматривать все отзывы в системе для модерации")
+    @Operation(
+            summary = "Список всех отзывов",
+            description = "Позволяет админу просматривать все отзывы в системе для модерации"
+    )
     @GetMapping("/reviews")
     public ResponseEntity<PageResponse<ReviewResponseDto>> getAllReviews(
             @Parameter(description = "Номер страницы") @RequestParam(defaultValue = "0") int page,
@@ -42,7 +47,10 @@ public class AdminContentController {
         log.info("GET /api/admin/content/reviews - Found: {} reviews, page: {}, size: {}", reviews.size(), page, size);
         return ResponseEntity.ok(reviews);
     }
-    @Operation(summary = "Список всех объявлений", description = "Включает скрытые и заблокированные объявления")
+    @Operation(
+            summary = "Список всех объявлений",
+            description = "Включает скрытые и заблокированные объявления"
+    )
     @GetMapping("/advertisements")
     public ResponseEntity<PageResponse<AdvertisementResponseDto>> getAllAdvertisements(
             @RequestParam(defaultValue = "0") int page,
@@ -53,7 +61,8 @@ public class AdminContentController {
         log.info("GET /api/admin/content/advertisements - Found: {} advertisements, page: {}, size: {}", ads.size(), page, size);
         return ResponseEntity.ok(ads);
     }
-    @Operation(summary = "Создать новую категорию")
+
+    @Operation(summary = "Создание категории")
     @ApiResponse(responseCode = "201", description = "Категория успешно создана")
     @PostMapping("/categories")
     public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody @Valid CategoryCreateDto dto) {
@@ -63,7 +72,8 @@ public class AdminContentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
 
-    @Operation(summary = "Обновить категорию")
+    @Operation(
+            summary = "Изменение категории")
     @PatchMapping("/categories/{id}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
             @PathVariable Long id,
@@ -74,7 +84,8 @@ public class AdminContentController {
         return ResponseEntity.ok(category);
     }
 
-    @Operation(summary = "Удалить категорию")
+    @Operation(
+            summary = "Удаление категории")
     @ApiResponse(responseCode = "204", description = "Категория удалена")
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {

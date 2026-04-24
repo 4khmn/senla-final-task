@@ -1,4 +1,5 @@
 package com.project.velo.security;
+import com.project.velo.exception.CustomSecurityExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,9 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomSecurityExceptionHandler securityExceptionHandler;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomSecurityExceptionHandler securityExceptionHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.securityExceptionHandler = securityExceptionHandler;
     }
 
     @Bean
@@ -43,6 +46,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(securityExceptionHandler) // Для 401
+                        .accessDeniedHandler(securityExceptionHandler)      // Для 403
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
