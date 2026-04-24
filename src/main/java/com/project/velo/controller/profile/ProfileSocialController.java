@@ -5,6 +5,10 @@ import com.project.velo.dto.response.review.ReviewResponseDto;
 import com.project.velo.dto.response.profile.UserCommentResponseDto;
 import com.project.velo.service.social.CommentService;
 import com.project.velo.service.social.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
+@Tag(name = "Profile: Social", description = "Управление коментариями и отзывами пользователя")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -22,6 +27,10 @@ public class ProfileSocialController {
     private final CommentService commentService;
     private final ReviewService reviewService;
 
+    @Operation(
+            summary = "Получение комментариев текущего пользователя",
+            security = @SecurityRequirement(name = "JWT")
+    )
     @GetMapping("/my/comments")
     public ResponseEntity<PageResponse<UserCommentResponseDto>> getAllComments(
             @AuthenticationPrincipal UserDetails user,
@@ -34,6 +43,10 @@ public class ProfileSocialController {
         return ResponseEntity.ok(comments);
     }
 
+    @Operation(
+            summary = "Список отзывов, оставленных другими пользователями о текущем пользователе",
+            security = @SecurityRequirement(name = "JWT")
+    )
     @GetMapping("/my/reviews")
     public ResponseEntity<PageResponse<ReviewResponseDto>> getMyReceivedReviews(
             @AuthenticationPrincipal UserDetails user,
@@ -47,6 +60,9 @@ public class ProfileSocialController {
         return ResponseEntity.ok(reviews);
     }
 
+    @Operation(summary = "Список отзывов, оставленных другими пользователями о пользователе по username")
+    @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    @ApiResponse(responseCode = "200")
     @GetMapping("/{username}/reviews")
     public ResponseEntity<PageResponse<ReviewResponseDto>> getUserReceivedReviews(
             @PathVariable String username,

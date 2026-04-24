@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
+import com.project.velo.exception.CustomSecurityExceptionHandler;
 import com.project.velo.security.JwtUtil;
 import com.project.velo.security.SecurityConfig;
 import com.project.velo.service.auth.AuthService;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AdminUserController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, CustomSecurityExceptionHandler.class})
 public class AdminUsersControllerTest {
 
     @Autowired

@@ -41,7 +41,7 @@ public interface AdvertisementMapper {
 
     @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "primaryImageUrl", source = "images")
-    @Mapping(target = "isTop", source = "top")
+    @Mapping(target = "isTop", expression = "java(advertisement.isTopActive())")
     @Mapping(target = "sellerUsername", source = "seller.username")
     @Mapping(target = "sellerScore", source = "seller.rating")
     AdvertisementShortResponseDto toShortDto(Advertisement advertisement);

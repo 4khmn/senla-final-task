@@ -4,7 +4,7 @@ import com.project.velo.dto.create.CategoryCreateDto;
 import com.project.velo.dto.response.advertisement.CategoryResponseDto;
 import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.entity.Category;
-import com.project.velo.exception.NotUniqueRecordException;
+import com.project.velo.exception.AlreadyExistsException;
 import com.project.velo.mapper.CategoryMapper;
 import com.project.velo.repository.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,7 +24,7 @@ public class CategoryService {
     @Transactional
     public CategoryResponseDto create(CategoryCreateDto dto) {
         if (categoryRepository.existsByName(dto.name())) {
-            throw new NotUniqueRecordException("Категория с именем " + dto.name() + " должна быть уникальной");
+            throw new AlreadyExistsException("Категория с именем " + dto.name() + " должна быть уникальной");
         }
 
         Category category = mapper.toEntity(dto);
@@ -41,7 +41,7 @@ public class CategoryService {
     @Transactional
     public CategoryResponseDto update(Long id, CategoryUpdateDto dto) {
         if (categoryRepository.existsByName(dto.name())) {
-            throw new NotUniqueRecordException("Категория с именем " + dto.name() + " должна быть уникальной");
+            throw new AlreadyExistsException("Категория с именем " + dto.name() + " должна быть уникальной");
         }
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Категория с id " + id + " не найдена"));

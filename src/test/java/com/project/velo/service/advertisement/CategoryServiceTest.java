@@ -4,7 +4,7 @@ import com.project.velo.dto.create.CategoryCreateDto;
 import com.project.velo.dto.response.advertisement.CategoryResponseDto;
 import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.entity.Category;
-import com.project.velo.exception.NotUniqueRecordException;
+import com.project.velo.exception.AlreadyExistsException;
 import com.project.velo.mapper.CategoryMapper;
 import com.project.velo.repository.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -55,12 +55,12 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void create_ShouldThrowNotUniqueRecordException_WhenCategoryExists() {
+    void create_ShouldThrowAlreadyExistsException_WhenCategoryExists() {
         CategoryCreateDto dto = new CategoryCreateDto("name");
 
         given(categoryRepository.existsByName(dto.name())).willReturn(true);
 
-        NotUniqueRecordException result = assertThrows(NotUniqueRecordException.class,
+        AlreadyExistsException result = assertThrows(AlreadyExistsException.class,
                 () -> categoryService.create(dto));
 
         assertEquals("Категория с именем " + dto.name() + " должна быть уникальной", result.getMessage());
@@ -113,13 +113,13 @@ public class CategoryServiceTest {
     }
 
     @Test
-    void update_ShouldThrowNotUniqueRecordException_WhenCategoryExistsWithSameName() {
+    void update_ShouldThrowAlreadyExistsException_WhenCategoryExistsWithSameName() {
         CategoryUpdateDto dto = new CategoryUpdateDto("newName");
         Long id = 1L;
 
         given(categoryRepository.existsByName(dto.name())).willReturn(true);
 
-        NotUniqueRecordException result = assertThrows(NotUniqueRecordException.class,
+        AlreadyExistsException result = assertThrows(AlreadyExistsException.class,
                 () -> categoryService.update(id, dto));
 
         assertEquals("Категория с именем " + dto.name() + " должна быть уникальной", result.getMessage());

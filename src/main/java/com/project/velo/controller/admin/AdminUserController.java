@@ -5,6 +5,10 @@ import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
 import com.project.velo.service.auth.AuthService;
 import com.project.velo.service.profile.ProfileService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Admin: Users", description = "Управление пользователями")
+@SecurityRequirement(name = "JWT")
 @RestController
 @RequestMapping("/api/admin/users")
 @RequiredArgsConstructor
@@ -21,6 +27,10 @@ public class AdminUserController {
     private final ProfileService profileService;
     private final AuthService authService;
 
+    @Operation(
+            summary = "Список всех пользователей",
+            description = "Позволяет админу просматривать всех пользователей системе для модерации"
+    )
     @GetMapping
     public ResponseEntity<PageResponse<ProfilePrivateResponseDto>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -32,6 +42,11 @@ public class AdminUserController {
         return ResponseEntity.ok(users);
     }
 
+    @Operation(
+            summary = "Управление блокировкой пользователя",
+            description = "Позволяет включить (разбанить) или выключить (забанить) учетную запись пользователя по его username"
+    )
+    @ApiResponse(responseCode = "204", description = "Блокировка успешно изменена")
     @PatchMapping("/{username}/status")
     public ResponseEntity<Void> updateUserStatus(
             @PathVariable String username,
@@ -43,6 +58,13 @@ public class AdminUserController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Регистрация админа в системе",
+            description = "Создание учетной записи с правами ADMIN. Доступно только действующим администраторам"
+    )
+    @ApiResponse(responseCode = "201", description = "Админ успешно создан")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
+    @ApiResponse(responseCode = "409", description = "Пользователь с таким логином или email уже существует")
     @PostMapping
     public ResponseEntity<ProfilePrivateResponseDto> createAdmin(@RequestBody @Valid UserCreateDto dto) {
         log.info("POST /api/admin/users - Admin is creating a new administrator: {}", dto.username());

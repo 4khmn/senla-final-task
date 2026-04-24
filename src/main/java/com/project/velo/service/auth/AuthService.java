@@ -7,6 +7,7 @@ import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.Role;
+import com.project.velo.exception.AlreadyExistsException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
@@ -36,10 +37,10 @@ public class AuthService {
     @Transactional
     public ProfilePrivateResponseDto addUser(UserCreateDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
-            throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
+            throw new AlreadyExistsException("Пользователь с именем " + dto.username() + " уже существует");
         }
         if (userRepository.existsByEmail(dto.email())) {
-            throw new ValidationException("Пользователь с почтой " + dto.email() + " уже существует");
+            throw new AlreadyExistsException("Пользователь с почтой " + dto.email() + " уже существует");
         }
         User user = mapper.toEntity(dto);
         user.setPassword(passwordEncoder.encode(dto.password()));
@@ -73,10 +74,10 @@ public class AuthService {
     @Transactional
     public ProfilePrivateResponseDto addAdmin(UserCreateDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
-            throw new ValidationException("Пользователь с именем " + dto.username() + " уже существует");
+            throw new AlreadyExistsException("Пользователь с именем " + dto.username() + " уже существует");
         }
         if (userRepository.existsByEmail(dto.email())) {
-            throw new ValidationException("Пользователь с почтой " + dto.email() + " уже существует");
+            throw new AlreadyExistsException("Пользователь с почтой " + dto.email() + " уже существует");
         }
 
         User user = mapper.toEntity(dto);

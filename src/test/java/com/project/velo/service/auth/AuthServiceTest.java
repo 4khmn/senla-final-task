@@ -5,6 +5,7 @@ import com.project.velo.dto.auth.AuthResponseDto;
 import com.project.velo.dto.auth.LoginRequestDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
+import com.project.velo.exception.AlreadyExistsException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.UserMapper;
 import com.project.velo.repository.UserRepository;
@@ -91,7 +92,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void addUser_ShouldThrowValidationException_WhenUsernameAlreadyTaken() {
+    void addUser_ShouldThrowAlreadyExistsException_WhenUsernameAlreadyTaken() {
         UserCreateDto request = new UserCreateDto(
                 "username", "password", "email@test.com", "Ivan", "Ivanov"
         );
@@ -99,7 +100,7 @@ public class AuthServiceTest {
         given(userRepository.existsByUsername(request.username())).willReturn(false);
         given(userRepository.existsByEmail(request.email())).willReturn(true);
 
-        assertThrows(ValidationException.class, () -> authService.addUser(request));
+        assertThrows(AlreadyExistsException.class, () -> authService.addUser(request));
 
         verifyNoInteractions(passwordEncoder);
         verifyNoInteractions(mapper);
@@ -107,7 +108,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void addUser_ShouldThrowValidationException_WhenEmailAlreadyTaken() {
+    void addUser_ShouldThrowAlreadyExistsException_WhenEmailAlreadyTaken() {
         UserCreateDto request = new UserCreateDto(
                 "username", "password", "email@test.com", "Ivan", "Ivanov"
         );
@@ -115,7 +116,7 @@ public class AuthServiceTest {
         given(userRepository.existsByUsername(request.username())).willReturn(false);
         given(userRepository.existsByEmail(request.email())).willReturn(true);
 
-        assertThrows(ValidationException.class, () -> authService.addUser(request));
+        assertThrows(AlreadyExistsException.class, () -> authService.addUser(request));
 
         verifyNoInteractions(passwordEncoder);
         verifyNoInteractions(mapper);
@@ -213,14 +214,14 @@ public class AuthServiceTest {
     }
 
     @Test
-    void addAdmin_ShouldThrowValidationException_WhenUsernameAlreadyTaken() {
+    void addAdmin_ShouldThrowAlreadyExistsException_WhenUsernameAlreadyTaken() {
         UserCreateDto request = new UserCreateDto(
                 "username", "password", "email@test.com", "Ivan", "Ivanov"
         );
 
         given(userRepository.existsByUsername(request.username())).willReturn(true);
 
-        assertThrows(ValidationException.class, () -> authService.addAdmin(request));
+        assertThrows(AlreadyExistsException.class, () -> authService.addAdmin(request));
 
         verifyNoInteractions(passwordEncoder);
         verifyNoInteractions(mapper);
@@ -228,7 +229,7 @@ public class AuthServiceTest {
     }
 
     @Test
-    void addAdmin_ShouldThrowValidationException_WhenEmailAlreadyTaken() {
+    void addAdmin_ShouldThrowAlreadyExistsException_WhenEmailAlreadyTaken() {
         UserCreateDto request = new UserCreateDto(
                 "username", "password", "email@test.com", "Ivan", "Ivanov"
         );
@@ -236,7 +237,7 @@ public class AuthServiceTest {
         given(userRepository.existsByUsername(request.username())).willReturn(false);
         given(userRepository.existsByEmail(request.email())).willReturn(true);
 
-        assertThrows(ValidationException.class, () -> authService.addAdmin(request));
+        assertThrows(AlreadyExistsException.class, () -> authService.addAdmin(request));
 
         verifyNoInteractions(passwordEncoder);
         verifyNoInteractions(mapper);

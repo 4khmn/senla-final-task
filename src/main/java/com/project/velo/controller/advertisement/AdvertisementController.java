@@ -7,6 +7,10 @@ import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
 import com.project.velo.dto.update.AdvertisementUpdateDto;
 import com.project.velo.service.advertisement.AdvertisementService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Tag(name = "Advertisements", description = "Управление объявлениями: просмотр, создание, покупка и продвижение")
 @RestController
 @Slf4j
 @Validated
@@ -32,6 +37,8 @@ public class AdvertisementController {
 
     private final AdvertisementService advertisementService;
 
+
+    @Operation(summary = "Получить список объявлений", description = "Публичный поиск объявлений с фильтрацией по названию и категории")
     @GetMapping
     public ResponseEntity<PageResponse<AdvertisementShortResponseDto>> getAllAdvertisements(
             @RequestParam(required = false) String search,
@@ -45,6 +52,10 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisements);
     }
 
+
+    @Operation(summary = "Получить детали объявления", description = "Публичный просмотр полной информации об объявлении по его ID")
+    @ApiResponse(responseCode = "404", description = "Объявление не найдено")
+    @ApiResponse(responseCode = "200")
     @GetMapping("/{id}")
     public ResponseEntity<AdvertisementResponseDto> getAdvertisementById(@PathVariable Long id) {
         log.info("GET /api/advertisements/{} - Fetching advertisement by id: {}", id, id);
@@ -53,6 +64,14 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisement);
     }
 
+
+    @Operation(
+            summary = "Создать новое объявление",
+            description = "Требуется авторизация. Изображения передаются списком файлов.",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
+    @ApiResponse(responseCode = "201", description = "Объявление успешно создано")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdvertisementResponseDto> createAdvertisement(
             @ModelAttribute @Valid AdvertisementCreateDto dto,
@@ -69,6 +88,10 @@ public class AdvertisementController {
         return ResponseEntity.status(HttpStatus.CREATED).body(advertisement);
     }
 
+
+    @Operation(summary = "Удалить объявление", security = @SecurityRequirement(name = "JWT"))
+    @ApiResponse(responseCode = "204", description = "Объявление успешно удалено")
+    @ApiResponse(responseCode = "403", description = "Нельзя удалить чужое объявление")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAdvertisement(
             @PathVariable Long id,
@@ -80,6 +103,10 @@ public class AdvertisementController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @Operation(summary = "Редактировать объявление", security = @SecurityRequirement(name = "JWT"))
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
+    @ApiResponse(responseCode = "200")
     @PatchMapping("/{id}")
     public ResponseEntity<AdvertisementResponseDto> updateAdvertisement(
             @PathVariable Long id,
@@ -92,6 +119,11 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisement);
     }
 
+
+    @Operation(summary = "Купить товар (закрыть объявление)", security = @SecurityRequirement(name = "JWT"))
+    @ApiResponse(responseCode = "204", description = "Покупка успешно оформлена")
+    @ApiResponse(responseCode = "409", description = "Сделка по объявлению уже произошла")
+    @ApiResponse(responseCode = "400", description = "Нельзя купить у самого себя")
     @PostMapping("/{adId}/buy")
     public ResponseEntity<Void> buyAdvertisement(
             @PathVariable Long adId,
@@ -103,6 +135,10 @@ public class AdvertisementController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @Operation(summary = "Поднять объявление (продвижение)", security = @SecurityRequirement(name = "JWT"))
+    @ApiResponse(responseCode = "204", description = "Услуга продвижения применена")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
     @PostMapping("/{adId}/promote")
     public ResponseEntity<Void> promote(
             @PathVariable Long adId,
