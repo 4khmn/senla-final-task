@@ -64,6 +64,7 @@ public class AdminContentController {
 
     @Operation(summary = "Создание категории")
     @ApiResponse(responseCode = "201", description = "Категория успешно создана")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
     @PostMapping("/categories")
     public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody @Valid CategoryCreateDto dto) {
         log.info("POST /api/admin/content/categories - Trying to save new category: {}", dto.name());
@@ -72,8 +73,9 @@ public class AdminContentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
 
-    @Operation(
-            summary = "Изменение категории")
+    @Operation(summary = "Изменение категории")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
+    @ApiResponse(responseCode = "200")
     @PatchMapping("/categories/{id}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
             @PathVariable Long id,

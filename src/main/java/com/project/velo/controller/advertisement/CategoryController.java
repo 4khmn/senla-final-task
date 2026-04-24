@@ -20,7 +20,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    
+
     @Operation(summary = "Получить список доступных категорий")
     @GetMapping
     public ResponseEntity<List<CategoryResponseDto>> getAllCategories() {

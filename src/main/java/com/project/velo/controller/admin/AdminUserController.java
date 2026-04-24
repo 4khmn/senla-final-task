@@ -63,6 +63,8 @@ public class AdminUserController {
             description = "Создание учетной записи с правами ADMIN. Доступно только действующим администраторам"
     )
     @ApiResponse(responseCode = "201", description = "Админ успешно создан")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
+    @ApiResponse(responseCode = "409", description = "Пользователь с таким логином или email уже существует")
     @PostMapping
     public ResponseEntity<ProfilePrivateResponseDto> createAdmin(@RequestBody @Valid UserCreateDto dto) {
         log.info("POST /api/admin/users - Admin is creating a new administrator: {}", dto.username());

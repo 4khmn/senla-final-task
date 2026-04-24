@@ -70,6 +70,7 @@ public class AdvertisementController {
             description = "Требуется авторизация. Изображения передаются списком файлов.",
             security = @SecurityRequirement(name = "JWT")
     )
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
     @ApiResponse(responseCode = "201", description = "Объявление успешно создано")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AdvertisementResponseDto> createAdvertisement(
@@ -104,6 +105,8 @@ public class AdvertisementController {
 
 
     @Operation(summary = "Редактировать объявление", security = @SecurityRequirement(name = "JWT"))
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
+    @ApiResponse(responseCode = "200")
     @PatchMapping("/{id}")
     public ResponseEntity<AdvertisementResponseDto> updateAdvertisement(
             @PathVariable Long id,
@@ -135,6 +138,7 @@ public class AdvertisementController {
 
     @Operation(summary = "Поднять объявление (продвижение)", security = @SecurityRequirement(name = "JWT"))
     @ApiResponse(responseCode = "204", description = "Услуга продвижения применена")
+    @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")
     @PostMapping("/{adId}/promote")
     public ResponseEntity<Void> promote(
             @PathVariable Long adId,
