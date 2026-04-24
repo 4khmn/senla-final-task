@@ -7,6 +7,7 @@ import com.project.velo.dto.response.advertisement.CategoryResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.response.review.ReviewResponseDto;
 import com.project.velo.dto.update.CategoryUpdateDto;
+import com.project.velo.exception.CustomSecurityExceptionHandler;
 import com.project.velo.security.JwtUtil;
 import com.project.velo.security.SecurityConfig;
 import com.project.velo.service.advertisement.AdvertisementService;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AdminContentController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, CustomSecurityExceptionHandler.class})
 public class AdminContentControllerTest {
 
     @Autowired
