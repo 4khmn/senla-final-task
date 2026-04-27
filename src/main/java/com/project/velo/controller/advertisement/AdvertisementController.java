@@ -1,6 +1,7 @@
 package com.project.velo.controller.advertisement;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
+import com.project.velo.dto.request.AdvertisementFilterDto;
 import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
 import com.project.velo.dto.response.advertisement.AdvertisementShortResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
@@ -25,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Tag(name = "Advertisements", description = "Управление объявлениями: просмотр, создание, покупка и продвижение")
@@ -41,13 +43,13 @@ public class AdvertisementController {
     @Operation(summary = "Получить список объявлений", description = "Публичный поиск объявлений с фильтрацией по названию и категории")
     @GetMapping
     public ResponseEntity<PageResponse<AdvertisementShortResponseDto>> getAllAdvertisements(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String category,
+            AdvertisementFilterDto filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        log.info("GET /api/advertisements - Fetching advertisements: query={}, category={}, page={}, size={}", search, category, page, size);
-        PageResponse<AdvertisementShortResponseDto> advertisements = advertisementService.getAll(search, category, page, size);
+        log.info("GET /api/advertisements - Fetching advertisements: filter: {}, page={}, size={}",
+                filter, page, size);
+        PageResponse<AdvertisementShortResponseDto> advertisements = advertisementService.getAll(filter, page, size);
         log.info("GET /api/advertisements - Found {} advertisements", advertisements.content().size());
         return ResponseEntity.ok(advertisements);
     }

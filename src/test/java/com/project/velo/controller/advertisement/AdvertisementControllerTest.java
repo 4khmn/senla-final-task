@@ -2,6 +2,7 @@ package com.project.velo.controller.advertisement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.AdvertisementCreateDto;
+import com.project.velo.dto.request.AdvertisementFilterDto;
 import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
 import com.project.velo.dto.response.advertisement.AdvertisementShortResponseDto;
 import com.project.velo.dto.response.profile.AuthorResponseDto;
@@ -79,12 +80,14 @@ public class AdvertisementControllerTest {
                 1L, "title", new BigDecimal("2000.00"), "categoryName",
                 "img.jpg", true, LocalDateTime.now(), "seller", new BigDecimal("4.8")
         );
+        AdvertisementFilterDto filter = new AdvertisementFilterDto(null, null, null, null, null);
+
 
         PageResponse<AdvertisementShortResponseDto> pageResponse = new PageResponse<>(
                 List.of(dto), 1, 1, 0, 10
         );
 
-        given(advertisementService.getAll(isNull(), isNull(), anyInt(), anyInt()))
+        given(advertisementService.getAll(eq(filter), anyInt(), anyInt()))
                 .willReturn(pageResponse);
 
         mockMvc.perform(get("/api/advertisements")
@@ -97,19 +100,21 @@ public class AdvertisementControllerTest {
 
     @Test
     void getAllAdvertisements_WithFilters_ShouldReturnFilteredPageResponse() throws Exception {
-        String search = "Carbon";
-        String category = "Frames";
+
+        AdvertisementFilterDto filter = new AdvertisementFilterDto("query", "category", new BigDecimal(0), new BigDecimal(100), null );
 
         PageResponse<AdvertisementShortResponseDto> emptyResponse = new PageResponse<>(
                 List.of(), 0, 0, 0, 10
         );
 
-        given(advertisementService.getAll(eq(search), eq(category), anyInt(), anyInt()))
+        given(advertisementService.getAll(eq(filter), anyInt(), anyInt()))
                 .willReturn(emptyResponse);
 
         mockMvc.perform(get("/api/advertisements")
-                        .param("search", search)
-                        .param("category", category)
+                        .param("query", filter.query())
+                        .param("category", filter.category())
+                        .param("minPrice", "0")
+                        .param("maxPrice", "100")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())

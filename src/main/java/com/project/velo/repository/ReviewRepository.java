@@ -1,6 +1,7 @@
 package com.project.velo.repository;
 
 import com.project.velo.entity.Review;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
@@ -24,9 +25,9 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
     }
 
     public BigDecimal calculateAverageRating(Long sellerId) {
-        Double avg = entityManager.createQuery("SELECT AVG(r.score) FROM Review r WHERE r.seller.id = :id", Double.class)
-                .setParameter("id", sellerId)
-                .getSingleResult();
+        TypedQuery<Double> query = entityManager.createQuery(
+                "SELECT AVG(r.score) FROM Review r WHERE r.seller.id = :id", Double.class);
+        Double avg = query.setParameter("id", sellerId).getSingleResult();
         return avg != null ? BigDecimal.valueOf(avg) : BigDecimal.ZERO;
     }
 
@@ -34,13 +35,9 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Review> cq = cb.createQuery(Review.class);
         Root<Review> root = cq.from(Review.class);
-        List<Predicate> predicates = new ArrayList<>();
 
-        predicates.add(cb.equal(root.get("seller").get("username"), sellerUsername));
-
-        if (rating != null) {
-            predicates.add(cb.equal(root.get("rating"), rating));
-        }
+        List<Predicate> predicates = buildReviewPredicates(cb, root, sellerUsername, rating);
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
 
         List<Order> orders = new ArrayList<>();
 
@@ -52,9 +49,6 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
             }
         }
         orders.add(cb.desc(root.get("createdAt")));
-
-        cq.where(cb.and(predicates.toArray(new Predicate[0])));
-
         cq.orderBy(orders);
 
         return entityManager.createQuery(cq)
@@ -68,12 +62,7 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Review> root = cq.from(Review.class);
 
-        List<Predicate> predicates = new ArrayList<>();
-        predicates.add(cb.equal(root.get("seller").get("username"), sellerUsername));
-
-        if (rating != null) {
-            predicates.add(cb.equal(root.get("rating"), rating));
-        }
+        List<Predicate> predicates = buildReviewPredicates(cb, root, sellerUsername, rating);
 
         cq.select(cb.count(root)).where(predicates.toArray(new Predicate[0]));
         return entityManager.createQuery(cq).getSingleResult();
@@ -89,5 +78,16 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
     public long countAll() {
         return entityManager.createQuery("SELECT COUNT(r) FROM Review r", Long.class)
                 .getSingleResult();
+    }
+
+    private List<Predicate> buildReviewPredicates(CriteriaBuilder cb, Root<Review> root, String sellerUsername, Integer rating) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(cb.equal(root.get("seller").get("username"), sellerUsername));
+
+        if (rating != null) {
+            predicates.add(cb.equal(root.get("rating"), rating));
+        }
+        return predicates;
     }
 }

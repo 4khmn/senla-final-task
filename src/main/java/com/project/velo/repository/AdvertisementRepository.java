@@ -1,5 +1,6 @@
 package com.project.velo.repository;
 
+import com.project.velo.dto.request.AdvertisementFilterDto;
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.enums.AdStatus;
 import jakarta.persistence.TypedQuery;
@@ -39,13 +40,13 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
                 .executeUpdate();
     }
 
-    public List<Advertisement> findAllFiltered(String query, String category, int page, int size) {
+    public List<Advertisement> findAllFiltered(AdvertisementFilterDto filter, int page, int size) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Advertisement> cq = cb.createQuery(Advertisement.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
         Join<Object, Object> authorJoin = root.join("seller");
 
-        cq.where(buildPredicates(cb, root, query, category));
+        cq.where(buildPredicates(cb, root, filter.query(), filter.category(), filter.minPrice(), filter.maxPrice()));
 
         Expression<Object> effectiveRating = cb.selectCase()
                 .when(cb.equal(authorJoin.get("rating"), BigDecimal.ZERO), new BigDecimal("3.5"))
@@ -57,10 +58,21 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
                 .as(Boolean.class);
 
         List<Order> orders = new ArrayList<>();
-        orders.add(cb.desc(trueTop));
 
-        if (query != null && !query.isBlank()) {
-            orders.add(cb.desc(buildRelevance(cb, root, query)));
+        boolean isPriceSort = filter.sortDirection() != null && !filter.sortDirection().isBlank();
+        if (isPriceSort) {
+            if ("asc".equalsIgnoreCase(filter.sortDirection())) {
+                orders.add(cb.asc(root.get("price")));
+            } else {
+                orders.add(cb.desc(root.get("price")));
+            }
+            orders.add(cb.desc(trueTop));
+        } else {
+            orders.add(cb.desc(trueTop));
+
+            if (filter.query() != null && !filter.query().isBlank()) {
+                orders.add(cb.desc(buildRelevance(cb, root, filter.query())));
+            }
         }
         orders.add(cb.desc(effectiveRating));
         orders.add(cb.desc(root.get("createdAt")));
@@ -72,12 +84,12 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
     }
 
 
-    public long countFiltered(String query, String category) {
+    public long countFiltered(AdvertisementFilterDto filter) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
 
-        cq.select(cb.count(root)).where(buildPredicates(cb, root, query, category));
+        cq.select(cb.count(root)).where(buildPredicates(cb, root, filter.query(), filter.category(), filter.minPrice(), filter.maxPrice()));
 
         return entityManager.createQuery(cq).getSingleResult();
     }
@@ -106,7 +118,9 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
     }
 
 
-    private Predicate[] buildPredicates(CriteriaBuilder cb, Root<Advertisement> root, String query, String category) {
+    private Predicate[] buildPredicates(CriteriaBuilder cb, Root<Advertisement> root,
+                                        String query, String category,
+                                        BigDecimal minPrice, BigDecimal maxPrice) {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("status"), AdStatus.ACTIVE));
 
@@ -128,6 +142,14 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
         if (category != null && !category.isBlank()) {
             predicates.add(cb.equal(root.get("category").get("name"), category));
+        }
+
+        if (minPrice != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
+        }
+
+        if (maxPrice != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
         }
 
         return predicates.toArray(new Predicate[0]);
