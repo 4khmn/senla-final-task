@@ -1,5 +1,6 @@
 package com.project.velo.service.advertisement;
 
+import com.project.velo.dto.request.AdvertisementFilterDto;
 import com.project.velo.dto.response.advertisement.AdvertisementShortResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.update.AdvertisementPromoteDto;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,10 +90,10 @@ public class AdvertisementService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AdvertisementShortResponseDto> getAll(String query, String category, int page, int size) {
-        List<Advertisement> entities = advertisementRepository.findAllFiltered(query, category, page, size);
+    public PageResponse<AdvertisementShortResponseDto> getAll(AdvertisementFilterDto filter, int page, int size) {
+        List<Advertisement> entities = advertisementRepository.findAllFiltered(filter, page, size);
 
-        long totalElements = advertisementRepository.countFiltered(query, category);
+        long totalElements = advertisementRepository.countFiltered(filter);
 
         int totalPages = (int) Math.ceil((double) totalElements / size);
 

@@ -1,6 +1,7 @@
 package com.project.velo.service.advertisement;
 
 import com.project.velo.dto.create.AdvertisementCreateDto;
+import com.project.velo.dto.request.AdvertisementFilterDto;
 import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
 import com.project.velo.dto.response.advertisement.AdvertisementShortResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
@@ -198,11 +199,9 @@ public class AdvertisementServiceTest {
 
     @Test
     void getAll_ShouldReturnPageResponse_Success() {
-        String query = "Velo";
-        String category = "Bikes";
+        AdvertisementFilterDto filter = new AdvertisementFilterDto("Velo", "bikes",new BigDecimal(0), new BigDecimal(100), null );
         int page = 0;
         int size = 5;
-
         Advertisement ad1 = new Advertisement();
         Advertisement ad2 = new Advertisement();
         List<Advertisement> entities = List.of(ad1, ad2);
@@ -212,15 +211,15 @@ public class AdvertisementServiceTest {
         AdvertisementShortResponseDto dto2 = new AdvertisementShortResponseDto(
                 2L, "Title 2", BigDecimal.valueOf(20), "img2", "Cat2", true, LocalDateTime.now(), "seller", BigDecimal.ONE);
 
-        given(advertisementRepository.findAllFiltered(query, category, page, size))
+        given(advertisementRepository.findAllFiltered(filter, page, size))
                 .willReturn(entities);
-        given(advertisementRepository.countFiltered(query, category)).willReturn(11L);
+        given(advertisementRepository.countFiltered(filter)).willReturn(11L);
 
         given(mapper.toShortDto(ad1)).willReturn(dto1);
         given(mapper.toShortDto(ad2)).willReturn(dto2);
 
         PageResponse<AdvertisementShortResponseDto> result =
-                advertisementService.getAll(query, category, page, size);
+                advertisementService.getAll(filter, page, size);
 
         assertNotNull(result);
         assertEquals(2, result.content().size());
@@ -229,23 +228,24 @@ public class AdvertisementServiceTest {
         assertEquals(page, result.page());
         assertEquals(size, result.size());
 
-        verify(advertisementRepository).findAllFiltered(query, category, page, size);
-        verify(advertisementRepository).countFiltered(query, category);
+        verify(advertisementRepository).findAllFiltered(filter, page, size);
+        verify(advertisementRepository).countFiltered(filter);
         verify(mapper, times(2)).toShortDto(any());
     }
 
     @Test
     void getAll_ShouldReturnEmptyPage_WhenNoMatches() {
-        String query = "Nothing";
+        AdvertisementFilterDto filter = new AdvertisementFilterDto("Velo", "bikes",new BigDecimal(0), new BigDecimal(100), null );
+
         int page = 0;
         int size = 10;
 
-        given(advertisementRepository.findAllFiltered(query, null, page, size))
+        given(advertisementRepository.findAllFiltered(filter, page, size))
                 .willReturn(List.of());
-        given(advertisementRepository.countFiltered(query, null)).willReturn(0L);
+        given(advertisementRepository.countFiltered(filter)).willReturn(0L);
 
         PageResponse<AdvertisementShortResponseDto> result =
-                advertisementService.getAll(query, null, page, size);
+                advertisementService.getAll(filter, page, size);
 
         assertTrue(result.content().isEmpty());
         assertEquals(0, result.totalElements());
