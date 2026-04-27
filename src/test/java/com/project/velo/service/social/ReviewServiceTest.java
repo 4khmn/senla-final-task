@@ -51,7 +51,7 @@ public class ReviewServiceTest {
 
     @Test
     void leaveReview_ShouldReturnPageResponse_Success() {
-        ReviewCreateDto request = new ReviewCreateDto(BigDecimal.ONE, "content");
+        ReviewCreateDto request = new ReviewCreateDto(1, "content");
         String username = "username";
         User buyer = new User();
         buyer.setUsername(username);
@@ -98,7 +98,7 @@ public class ReviewServiceTest {
 
     @Test
     void leaveReview_ShouldThrowResourceAlreadyProcessedException_WhenReviewAlreadyExist() {
-        ReviewCreateDto request = new ReviewCreateDto(BigDecimal.ONE, "content");
+        ReviewCreateDto request = new ReviewCreateDto(1, "content");
         String username = "username";
 
         given(reviewRepository.existsByAdvertisementId(any())).willReturn(true);
@@ -116,7 +116,7 @@ public class ReviewServiceTest {
 
     @Test
     void leaveReview_ShouldThrowENFException_WhenSaleDoesNotExist() {
-        ReviewCreateDto request = new ReviewCreateDto(BigDecimal.ONE, "content");
+        ReviewCreateDto request = new ReviewCreateDto(1, "content");
         String username = "username";
         Long adId = 1L;
 
@@ -136,7 +136,7 @@ public class ReviewServiceTest {
 
     @Test
     void leaveReview_ShouldThrowENFException_WhenUserDoesNotExist() {
-        ReviewCreateDto request = new ReviewCreateDto(BigDecimal.ONE, "content");
+        ReviewCreateDto request = new ReviewCreateDto(1, "content");
         String username = "username";
         SalesHistory sale = new SalesHistory();
         Long adId = 1L;
@@ -156,7 +156,7 @@ public class ReviewServiceTest {
 
     @Test
     void leaveReview_ShouldThrowValidationException_WhenUserIsNotBuyer() {
-        ReviewCreateDto request = new ReviewCreateDto(BigDecimal.ONE, "content");
+        ReviewCreateDto request = new ReviewCreateDto(1, "content");
         String username = "username";
         User buyer = new User();
         buyer.setUsername(username);
