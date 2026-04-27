@@ -68,7 +68,7 @@ public class ReviewControllerTest {
 
     @Test
     void leaveReview_ShouldReturnDto_Success() throws Exception{
-        ReviewCreateDto request = new ReviewCreateDto(BigDecimal.ONE, "content");
+        ReviewCreateDto request = new ReviewCreateDto(1, "content");
         Long adId = 1L;
         ReviewResponseDto response = new ReviewResponseDto(1L, "title", 1L, "testUser",  BigDecimal.ONE, "content", LocalDateTime.now());
 
@@ -83,7 +83,7 @@ public class ReviewControllerTest {
 
     @Test
     void leaveReview_ShouldReturnBadRequest_WhenScoreMoreThan5() throws Exception{
-        ReviewCreateDto request = new ReviewCreateDto(new BigDecimal("6"), "content");
+        ReviewCreateDto request = new ReviewCreateDto(6, "content");
         Long adId = 1L;
 
         mockMvc.perform(post("/api/reviews/advertisement/{adId}", adId)

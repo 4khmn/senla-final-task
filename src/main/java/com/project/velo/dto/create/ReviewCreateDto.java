@@ -13,7 +13,7 @@ public record ReviewCreateDto(
         @NotNull(message = "Оценка обязательна")
         @Min(value = 1, message = "Минимальная оценка — 1")
         @Max(value = 5, message = "Максимальная оценка — 5")
-        BigDecimal score,
+        Integer score,
 
         @Size(max = 1000, message = "Отзыв не может быть длиннее 1000 символов")
         String content
