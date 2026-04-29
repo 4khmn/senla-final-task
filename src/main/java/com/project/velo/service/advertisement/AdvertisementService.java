@@ -111,7 +111,7 @@ public class AdvertisementService {
     }
 
     @Transactional
-    public AdvertisementResponseDto update(Long id, AdvertisementUpdateDto dto, String username) {
+    public AdvertisementResponseDto update(Long id, AdvertisementUpdateDto dto, List<MultipartFile> files, String username) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
@@ -127,18 +127,20 @@ public class AdvertisementService {
             advertisement.setCategory(category);
         }
 
-        if (dto.imageUrls() != null) {
+        if (files != null && !files.isEmpty()) {
             advertisement.getImages().clear();
-            advertisementRepository.saveAndFlush(advertisement);
+            List<AdImage> newImages = new ArrayList<>();
+            for (int i = 0; i < files.size(); i++) {
+                MultipartFile file = files.get(i);
+                String savedPath = storageService.save(file, "advertisements");
 
-            List<String> urls = dto.imageUrls();
-            for (int i = 0; i < urls.size(); i++) {
-                AdImage newImg = new AdImage();
-                newImg.setImageUrl(urls.get(i));
-                newImg.setAdvertisement(advertisement);
-                newImg.setPrimary(i == 0);
-                advertisement.getImages().add(newImg);
+                newImages.add(AdImage.builder()
+                        .imageUrl(savedPath)
+                        .advertisement(advertisement)
+                        .isPrimary(i == 0)
+                        .build());
             }
+            advertisement.getImages().addAll(newImages);
         }
 
         return mapper.toDto(advertisement);

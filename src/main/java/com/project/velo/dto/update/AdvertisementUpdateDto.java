@@ -5,7 +5,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public record AdvertisementUpdateDto(
         @Size(max = 255, message = "Название слишком длинное")
@@ -18,7 +17,6 @@ public record AdvertisementUpdateDto(
         @Digits(integer = 10, fraction = 2, message = "Цена должна быть числом (до 10 знаков до запятой и 2 после)")
         BigDecimal price,
 
-        Long categoryId,
 
-        List<String> imageUrls
+        Long categoryId
 ) {}

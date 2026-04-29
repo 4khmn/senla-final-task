@@ -199,7 +199,7 @@ public class AdvertisementServiceTest {
 
     @Test
     void getAll_ShouldReturnPageResponse_Success() {
-        AdvertisementFilterDto filter = new AdvertisementFilterDto("Velo", "bikes",new BigDecimal(0), new BigDecimal(100), null );
+        AdvertisementFilterDto filter = new AdvertisementFilterDto("Velo", 1L, new BigDecimal(0), new BigDecimal(100), null );
         int page = 0;
         int size = 5;
         Advertisement ad1 = new Advertisement();
@@ -207,9 +207,9 @@ public class AdvertisementServiceTest {
         List<Advertisement> entities = List.of(ad1, ad2);
 
         AdvertisementShortResponseDto dto1 = new AdvertisementShortResponseDto(
-                1L, "Title 1", BigDecimal.TEN, "img1", "Cat1", false, LocalDateTime.now(), "seller", BigDecimal.ONE);
+                1L, "Title 1", BigDecimal.TEN, "cat1", "img1", false, LocalDateTime.now(), "seller", BigDecimal.ONE);
         AdvertisementShortResponseDto dto2 = new AdvertisementShortResponseDto(
-                2L, "Title 2", BigDecimal.valueOf(20), "img2", "Cat2", true, LocalDateTime.now(), "seller", BigDecimal.ONE);
+                2L, "Title 2", BigDecimal.valueOf(20), "cat2", "img2", true, LocalDateTime.now(), "seller", BigDecimal.ONE);
 
         given(advertisementRepository.findAllFiltered(filter, page, size))
                 .willReturn(entities);
@@ -235,7 +235,7 @@ public class AdvertisementServiceTest {
 
     @Test
     void getAll_ShouldReturnEmptyPage_WhenNoMatches() {
-        AdvertisementFilterDto filter = new AdvertisementFilterDto("Velo", "bikes",new BigDecimal(0), new BigDecimal(100), null );
+        AdvertisementFilterDto filter = new AdvertisementFilterDto("Velo", 1L ,new BigDecimal(0), new BigDecimal(100), null );
 
         int page = 0;
         int size = 10;
@@ -258,8 +258,12 @@ public class AdvertisementServiceTest {
         Long adId = 1L;
         String username = "ownerUser";
         AdvertisementUpdateDto dto = new AdvertisementUpdateDto(
-                "New Title", "New Desc", BigDecimal.valueOf(200), 2L, List.of("/img/new1.jpg", "/img/new2.jpg")
+                "New Title", "New Desc", BigDecimal.valueOf(200), 2L
         );
+
+        MockMultipartFile file1 = new MockMultipartFile("file", "img1.jpg", "image/jpeg", "data1".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("file", "img2.jpg", "image/jpeg", "data2".getBytes());
+        List<MultipartFile> files = List.of(file1, file2);
 
         User seller = new User();
         seller.setUsername(username);
@@ -274,10 +278,13 @@ public class AdvertisementServiceTest {
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
         given(categoryRepository.findById(2L)).willReturn(Optional.of(newCategory));
         given(mapper.toDto(ad)).willReturn(new AdvertisementResponseDto(
-                adId, "New Title", "New Desc", BigDecimal.valueOf(200), "ACTIVE", false, null, null, "CatName", "/img/new1.jpg", List.of("/img/new2.jpg")
+                adId, "New Title", "New Desc", BigDecimal.valueOf(200), "ACTIVE", false, null, null, "CatName", "/path/1", List.of("/path/2")
         ));
+        given(storageService.save(file1, "advertisements")).willReturn("/path/1");
+        given(storageService.save(file2, "advertisements")).willReturn("/path/2");
 
-        AdvertisementResponseDto result = advertisementService.update(adId, dto, username);
+
+        AdvertisementResponseDto result = advertisementService.update(adId, dto, files, username);
 
         assertNotNull(result);
         verify(mapper).updateEntityFromDto(dto, ad);
@@ -285,7 +292,6 @@ public class AdvertisementServiceTest {
         assertEquals(2, ad.getImages().size());
         assertTrue(ad.getImages().get(0).isPrimary());
 
-        verify(advertisementRepository).saveAndFlush(ad);
     }
 
     @Test
@@ -299,12 +305,12 @@ public class AdvertisementServiceTest {
         Advertisement ad = new Advertisement();
         ad.setSeller(actualOwner);
 
-        AdvertisementUpdateDto dto = new AdvertisementUpdateDto("Title", "Desc", BigDecimal.ONE, 1L, null);
+        AdvertisementUpdateDto dto = new AdvertisementUpdateDto("Title", "Desc", BigDecimal.ONE, 1L);
 
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
 
         assertThrows(NotEnoughRightsException.class,
-                () -> advertisementService.update(adId, dto, strangerName)
+                () -> advertisementService.update(adId, dto, null, strangerName)
         );
 
         verify(mapper, never()).updateEntityFromDto(any(), any());
@@ -316,7 +322,7 @@ public class AdvertisementServiceTest {
         given(advertisementRepository.findById(adId)).willReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
-                () -> advertisementService.update(adId, null, "anyUser")
+                () -> advertisementService.update(adId, null, null, "anyUser")
         );
     }
 

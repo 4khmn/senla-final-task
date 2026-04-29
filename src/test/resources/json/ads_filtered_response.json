@@ -1,0 +1,17 @@
+{
+  "content" : [ {
+    "id" : 1,
+    "title" : "Смартфон флагман 2024",
+    "price" : 80000.00,
+    "categoryName" : "electronics",
+    "primaryImageUrl" : null,
+    "isTop" : false,
+    "createdAt" : "2026-04-01T10:00:00",
+    "sellerUsername" : "seller1",
+    "sellerScore" : 0.00
+  } ],
+  "totalElements" : 1,
+  "totalPages" : 1,
+  "page" : 0,
+  "size" : 10
+}

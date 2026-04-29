@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public record AdvertisementFilterDto(
         String query,
-        String category,
+        Long categoryId,
         BigDecimal minPrice,
         BigDecimal maxPrice,
         String sortDirection
