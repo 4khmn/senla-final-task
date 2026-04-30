@@ -1,6 +1,7 @@
-package com.project.velo.integration;
+package com.project.velo.integration.advertisement;
 
 import com.project.velo.entity.Advertisement;
+import com.project.velo.integration.BaseIT;
 import com.project.velo.repository.AdvertisementRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,10 @@ public class AdvertisementControllerIT extends BaseIT {
     private AdvertisementRepository advertisementRepository;
 
     @Test
-    @Sql("/sql/init_ads.sql")
+    @Sql("/sql/advertisement/init_ads.sql")
     void getAllAdvertisements_ShouldReturnAdvertisements() throws Exception {
 
-        String expectedJson = Files.readString(Path.of("src/test/resources/json/ads_list_response.json"));
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/advertisement/ads_list_response.json"));
 
         mockMvc.perform(get("/api/advertisements")
                         .param("page", "0")
@@ -46,9 +47,9 @@ public class AdvertisementControllerIT extends BaseIT {
     }
 
     @Test
-    @Sql("/sql/init_ads_filter.sql")
+    @Sql("/sql/advertisement/init_ads_filter.sql")
     void getAllAdvertisements_WithComplexFilter_ShouldReturnCorrectResult() throws Exception {
-        String expectedJson = Files.readString(Path.of("src/test/resources/json/ads_filtered_response.json"));
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/advertisement/ads_filtered_response.json"));
 
         mockMvc.perform(get("/api/advertisements")
                         .param("minPrice", "50000")
@@ -60,9 +61,9 @@ public class AdvertisementControllerIT extends BaseIT {
 
 
     @Test
-    @Sql("/sql/init_ads.sql")
+    @Sql("/sql/advertisement/init_ads.sql")
     void getAdvertisementById_ShouldReturnAdvertisement() throws Exception {
-        String expectedJson = Files.readString(Path.of("src/test/resources/json/ad_response.json"));
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/advertisement/ad_response.json"));
 
         mockMvc.perform(get("/api/advertisements/100"))
                 .andExpect(status().isOk())
@@ -70,9 +71,9 @@ public class AdvertisementControllerIT extends BaseIT {
     }
 
     @Test
-    @Sql("/sql/init_ads.sql")
+    @Sql("/sql/advertisement/init_ads.sql")
     void createAdvertisement_ShouldReturnCreatedAdvertisement() throws Exception {
-        String expectedJson = Files.readString(Path.of("src/test/resources/json/ad_created_response.json"));
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/advertisement/ad_created_response.json"));
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -97,10 +98,10 @@ public class AdvertisementControllerIT extends BaseIT {
     }
 
     @Test
-    @Sql("/sql/init_ads.sql")
+    @Sql("/sql/advertisement/init_ads.sql")
     void updateAdvertisement_ShouldReturnUpdatedAdvertisement() throws Exception {
 
-        String expectedJson = Files.readString(Path.of("src/test/resources/json/ad_updated_response.json"));
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/advertisement/ad_updated_response.json"));
 
         MockMultipartFile file1 = new MockMultipartFile(
                 "file",

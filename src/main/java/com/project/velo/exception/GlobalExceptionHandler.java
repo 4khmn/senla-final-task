@@ -55,6 +55,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex, request);
     }
 
+    @ExceptionHandler(UserDisabledException.class)
+    public ResponseEntity<ErrorResponse> handleUserDisabled(UserDisabledException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.FORBIDDEN, ex, request);
+    }
+
     @ExceptionHandler(ResourceAlreadyProcessedException.class)
     public ResponseEntity<ErrorResponse> handleConflict(ResourceAlreadyProcessedException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.CONFLICT, ex, request);
