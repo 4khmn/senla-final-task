@@ -31,7 +31,7 @@ public class ProfileActivityControllerIT {
         mockMvc.perform(get("/api/profiles/my/sales")
                         .with(user("owner_user")))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedJson));
+                .andExpect(content().json(expectedJson));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ProfileActivityControllerIT {
 
         mockMvc.perform(get("/api/profiles/{username}/sales", "other_user"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedJson));
+                .andExpect(content().json(expectedJson));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ProfileActivityControllerIT {
         mockMvc.perform(get("/api/profiles/my/advertisements")
                         .with(user("owner_user")))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedJson));
+                .andExpect(content().json(expectedJson));
     }
 
     @Test
