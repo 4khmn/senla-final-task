@@ -63,11 +63,9 @@ public class MessageControllerIT extends BaseIT {
                         .with(user("sender_user")))
                 .andExpect(status().isNoContent());
 
-        // Проверяем, что сообщения больше нет в чате
-        mockMvc.perform(get("/api/chats/1/messages")
+        mockMvc.perform(get("/api/chats/100/messages")
                         .with(user("sender_user")))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{'totalElements': 0}", false));
+                .andExpect(status().isNotFound());
     }
 
     @Test

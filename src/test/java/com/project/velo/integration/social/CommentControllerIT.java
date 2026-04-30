@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.CommentCreateDto;
 import com.project.velo.dto.update.CommentUpdateDto;
 import com.project.velo.integration.BaseIT;
+import com.project.velo.repository.CommentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -28,6 +31,9 @@ public class CommentControllerIT extends BaseIT {
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Test
     @Sql("/sql/social/init_comments.sql")
@@ -73,6 +79,9 @@ public class CommentControllerIT extends BaseIT {
                         .with(user("commenter_user")))
                 .andExpect(status().isNoContent());
 
+        assertThrows(EntityNotFoundException.class, () ->
+                commentRepository.findById(100L).orElseThrow(
+                () -> new EntityNotFoundException("Комментария с id 100 не найдено")));
     }
 
     @Test
