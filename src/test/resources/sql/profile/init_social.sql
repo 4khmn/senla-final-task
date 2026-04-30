@@ -1,10 +1,13 @@
-DELETE FROM reviews;
+DELETE FROM ad_images;
 DELETE FROM comments;
+DELETE FROM messages;
+DELETE FROM chats;
+DELETE FROM sales_history;
+DELETE FROM reviews;
+DELETE FROM profiles;
 DELETE FROM advertisements;
 DELETE FROM categories;
-DELETE FROM profiles;
 DELETE FROM users;
-
 INSERT INTO users (id, username, password, email, role, rating, enabled, created_at)
 VALUES
     (1, 'owner_user', 'pass', 'owner@test.com', 'ROLE_USER', 5.00, TRUE, '2026-04-29 10:00:00'),

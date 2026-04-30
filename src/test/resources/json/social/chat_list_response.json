@@ -1,0 +1,16 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "advertisementId": 500,
+      "advertisementTitle": "Mirrorless Camera",
+      "lastMessageContent": "Yes, it is!",
+      "interlocutorUsername": "seller_user",
+      "interlocutorAvatarUrl": "avatars/seller.png"
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "page": 0,
+  "size": 15
+}

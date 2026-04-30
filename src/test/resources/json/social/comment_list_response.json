@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "id": 100,
+      "content": "content",
+      "createdAt": "2026-04-30T10:00:00",
+      "author": {
+        "username": "commenter_user",
+        "avatarUrl": "avatarUrl"
+      }
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "page": 0,
+  "size": 10
+}
