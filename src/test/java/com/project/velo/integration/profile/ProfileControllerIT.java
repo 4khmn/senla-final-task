@@ -6,6 +6,7 @@ import com.project.velo.entity.User;
 import com.project.velo.integration.BaseIT;
 import com.project.velo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,8 +17,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -103,5 +107,9 @@ public class ProfileControllerIT extends BaseIT {
 
         assertThat(actualAvatarUrl)
                 .matches("^/api/images/avatars/[a-f0-9\\-]+_new_avatar\\.jpg$");
+
+        String relativePath = actualAvatarUrl.replace("/api/images/", "");
+        Path filePath = Path.of("uploads").resolve(relativePath);
+        Files.deleteIfExists(filePath);
     }
 }

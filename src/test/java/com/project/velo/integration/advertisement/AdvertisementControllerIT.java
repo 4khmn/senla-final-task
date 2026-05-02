@@ -81,7 +81,7 @@ public class AdvertisementControllerIT extends BaseIT {
                 "image/jpeg",
                 "image-content".getBytes()
         );
-        mockMvc.perform(multipart("/api/advertisements")
+        var result = mockMvc.perform(multipart("/api/advertisements")
                         .file(file)
                         .param("title", "title")
                         .param("description", "description")
@@ -90,11 +90,18 @@ public class AdvertisementControllerIT extends BaseIT {
                         .with(user("seller1"))
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isCreated())
-                .andExpect(content().json(expectedJson));
+                .andExpect(content().json(expectedJson))
+                .andReturn();
 
         Advertisement savedAd = advertisementRepository.findById(1L)
-                .orElseThrow(() -> new AssertionError("Объявление не найдено в БД!"));
+                .orElseThrow(() -> new AssertionError("Объявления с id 1 не найдено"));
         assertEquals("title", savedAd.getTitle());
+
+        String content = result.getResponse().getContentAsString();
+        String imageUrl = com.jayway.jsonpath.JsonPath.read(content, "$.primaryImageUrl");
+
+        Path filePath = Path.of("uploads").resolve(imageUrl.replace("/api/images/", ""));
+        Files.deleteIfExists(filePath);
     }
 
     @Test
@@ -109,15 +116,22 @@ public class AdvertisementControllerIT extends BaseIT {
                 MediaType.IMAGE_JPEG_VALUE,
                 "image-content".getBytes()
         );
-        mockMvc.perform(multipart(HttpMethod.PATCH, "/api/advertisements/100")
+        var result = mockMvc.perform(multipart(HttpMethod.PATCH, "/api/advertisements/100")
                         .file(file1)
                         .param("title", "New Title")
                         .param("price", "150.00")
                         .with(user("seller1")))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJson))
-
                 .andExpect(jsonPath("$.primaryImageUrl",
-                        matchesPattern("^/api/images/advertisements/[a-f0-9\\-]+_bike1\\.jpg$")));
+                        matchesPattern("^/api/images/advertisements/[a-f0-9\\-]+_bike1\\.jpg$")))
+                .andReturn();
+
+
+        String content = result.getResponse().getContentAsString();
+        String imageUrl = com.jayway.jsonpath.JsonPath.read(content, "$.primaryImageUrl");
+        Path filePath = Path.of("uploads").resolve(imageUrl.replace("/api/images/", ""));
+
+        Files.deleteIfExists(filePath);
     }
 }
