@@ -6,6 +6,7 @@ import com.project.velo.dto.response.profile.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
+import com.project.velo.exception.UserDisabledException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ProfileMapper;
 import com.project.velo.mapper.UserMapper;
@@ -36,6 +37,9 @@ public class ProfileService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
+        if (!user.isEnabled()) {
+            throw new UserDisabledException("Пользователь с username " + username + " деактивирован");
+        }
         return userMapper.toPublicProfileDto(user);
     }
 

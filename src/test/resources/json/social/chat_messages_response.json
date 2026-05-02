@@ -1,0 +1,24 @@
+{
+  "content": [
+    {
+      "id": 2,
+      "content": "Yes, it is!",
+      "sentAt": "2026-04-30T09:10:00",
+      "senderUsername": "seller_user",
+      "isMine": false,
+      "isEdited": false
+    },
+    {
+      "id": 1,
+      "content": "Hi! Is the camera still available?",
+      "sentAt": "2026-04-30T09:05:00",
+      "senderUsername": "buyer_user",
+      "isMine": true,
+      "isEdited": false
+    }
+  ],
+  "totalElements": 2,
+  "totalPages": 1,
+  "page": 0,
+  "size": 15
+}

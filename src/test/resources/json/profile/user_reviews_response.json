@@ -1,0 +1,17 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "advertisementTitle": "Specialized Stumpjumper",
+      "advertisementId": 100,
+      "authorUsername": "buyer_user",
+      "score": 5,
+      "content": "Great seller, fast shipping",
+      "createdAt": "2026-04-30T15:00:00"
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "page": 0,
+  "size": 10
+}

@@ -1,0 +1,10 @@
+{
+  "id" : 1,
+  "username" : "owner_user",
+  "rating" : 5.00,
+  "firstName" : "Ivan",
+  "lastName" : "Ivanov",
+  "bio" : "bio",
+  "avatarUrl" : "avatars/main.jpg",
+  "createdAt" : "2026-04-29T10:00:00"
+}

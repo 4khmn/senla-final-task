@@ -1,0 +1,41 @@
+{
+  "content" : [ {
+    "id" : 1,
+    "title" : "title",
+    "description" : "description",
+    "price" : 100.00,
+    "status" : "SOLD",
+    "isTop" : false,
+    "createdAt" : "2026-04-30T10:00:00",
+    "seller" : {
+      "id" : 3,
+      "username" : "third_user",
+      "rating" : 4.50,
+      "avatarUrl" : "avatars/third.jpg"
+    },
+    "categoryName" : "category",
+    "primaryImageUrl" : null,
+    "otherImageUrls" : [ ]
+  }, {
+    "id" : 2,
+    "title" : "title2",
+    "description" : "description2",
+    "price" : 100.00,
+    "status" : "SOLD",
+    "isTop" : false,
+    "createdAt" : "2026-04-30T10:00:00",
+    "seller" : {
+      "id" : 3,
+      "username" : "third_user",
+      "rating" : 4.50,
+      "avatarUrl" : "avatars/third.jpg"
+    },
+    "categoryName" : "category",
+    "primaryImageUrl" : null,
+    "otherImageUrls" : [ ]
+  } ],
+  "totalElements" : 2,
+  "totalPages" : 1,
+  "page" : 0,
+  "size" : 20
+}

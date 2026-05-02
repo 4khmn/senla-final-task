@@ -13,7 +13,7 @@ public interface MessageMapper {
 
     @Mapping(target = "senderUsername", source = "message.sender.username")
     @Mapping(target = "isMine", expression = "java(message.getSender().getUsername().equals(currentUser))")
-    @Mapping(target = "isEdited", expression = "java(message.getUpdatedAt().isAfter(message.getSentAt()))")
+    @Mapping(target = "isEdited", source = "message.edited")
     MessageResponseDto toDto(Message message, @Context String currentUser);
 
     @Mapping(target = "id", ignore = true)

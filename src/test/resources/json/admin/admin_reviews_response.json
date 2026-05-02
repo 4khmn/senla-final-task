@@ -1,0 +1,23 @@
+{
+  "content" : [ {
+    "id" : 100,
+    "advertisementTitle" : "title",
+    "advertisementId" : 1,
+    "authorUsername" : "other_user",
+    "score" : 5,
+    "content" : "content",
+    "createdAt" : "2026-04-30T11:00:00"
+  }, {
+    "id" : 101,
+    "advertisementTitle" : "title2",
+    "advertisementId" : 2,
+    "authorUsername" : "other_user",
+    "score" : 5,
+    "content" : "content",
+    "createdAt" : "2026-04-30T11:00:00"
+  } ],
+  "totalElements" : 2,
+  "totalPages" : 1,
+  "page" : 0,
+  "size" : 20
+}

@@ -1,0 +1,17 @@
+{
+  "id" : 100,
+  "title" : "New Title",
+  "description" : "Отличный велик",
+  "price" : 150.00,
+  "status" : "ACTIVE",
+  "isTop" : false,
+  "createdAt" : "2026-04-28T10:00:00",
+  "seller" : {
+    "id" : 1,
+    "username" : "seller1",
+    "rating" : 0.00,
+    "avatarUrl" : null
+  },
+  "categoryName" : "Bicycles",
+  "otherImageUrls" : [ ]
+}

@@ -1,0 +1,13 @@
+{
+  "id" : 2,
+  "username" : "new_user",
+  "email" : "new@test.com",
+  "phone" : null,
+  "role" : "ROLE_USER",
+  "rating" : 0,
+  "firstName" : "Ivan",
+  "lastName" : "Ivanov",
+  "bio" : null,
+  "avatarUrl" : null,
+  "enabled" : true
+}

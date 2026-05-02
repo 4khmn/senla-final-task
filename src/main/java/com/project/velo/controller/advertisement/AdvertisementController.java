@@ -111,11 +111,16 @@ public class AdvertisementController {
     @PatchMapping("/{id}")
     public ResponseEntity<AdvertisementResponseDto> updateAdvertisement(
             @PathVariable Long id,
-            @RequestBody @Valid AdvertisementUpdateDto dto,
+
+            @ModelAttribute @Valid AdvertisementUpdateDto dto,
+
+            @Size(min = 1, max = 20, message = "Количество фотографий может быть от 1 до 20")
+            @RequestParam(value = "file", required = false) List<MultipartFile> files,
+
             @AuthenticationPrincipal UserDetails user
     ) {
         log.info("PATCH /api/advertisement/{} - Updating advertisement with id: {}", id, id);
-        AdvertisementResponseDto advertisement = advertisementService.update(id, dto, user.getUsername());
+        AdvertisementResponseDto advertisement = advertisementService.update(id, dto, files, user.getUsername());
         log.info("PATCH /api/advertisement/{} - Advertisement with id: {} was successfully updated", id, id);
         return ResponseEntity.ok(advertisement);
     }

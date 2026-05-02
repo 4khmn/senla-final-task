@@ -1,0 +1,24 @@
+{
+  "content" : [ {
+    "id" : 500,
+    "title" : "My Bike",
+    "description" : "Selling my bike",
+    "price" : 1000.00,
+    "status" : "ACTIVE",
+    "isTop" : false,
+    "createdAt" : "2026-04-29T10:00:00",
+    "seller" : {
+      "id" : 1,
+      "username" : "owner_user",
+      "rating" : 5.00,
+      "avatarUrl" : "avatars/main.jpg"
+    },
+    "categoryName" : "Bicycles",
+    "primaryImageUrl" : null,
+    "otherImageUrls" : [ ]
+  } ],
+  "totalElements" : 1,
+  "totalPages" : 1,
+  "page" : 0,
+  "size" : 10
+}

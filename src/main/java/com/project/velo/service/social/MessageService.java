@@ -79,6 +79,7 @@ public class MessageService {
             throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете изменять чужие сообщения");
         }
         message.setContent(dto.content());
+        message.setEdited(true);
         return mapper.toDto(message, username);
     }
 

@@ -47,6 +47,7 @@ public class AdminContentController {
         log.info("GET /api/admin/content/reviews - Found: {} reviews, page: {}, size: {}", reviews.size(), page, size);
         return ResponseEntity.ok(reviews);
     }
+
     @Operation(
             summary = "Список всех объявлений",
             description = "Включает скрытые и заблокированные объявления"

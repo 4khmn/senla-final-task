@@ -1,0 +1,46 @@
+{
+  "content" : [ {
+    "id" : 3,
+    "username" : "third_user",
+    "email" : "third@test.com",
+    "phone" : "+79994445566",
+    "role" : "ROLE_USER",
+    "rating" : 4.50,
+    "firstName" : "Third",
+    "lastName" : "Thirdovich",
+    "bio" : "bio3",
+    "avatarUrl" : "avatars/third.jpg",
+    "enabled" : true,
+    "createdAt" : "2026-04-29T10:00:00"
+  }, {
+    "id" : 2,
+    "username" : "other_user",
+    "email" : "other@test.com",
+    "phone" : "+79994445566",
+    "role" : "ROLE_USER",
+    "rating" : 4.50,
+    "firstName" : "Petr",
+    "lastName" : "Petrov",
+    "bio" : "bio2",
+    "avatarUrl" : "avatars/other.jpg",
+    "enabled" : false,
+    "createdAt" : "2026-04-29T10:00:00"
+  }, {
+    "id" : 1,
+    "username" : "admin-user",
+    "email" : "admin@test.com",
+    "phone" : "+79991112233",
+    "role" : "ROLE_ADMIN",
+    "rating" : 5.00,
+    "firstName" : "Ivan",
+    "lastName" : "Ivanov",
+    "bio" : "bio",
+    "avatarUrl" : "avatars/main.jpg",
+    "enabled" : true,
+    "createdAt" : "2026-04-29T10:00:00"
+  } ],
+  "totalElements" : 3,
+  "totalPages" : 1,
+  "page" : 0,
+  "size" : 20
+}

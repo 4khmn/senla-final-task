@@ -46,7 +46,7 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         Root<Advertisement> root = cq.from(Advertisement.class);
         Join<Object, Object> authorJoin = root.join("seller");
 
-        cq.where(buildPredicates(cb, root, filter.query(), filter.category(), filter.minPrice(), filter.maxPrice()));
+        cq.where(buildPredicates(cb, root, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));
 
         Expression<Object> effectiveRating = cb.selectCase()
                 .when(cb.equal(authorJoin.get("rating"), BigDecimal.ZERO), new BigDecimal("3.5"))
@@ -89,7 +89,7 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
 
-        cq.select(cb.count(root)).where(buildPredicates(cb, root, filter.query(), filter.category(), filter.minPrice(), filter.maxPrice()));
+        cq.select(cb.count(root)).where(buildPredicates(cb, root, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));
 
         return entityManager.createQuery(cq).getSingleResult();
     }
@@ -119,7 +119,7 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
 
     private Predicate[] buildPredicates(CriteriaBuilder cb, Root<Advertisement> root,
-                                        String query, String category,
+                                        String query, Long categoryId,
                                         BigDecimal minPrice, BigDecimal maxPrice) {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("status"), AdStatus.ACTIVE));
@@ -140,8 +140,8 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
             predicates.add(cb.and(wordPredicates.toArray(new Predicate[0])));
         }
 
-        if (category != null && !category.isBlank()) {
-            predicates.add(cb.equal(root.get("category").get("name"), category));
+        if (categoryId != null) {
+            predicates.add(cb.equal(root.get("category").get("id"), categoryId));
         }
 
         if (minPrice != null) {

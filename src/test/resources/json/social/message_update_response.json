@@ -1,0 +1,7 @@
+{
+  "id": 100,
+  "content": "new content",
+  "senderUsername": "sender_user",
+  "isMine": true,
+  "isEdited": true
+}

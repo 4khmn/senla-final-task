@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -101,7 +102,7 @@ public class AdvertisementControllerTest {
     @Test
     void getAllAdvertisements_WithFilters_ShouldReturnFilteredPageResponse() throws Exception {
 
-        AdvertisementFilterDto filter = new AdvertisementFilterDto("query", "category", new BigDecimal(0), new BigDecimal(100), null );
+        AdvertisementFilterDto filter = new AdvertisementFilterDto("query", 1L, new BigDecimal(0), new BigDecimal(100), null );
 
         PageResponse<AdvertisementShortResponseDto> emptyResponse = new PageResponse<>(
                 List.of(), 0, 0, 0, 10
@@ -112,7 +113,7 @@ public class AdvertisementControllerTest {
 
         mockMvc.perform(get("/api/advertisements")
                         .param("query", filter.query())
-                        .param("category", filter.category())
+                        .param("categoryId", "1")
                         .param("minPrice", "0")
                         .param("maxPrice", "100")
                         .param("page", "0")
@@ -241,7 +242,7 @@ public class AdvertisementControllerTest {
     void updateAdvertisement_ShouldReturnDto_Success() throws Exception {
         Long adId = 1L;
         AdvertisementUpdateDto updateDto = new AdvertisementUpdateDto(
-                "New Title", "New Desc", new BigDecimal("150.00"), 2L, List.of("img1.jpg")
+                "New Title", "New Desc", new BigDecimal("150.00"), 2L
         );
 
         AdvertisementResponseDto responseDto = new AdvertisementResponseDto(
@@ -251,12 +252,14 @@ public class AdvertisementControllerTest {
                 "Components", "img1.jpg", List.of()
         );
 
-        given(advertisementService.update(adId, updateDto, "testUser"))
+        given(advertisementService.update(adId, updateDto, null,"testUser"))
                 .willReturn(responseDto);
 
-        mockMvc.perform(patch("/api/advertisements/{id}", adId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDto)))
+        mockMvc.perform(multipart(HttpMethod.PATCH,"/api/advertisements/{id}", adId)
+                        .param("title", "New Title")
+                        .param("description", "New Desc")
+                        .param("price", "150.00")
+                        .param("categoryId", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("New Title"))
                 .andExpect(jsonPath("$.price").value(150.00));
@@ -265,14 +268,16 @@ public class AdvertisementControllerTest {
     @Test
     void updateAdvertisement_ShouldReturnNotFound_WhenAdvertisementDoesNotExist() throws Exception {
         Long adId = 1L;
-        AdvertisementUpdateDto updateDto = new AdvertisementUpdateDto("title", "desc", BigDecimal.TEN, 1L, List.of());
+        AdvertisementUpdateDto updateDto = new AdvertisementUpdateDto("title", "desc", BigDecimal.TEN, 1L);
 
-        given(advertisementService.update(adId, updateDto, "testUser"))
+        given(advertisementService.update(adId, updateDto, null, "testUser"))
                 .willThrow(new EntityNotFoundException("Объявления с id " + adId + " не найдено"));
 
-        mockMvc.perform(patch("/api/advertisements/{id}", adId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDto)))
+        mockMvc.perform(multipart(HttpMethod.PATCH,"/api/advertisements/{id}", adId)
+                        .param("title", "title")
+                        .param("description", "desc")
+                        .param("price", "10")
+                        .param("categoryId", "1"))
                 .andExpect(status().isNotFound());
     }
 
@@ -280,12 +285,14 @@ public class AdvertisementControllerTest {
     void updateAdvertisement_ShouldReturnBadRequest_WhenPriceIsNegative() throws Exception {
         Long adId = 1L;
         AdvertisementUpdateDto invalidDto = new AdvertisementUpdateDto(
-                "title", "desc", new BigDecimal("-100.00"), 1L, List.of()
+                "title", "desc", new BigDecimal("-100.00"), 1L
         );
 
-        mockMvc.perform(patch("/api/advertisements/{id}", adId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidDto)))
+        mockMvc.perform(multipart(HttpMethod.PATCH,"/api/advertisements/{id}", adId)
+                        .param("title", "title")
+                        .param("description", "desc")
+                        .param("price", "-100")
+                        .param("categoryId", "1"))
                 .andExpect(status().isBadRequest());
     }
 

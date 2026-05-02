@@ -44,4 +44,7 @@ public class Message {
     private LocalDateTime updatedAt;
 
 
+    @Column(name = "is_edited", nullable = false)
+    private boolean isEdited = false;
+
 }

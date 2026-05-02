@@ -1,0 +1,16 @@
+{
+  "id" : 1,
+  "title" : "title",
+  "description" : "description",
+  "price" : 500.00,
+  "status" : "ACTIVE",
+  "isTop" : false,
+  "seller" : {
+    "id" : 1,
+    "username" : "seller1",
+    "rating" : 0.00,
+    "avatarUrl" : null
+  },
+  "categoryName" : "Bicycles",
+  "otherImageUrls" : [ ]
+}

@@ -1,0 +1,13 @@
+{
+  "id" : 4,
+  "username" : "new-admin",
+  "email" : "email@new.com",
+  "phone" : null,
+  "role" : "ROLE_ADMIN",
+  "rating" : 0,
+  "firstName" : "firstName",
+  "lastName" : "lastName",
+  "bio" : null,
+  "avatarUrl" : null,
+  "enabled" : true
+}

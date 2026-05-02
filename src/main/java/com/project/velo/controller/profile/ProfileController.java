@@ -36,7 +36,7 @@ public class ProfileController {
             security = @SecurityRequirement(name = "JWT")
     )
     @GetMapping("/my")
-    public ResponseEntity<ProfilePrivateResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ProfilePrivateResponseDto> getMyProfile(@AuthenticationPrincipal UserDetails user) {
         log.info("GET /api/profiles/my - Fetching profile for username = {}", user.getUsername());
         ProfilePrivateResponseDto profile = profileService.getPrivateByUsername(user.getUsername());
         log.info("GET /api/profiles/my - Profile for username: {} was successfully retrieved", user.getUsername());

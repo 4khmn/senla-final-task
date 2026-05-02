@@ -1,0 +1,14 @@
+{
+  "id" : 1,
+  "username" : "owner_user",
+  "email" : "owner@test.com",
+  "phone" : "+79998888776",
+  "role" : "ROLE_USER",
+  "rating" : 5.00,
+  "firstName" : "firstName2",
+  "lastName" : "secondName2",
+  "bio" : "new bio",
+  "avatarUrl" : "avatars/main.jpg",
+  "enabled" : true,
+  "createdAt" : "2026-04-29T10:00:00"
+}

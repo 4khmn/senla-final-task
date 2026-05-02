@@ -1,0 +1,8 @@
+{
+  "id": 100,
+  "content": "new content",
+  "author": {
+    "username": "commenter_user",
+    "avatarUrl": "avatarUrl"
+  }
+}

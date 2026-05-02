@@ -19,5 +19,4 @@ public record AdvertisementResponseDto(
         String categoryName,
         String primaryImageUrl,
         List<String> otherImageUrls
-) {
-}
+) { }
