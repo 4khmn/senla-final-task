@@ -1,5 +1,6 @@
 package com.project.velo.integration.profile;
 
+import com.project.velo.integration.BaseIT;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class ProfileActivityControllerIT {
+public class ProfileActivityControllerIT extends BaseIT {
 
     @Autowired
     private MockMvc mockMvc;
