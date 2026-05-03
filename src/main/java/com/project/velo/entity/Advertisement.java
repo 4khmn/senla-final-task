@@ -71,7 +71,6 @@ public class Advertisement {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Size(min = 1, max = 20, message = "Количество фотографий может быть от 1 до 20")
     private List<AdImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

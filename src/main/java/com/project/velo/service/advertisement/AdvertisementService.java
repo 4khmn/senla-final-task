@@ -129,6 +129,7 @@ public class AdvertisementService {
 
         if (files != null && !files.isEmpty()) {
             advertisement.getImages().clear();
+            advertisementRepository.flush();
             List<AdImage> newImages = new ArrayList<>();
             for (int i = 0; i < files.size(); i++) {
                 MultipartFile file = files.get(i);
