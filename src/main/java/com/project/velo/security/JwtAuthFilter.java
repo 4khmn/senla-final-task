@@ -5,12 +5,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
@@ -19,10 +22,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final HandlerExceptionResolver resolver;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+    public JwtAuthFilter(
+            JwtUtil jwtUtil,
+            UserDetailsService userDetailsService,
+            @Qualifier("handlerExceptionResolver")HandlerExceptionResolver resolver) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.resolver = resolver;
     }
 
     @Override
@@ -41,7 +49,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                     if (SecurityContextHolder.getContext().getAuthentication() == null) {
                         var userDetails = userDetailsService.loadUserByUsername(username);
-
+                        if (!userDetails.isEnabled()) {
+                            resolver.resolveException(request, response, null, new DisabledException("Аккаунт заблокирован"));
+                        }
                         var authToken = new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
