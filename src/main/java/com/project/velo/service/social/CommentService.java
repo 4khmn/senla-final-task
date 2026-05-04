@@ -11,6 +11,7 @@ import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
 import com.project.velo.exception.AdvertisementNotAvailableException;
 import com.project.velo.exception.NotEnoughRightsException;
+import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.CommentMapper;
 import com.project.velo.repository.AdvertisementRepository;
 import com.project.velo.repository.CommentRepository;
@@ -126,5 +127,17 @@ public class CommentService {
         }
         comment.setContent(dto.content());
         return mapper.toDetailsDto(comment);
+    }
+
+    @Transactional
+    public void togglePin(Long commentId, String username) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("Комментарий не найден"));
+
+        if (!comment.getAdvertisement().getSeller().getUsername().equals(username)) {
+            throw new ValidationException("Вы не можете закрепить этот комментарий");
+        }
+
+        comment.setPinned(!comment.isPinned());
     }
 }

@@ -220,4 +220,13 @@ public class CommentControllerTest {
                 .content(objectMapper.writeValueAsString(commentUpdateDto)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void togglePin_ShouldPinComment() throws Exception {
+        Long commentId = 1L;
+        mockMvc.perform(patch("/api/comments/{commentId}/pin", commentId))
+                .andExpect(status().isNoContent());
+
+        verify(commentService).togglePin(eq(commentId), anyString());
+    }
 }

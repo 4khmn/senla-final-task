@@ -25,5 +25,5 @@ VALUES (1, 'title', 'description', 100.00, 1, 1, 'ACTIVE', '2026-04-30 10:00:00'
 INSERT INTO ad_images (id, ad_id, image_url, is_primary)
 VALUES (1, 1, 'imageUrl', TRUE);
 
-INSERT INTO comments (id, ad_id, author_id, content, created_at)
-VALUES (100, 1, 2, 'content', '2026-04-30 10:00:00');
+INSERT INTO comments (id, ad_id, author_id, content, created_at, is_pinned)
+VALUES (100, 1, 2, 'content', '2026-04-30 10:00:00', false);

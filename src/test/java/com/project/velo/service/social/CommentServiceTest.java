@@ -13,6 +13,7 @@ import com.project.velo.entity.enums.AdStatus;
 import com.project.velo.entity.enums.Role;
 import com.project.velo.exception.AdvertisementNotAvailableException;
 import com.project.velo.exception.NotEnoughRightsException;
+import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.CommentMapper;
 import com.project.velo.repository.AdvertisementRepository;
 import com.project.velo.repository.CommentRepository;
@@ -474,5 +475,43 @@ public class CommentServiceTest {
         );
     }
 
+    @Test
+    void togglePin_ShouldPinComment_WhenUnpinnedAndSeller() {
+        User seller = new User();
+        seller.setUsername("seller");
+        Advertisement advertisement = new Advertisement();
+        advertisement.setSeller(seller);
+        Long commentId = 99L;
+        Comment comment = new Comment();
+        comment.setId(commentId);
+        comment.setAdvertisement(advertisement);
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+
+        commentService.togglePin(commentId, "seller");
+
+        assertTrue(comment.isPinned());
+        verify(commentRepository).findById(commentId);
+    }
+
+
+    @Test
+    void togglePin_ShouldThrowValidationException_WhenNotSeller() {
+        User seller = new User();
+        seller.setUsername("seller");
+        Advertisement advertisement = new Advertisement();
+        advertisement.setSeller(seller);
+        Long commentId = 99L;
+        Comment comment = new Comment();
+        comment.setId(commentId);
+        comment.setAdvertisement(advertisement);
+        given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
+
+
+        assertThrows(ValidationException.class,
+                () -> commentService.togglePin(commentId, "random_kid"));
+
+        verify(commentRepository).findById(commentId);
+    }
 
 }
