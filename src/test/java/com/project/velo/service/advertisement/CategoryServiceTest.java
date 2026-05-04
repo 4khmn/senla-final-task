@@ -36,10 +36,10 @@ public class CategoryServiceTest {
 
     @Test
     void create_ShouldReturnDto_WhenCategoryDoesNotExist() {
-        CategoryCreateDto dto = new CategoryCreateDto("name");
+        CategoryCreateDto dto = new CategoryCreateDto("name", "secName");
         Category category = new Category();
         category.setName("name");
-        CategoryResponseDto response = new CategoryResponseDto(1L, "name");
+        CategoryResponseDto response = new CategoryResponseDto(1L, "name", "secName");
         given(categoryRepository.existsByName(dto.name())).willReturn(false);
         given(mapper.toEntity(dto)).willReturn(category);
         given(categoryRepository.save(category)).willAnswer(i -> i.getArgument(0));
@@ -56,7 +56,7 @@ public class CategoryServiceTest {
 
     @Test
     void create_ShouldThrowAlreadyExistsException_WhenCategoryExists() {
-        CategoryCreateDto dto = new CategoryCreateDto("name");
+        CategoryCreateDto dto = new CategoryCreateDto("name", "secName");
 
         given(categoryRepository.existsByName(dto.name())).willReturn(true);
 
@@ -74,7 +74,7 @@ public class CategoryServiceTest {
         Category category = new Category();
         category.setName("name");
 
-        CategoryResponseDto dto = new CategoryResponseDto(1L, "name");
+        CategoryResponseDto dto = new CategoryResponseDto(1L, "name", "secName");
 
         given(categoryRepository.findAll()).willReturn(List.of(category));
         given(mapper.toDto(category)).willReturn(dto);
@@ -90,14 +90,14 @@ public class CategoryServiceTest {
 
     @Test
     void update_ShouldReturnDto_Success() {
-        CategoryUpdateDto dto = new CategoryUpdateDto("newName");
+        CategoryUpdateDto dto = new CategoryUpdateDto("newName", "secName");
         Long id = 1L;
 
         Category category = new Category();
         category.setId(id);
         category.setName("name");
 
-        CategoryResponseDto response = new CategoryResponseDto(1L, "newName");
+        CategoryResponseDto response = new CategoryResponseDto(1L, "newName", "secName");
         given(categoryRepository.existsByName(dto.name())).willReturn(false);
         given(categoryRepository.findById(id)).willReturn(Optional.of(category));
         given(mapper.toDto(category)).willReturn(response);
@@ -114,7 +114,7 @@ public class CategoryServiceTest {
 
     @Test
     void update_ShouldThrowAlreadyExistsException_WhenCategoryExistsWithSameName() {
-        CategoryUpdateDto dto = new CategoryUpdateDto("newName");
+        CategoryUpdateDto dto = new CategoryUpdateDto("newName", "secName");
         Long id = 1L;
 
         given(categoryRepository.existsByName(dto.name())).willReturn(true);
@@ -131,7 +131,7 @@ public class CategoryServiceTest {
 
     @Test
     void update_ShouldThrowENFException_WhenCategoryDoesNotExist() {
-        CategoryUpdateDto dto = new CategoryUpdateDto("newName");
+        CategoryUpdateDto dto = new CategoryUpdateDto("newName", "secName");
         Long id = 1L;
 
         given(categoryRepository.existsByName(dto.name())).willReturn(false);

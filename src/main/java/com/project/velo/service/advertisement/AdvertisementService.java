@@ -157,7 +157,7 @@ public class AdvertisementService {
             if (advertisement.getStatus().equals(AdStatus.ACTIVE)) {
                 advertisement.setStatus(AdStatus.ARCHIVED);
             } else {
-                throw new NotEnoughRightsException("Вы не можете удалить не активное объявление");
+                throw new NotEnoughRightsException("Вы не можете удалить неактивное объявление");
             }
         }
         else {
@@ -170,9 +170,7 @@ public class AdvertisementService {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
-
         advertisement.setStatus(AdStatus.BANNED);
-
     }
 
     @Transactional

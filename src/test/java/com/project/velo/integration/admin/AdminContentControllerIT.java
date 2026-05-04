@@ -70,7 +70,7 @@ public class AdminContentControllerIT extends BaseIT {
     @Sql("/sql/admin/init_content_admin.sql")
     void createCategory_ShouldCreatedCategory() throws Exception {
 
-        CategoryCreateDto categoryCreateDto = new CategoryCreateDto("name");
+        CategoryCreateDto categoryCreateDto = new CategoryCreateDto("name", "secName");
 
         mockMvc.perform(post("/api/admin/content/categories")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +84,7 @@ public class AdminContentControllerIT extends BaseIT {
     @Sql("/sql/admin/init_content_admin.sql")
     void updateCategory_ShouldUpdateCategory() throws Exception {
 
-        CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto("new_name");
+        CategoryUpdateDto categoryUpdateDto = new CategoryUpdateDto("new_name", "secName");
 
         mockMvc.perform(patch("/api/admin/content/categories/2")
                         .contentType(MediaType.APPLICATION_JSON)

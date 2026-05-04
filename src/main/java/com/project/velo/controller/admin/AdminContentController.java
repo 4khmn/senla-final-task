@@ -105,7 +105,7 @@ public class AdminContentController {
     public ResponseEntity<Void> deleteAdvertisement(@PathVariable Long id) {
         log.info("DELETE /api/admin/content/advertisements/{} - Trying to delete advertisement: {}", id, id);
         advertisementService.deleteByAdmin(id);
-        log.info("DELETE /api/admin/content/advertisements/{} - Advertisement successfully deleted: {}", id, id);
+        log.info("DELETE /api/admin/content/advertisements/{} - Advertisement: {} successfully banned by admin", id, id);
         return ResponseEntity.noContent().build();
     }
 

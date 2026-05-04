@@ -7,7 +7,7 @@ import java.util.List;
 
 public record AdvertisementCreateDto(
         @NotBlank(message = "Название объявления не может быть пустым")
-        @Size(max = 255, message = "Название объявления должно быть до 255 символов")
+        @Size(max = 64, message = "Название объявления должно быть до 64 символов")
         String title,
 
         @NotBlank(message = "Описание объявления не может быть пустым")
