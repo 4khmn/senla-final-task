@@ -15,7 +15,12 @@ import lombok.*;
 public class AdImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ad_images_gen")
+    @SequenceGenerator(
+            name = "ad_images_gen",
+            sequenceName = "ad_images_seq",
+            allocationSize = 20
+    )
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

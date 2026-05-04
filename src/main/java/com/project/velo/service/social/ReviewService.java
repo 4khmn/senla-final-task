@@ -130,6 +130,5 @@ public class ReviewService {
         } else {
             log.info("USER ACTION: Author: {} deleted their own review: {}", username, id);
         }
-
     }
 }

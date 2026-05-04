@@ -3,6 +3,7 @@ package com.project.velo.integration.social;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.CommentCreateDto;
 import com.project.velo.dto.update.CommentUpdateDto;
+import com.project.velo.entity.Comment;
 import com.project.velo.integration.BaseIT;
 import com.project.velo.repository.CommentRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -90,5 +91,31 @@ public class CommentControllerIT extends BaseIT {
         mockMvc.perform(delete("/api/comments/100")
                         .with(user("owner_user")))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Sql("/sql/social/init_comments.sql")
+    void togglePin_ShouldReturnNoContent_WhenSeller() throws Exception {
+        mockMvc.perform(patch("/api/comments/100/pin")
+                        .with(user("owner_user")))
+                .andExpect(status().isNoContent());
+
+        Comment comment = commentRepository.findById(100L).orElseThrow(
+                () -> new EntityNotFoundException("Комментария с id 100 не найдено")
+        );
+        assertTrue(comment.isPinned());
+    }
+
+    @Test
+    @Sql("/sql/social/init_comments.sql")
+    void togglePin_ShouldReturnNoContent_WhenNotSeller() throws Exception {
+        mockMvc.perform(patch("/api/comments/100/pin")
+                        .with(user("random_kid")))
+                .andExpect(status().isBadRequest());
+
+        Comment comment = commentRepository.findById(100L).orElseThrow(
+                () -> new EntityNotFoundException("Комментария с id 100 не найдено")
+        );
+        assertFalse(comment.isPinned());
     }
 }

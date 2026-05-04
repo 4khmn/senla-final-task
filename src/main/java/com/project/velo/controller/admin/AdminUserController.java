@@ -3,6 +3,7 @@ package com.project.velo.controller.admin;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
+import com.project.velo.entity.enums.Role;
 import com.project.velo.service.auth.AuthService;
 import com.project.velo.service.profile.ProfileService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,12 +34,14 @@ public class AdminUserController {
     )
     @GetMapping
     public ResponseEntity<PageResponse<ProfilePrivateResponseDto>> getAllUsers(
+            @RequestParam(required = false) Boolean enabled,
+            @RequestParam(required = false) Role role,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        log.info("GET /api/admin/users - Admin fetching all users, page: {}, size: {}", page, size);
-        PageResponse<ProfilePrivateResponseDto> users = profileService.getAllProfiles(page, size);
-        log.info("GET /api/admin/users - Found: {} users, page: {}, size: {}", users.size(), page, size);
+        log.info("GET /api/admin/users - Admin fetching all users, enabled: {}, role: {}, page: {}, size: {}",enabled, role, page, size);
+        PageResponse<ProfilePrivateResponseDto> users = profileService.getAllProfiles(enabled, role, page, size);
+        log.info("GET /api/admin/users - Found: {} users, enabled: {}, role: {}, page: {}, size: {}", users.size(), enabled, role, page, size);
         return ResponseEntity.ok(users);
     }
 

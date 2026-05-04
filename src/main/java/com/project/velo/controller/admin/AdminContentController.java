@@ -92,9 +92,20 @@ public class AdminContentController {
     @ApiResponse(responseCode = "204", description = "Категория удалена")
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        log.info("DELETE /api/admin/content/categories - Trying to delete category: {}", id);
+        log.info("DELETE /api/admin/content/categories/{} - Trying to delete category: {}", id, id);
         categoryService.delete(id);
-        log.info("DELETE /api/admin/content/categories - Category successfully deleted: {}", id);
+        log.info("DELETE /api/admin/content/categories/{} - Category successfully deleted: {}", id, id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Блокировка объявления")
+    @ApiResponse(responseCode = "204", description = "Объявление заблокировано")
+    @DeleteMapping("/advertisements/{id}")
+    public ResponseEntity<Void> deleteAdvertisement(@PathVariable Long id) {
+        log.info("DELETE /api/admin/content/advertisements/{} - Trying to delete advertisement: {}", id, id);
+        advertisementService.deleteByAdmin(id);
+        log.info("DELETE /api/admin/content/advertisements/{} - Advertisement: {} successfully banned by admin", id, id);
         return ResponseEntity.noContent().build();
     }
 

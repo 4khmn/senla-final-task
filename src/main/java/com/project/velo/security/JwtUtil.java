@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,15 +15,14 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
+    private final SecretKey key;
 
-    private static final String SECRET =
-            "my-super-secret-key-for-jwt-signing-which-is-very-long";
-
-    private final SecretKey key = Keys.hmacShaKeyFor(
-            SECRET.getBytes(StandardCharsets.UTF_8)
-    );
     // Время жизни токена (1 час)
     private final long expirationMs = 36000000; // 60 * 60 * 1000
+
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateToken(String username, String roles) {
         return Jwts.builder()
@@ -48,12 +48,8 @@ public class JwtUtil {
 
 
     public boolean isValid(String token) {
-        try {
-            parseToken(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        parseToken(token);
+        return true;
     }
 
     private Jws<Claims> parseToken(String token) {

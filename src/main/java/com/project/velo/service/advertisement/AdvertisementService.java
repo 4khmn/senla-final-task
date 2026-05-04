@@ -129,6 +129,7 @@ public class AdvertisementService {
 
         if (files != null && !files.isEmpty()) {
             advertisement.getImages().clear();
+            advertisementRepository.flush();
             List<AdImage> newImages = new ArrayList<>();
             for (int i = 0; i < files.size(); i++) {
                 MultipartFile file = files.get(i);
@@ -151,15 +152,25 @@ public class AdvertisementService {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
-        );
-        if (advertisement.getSeller().getUsername().equals(username) || user.getRole().name().equals("ROLE_ADMIN")) {
-            advertisement.setStatus(AdStatus.ARCHIVED);
+
+        if (advertisement.getSeller().getUsername().equals(username)) {
+            if (advertisement.getStatus().equals(AdStatus.ACTIVE)) {
+                advertisement.setStatus(AdStatus.ARCHIVED);
+            } else {
+                throw new NotEnoughRightsException("Вы не можете удалить неактивное объявление");
+            }
         }
         else {
             throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалить чужое объявление");
         }
+    }
+
+    @Transactional
+    public void deleteByAdmin(Long id) {
+        Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
+        );
+        advertisement.setStatus(AdStatus.BANNED);
     }
 
     @Transactional

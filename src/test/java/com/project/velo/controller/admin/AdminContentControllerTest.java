@@ -100,8 +100,8 @@ public class AdminContentControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateCategory_ShouldReturnDto_Success() throws Exception {
-        CategoryUpdateDto request = new CategoryUpdateDto("name");
-        CategoryResponseDto response = new CategoryResponseDto(1L, "name");
+        CategoryUpdateDto request = new CategoryUpdateDto("name", "secName");
+        CategoryResponseDto response = new CategoryResponseDto(1L, "name", "secName");
         given(categoryService.update(1L, request)).willReturn(response);
 
         mockMvc.perform(patch("/api/admin/content/categories/1")
@@ -115,7 +115,7 @@ public class AdminContentControllerTest {
     @WithMockUser(roles = "ADMIN")
     void updateCategory_ShouldReturnBadRequest_WhenNameIsBlank() throws Exception {
 
-        CategoryUpdateDto request = new CategoryUpdateDto("");
+        CategoryUpdateDto request = new CategoryUpdateDto("", "secName");
 
 
         mockMvc.perform(patch("/api/admin/content/categories/1")
@@ -135,10 +135,19 @@ public class AdminContentControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    void deleteAdvertisement_Success() throws Exception {
+
+        mockMvc.perform(delete("/api/admin/content/advertisements/{id}", 1L))
+                .andExpect(status().isNoContent());
+        verify(advertisementService).deleteByAdmin(any());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void createCategory_ShouldReturnDto_Success() throws Exception {
 
-        CategoryCreateDto request = new CategoryCreateDto("name");
-        CategoryResponseDto response = new CategoryResponseDto(1L, "name");
+        CategoryCreateDto request = new CategoryCreateDto("name", "secName");
+        CategoryResponseDto response = new CategoryResponseDto(1L, "name", "secName");
         given(categoryService.create(request)).willReturn(response);
 
         mockMvc.perform(post("/api/admin/content/categories")
@@ -152,7 +161,7 @@ public class AdminContentControllerTest {
     @WithMockUser(roles = "ADMIN")
     void createCategory_ShouldReturnBadRequest_WhenNameIsBlank() throws Exception {
 
-        CategoryCreateDto request = new CategoryCreateDto("");
+        CategoryCreateDto request = new CategoryCreateDto("", "secName");
 
 
         mockMvc.perform(post("/api/admin/content/categories")

@@ -100,4 +100,15 @@ public class CommentController {
         log.info("PATCH /api/comments/{} - Comment: {} by user: {} was successfully updated", commentId, updated, user.getUsername());
         return ResponseEntity.ok(updated);
     }
+
+
+    @Operation(summary = "Закрепить/открепить комментарий")
+    @PatchMapping("/{commentId}/pin")
+    public ResponseEntity<Void> togglePin(
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        commentService.togglePin(commentId, user.getUsername());
+        return ResponseEntity.noContent().build();
+    }
 }

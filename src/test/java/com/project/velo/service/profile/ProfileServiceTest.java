@@ -260,16 +260,16 @@ public class ProfileServiceTest {
                 true,
                 LocalDateTime.now()
         );
-        when(userRepository.findAll(page, size)).thenReturn(users);
-        when(userRepository.count()).thenReturn(10L);
+        when(userRepository.findAllFiltered(any(), any(), eq(page), eq(size))).thenReturn(users);
+        when(userRepository.countFiltered(any(), any())).thenReturn(10L);
         when(userMapper.toPrivateProfileDto(any())).thenReturn(profilePrivateResponseDto);
 
-        PageResponse<ProfilePrivateResponseDto> result = profileService.getAllProfiles(page, size);
+        PageResponse<ProfilePrivateResponseDto> result = profileService.getAllProfiles(null, null, page, size);
 
         assertEquals(10L, result.totalElements());
         assertEquals(5, result.totalPages());
         assertEquals(1, result.content().size());
-        verify(userRepository).findAll(page, size);
+        verify(userRepository).findAllFiltered(any(), any(), eq(page), eq(size));
     }
 
 

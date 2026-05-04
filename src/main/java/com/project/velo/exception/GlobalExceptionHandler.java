@@ -1,17 +1,27 @@
 package com.project.velo.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -103,6 +113,55 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public  ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex, request);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabledException(DisabledException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.FORBIDDEN, new RuntimeException("Недостаточно прав для этого действия"), request);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
+        String message = String.format("Тип контента '%s' не поддерживается. Ожидается: %s",
+                ex.getContentType(),
+                ex.getSupportedMediaTypes());
+       return buildResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, new RuntimeException(message), request);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        String message = String.format("Параметр '%s' должен быть типа '%s', а вы ввели '%s'",
+                ex.getName(),
+                ex.getRequiredType().getSimpleName(),
+                ex.getValue());
+        return buildResponse(HttpStatus.BAD_REQUEST, new RuntimeException(message), request);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+
+        return buildResponse(HttpStatus.METHOD_NOT_ALLOWED, new RuntimeException("Метод " + ex.getMethod() + " не поддерживается для этого адреса"), request);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, new RuntimeException("Такого адреса не существует"), request);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredJwt(ExpiredJwtException ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, new RuntimeException("Срок действия токена истек. Пожалуйста, войдите снова"), request);
+    }
+
+    @ExceptionHandler({SignatureException.class, MalformedJwtException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidJwt(Exception ex, HttpServletRequest request) {
+        log.error("Invalid JWT token: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNAUTHORIZED, new RuntimeException("Неверный токен доступа"), request);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex, request);
     }
 

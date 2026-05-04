@@ -4,6 +4,7 @@ import com.project.velo.entity.enums.AdStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -27,7 +28,7 @@ public class Advertisement {
 
 
     @NotBlank(message = "Название объявления не может быть пустым")
-    @Size(max = 255, message = "Название объявления должно быть до 255 символов")
+    @Size(max = 64, message = "Название объявления должно быть до 64 символов")
     @Column(nullable = false)
     private String title;
 
@@ -71,7 +72,7 @@ public class Advertisement {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Size(min = 1, max = 20, message = "Количество фотографий может быть от 1 до 20")
+    @BatchSize(size = 20)
     private List<AdImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "advertisement", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
