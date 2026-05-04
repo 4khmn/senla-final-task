@@ -135,6 +135,15 @@ public class AdminContentControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    void deleteAdvertisement_Success() throws Exception {
+
+        mockMvc.perform(delete("/api/admin/content/advertisements/{id}", 1L))
+                .andExpect(status().isNoContent());
+        verify(advertisementService).deleteByAdmin(any());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void createCategory_ShouldReturnDto_Success() throws Exception {
 
         CategoryCreateDto request = new CategoryCreateDto("name");

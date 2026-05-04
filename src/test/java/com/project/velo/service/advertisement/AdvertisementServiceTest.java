@@ -340,56 +340,26 @@ public class AdvertisementServiceTest {
         ad.setStatus(AdStatus.ACTIVE);
 
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
-        given(userRepository.findByUsername(username)).willReturn(Optional.of(seller));
 
         advertisementService.delete(adId, username);
 
         assertEquals(AdStatus.ARCHIVED, ad.getStatus());
         verify(advertisementRepository).findById(adId);
-        verify(userRepository).findByUsername(username);
     }
 
-    @Test
-    void delete_Success_ByAdmin() {
-        Long adId = 1L;
-        String adminName = "admin_boss";
-
-        User owner = new User();
-        owner.setUsername("regular_user");
-
-        User admin = new User();
-        admin.setUsername(adminName);
-        admin.setRole(Role.ROLE_ADMIN);
-
-        Advertisement ad = new Advertisement();
-        ad.setSeller(owner);
-        ad.setStatus(AdStatus.ACTIVE);
-
-        given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
-        given(userRepository.findByUsername(adminName)).willReturn(Optional.of(admin));
-
-        advertisementService.delete(adId, adminName);
-
-        assertEquals(AdStatus.ARCHIVED, ad.getStatus());
-    }
 
     @Test
-    void delete_ShouldThrowNotEnoughRightsException_WhenNotOwnerAndNotAdmin() {
+    void delete_ShouldThrowNotEnoughRightsException_WhenNotOwner() {
         Long adId = 1L;
         String strangerName = "stranger";
 
         User owner = new User();
         owner.setUsername("ownerUser");
 
-        User stranger = new User();
-        stranger.setUsername(strangerName);
-        stranger.setRole(Role.ROLE_USER);
-
         Advertisement ad = new Advertisement();
         ad.setSeller(owner);
 
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
-        given(userRepository.findByUsername(strangerName)).willReturn(Optional.of(stranger));
 
         assertThrows(NotEnoughRightsException.class,
                 () -> advertisementService.delete(adId, strangerName)
@@ -398,18 +368,6 @@ public class AdvertisementServiceTest {
         assertNotEquals(AdStatus.ARCHIVED, ad.getStatus());
     }
 
-    @Test
-    void delete_ShouldThrowENFException_WhenUserDoesNotExist() {
-        String username = "ghost";
-        given(advertisementRepository.findById(anyLong())).willReturn(Optional.of(new Advertisement()));
-        given(userRepository.findByUsername(username)).willReturn(Optional.empty());
-
-        EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
-                () -> advertisementService.delete(1L, username)
-        );
-
-        assertEquals("Пользователя с username " + username + " не найдено", result.getMessage());
-    }
 
     @Test
     void delete_ShouldThrowENFException_WhenAdvertisementDoesNotExist() {
@@ -736,5 +694,17 @@ public class AdvertisementServiceTest {
         assertTrue(result.content().isEmpty());
         assertEquals(3, result.totalPages());
         assertEquals(25L, result.totalElements());
+    }
+
+    @Test
+    void deleteByAdmin_ShouldBanAdvertisement_Success() {
+        Advertisement advertisement = new Advertisement();
+        advertisement.setStatus(AdStatus.ACTIVE);
+        advertisement.setId(1L);
+        when(advertisementRepository.findById(1L)).thenReturn(Optional.of(advertisement));
+
+        advertisementService.deleteByAdmin(1L);
+        assertEquals(AdStatus.BANNED, advertisement.getStatus());
+        verify(advertisementRepository).findById(1L);
     }
 }

@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -54,7 +55,7 @@ public class AdminUsersControllerTest {
     void getAllUsers_ShouldReturnOk() throws Exception {
         PageResponse<ProfilePrivateResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
 
-        given(profileService.getAllProfiles(0, 20)).willReturn(pageResponse);
+        given(profileService.getAllProfiles(any(), any(), eq(0), eq(20))).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/admin/users")
                         .param("page", "0")

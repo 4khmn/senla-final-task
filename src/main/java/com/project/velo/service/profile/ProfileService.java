@@ -6,6 +6,7 @@ import com.project.velo.dto.response.profile.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
+import com.project.velo.entity.enums.Role;
 import com.project.velo.exception.UserDisabledException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ProfileMapper;
@@ -78,10 +79,10 @@ public class ProfileService {
 
 
     @Transactional(readOnly = true)
-    public PageResponse<ProfilePrivateResponseDto> getAllProfiles(int page, int size) {
-        List<User> users = userRepository.findAll(page, size);
+    public PageResponse<ProfilePrivateResponseDto> getAllProfiles(Boolean enabled, Role role, int page, int size) {
+        List<User> users = userRepository.findAllFiltered(enabled, role, page, size);
 
-        long totalElements = userRepository.count();
+        long totalElements = userRepository.countFiltered(enabled, role);
 
         List<ProfilePrivateResponseDto> dtos = users.stream()
                 .map(userMapper::toPrivateProfileDto)

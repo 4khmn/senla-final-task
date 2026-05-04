@@ -3,7 +3,10 @@ package com.project.velo.integration.admin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.CategoryCreateDto;
 import com.project.velo.dto.update.CategoryUpdateDto;
+import com.project.velo.entity.Advertisement;
+import com.project.velo.entity.enums.AdStatus;
 import com.project.velo.integration.BaseIT;
+import com.project.velo.repository.AdvertisementRepository;
 import com.project.velo.repository.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -17,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -32,6 +36,9 @@ public class AdminContentControllerIT extends BaseIT {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private AdvertisementRepository advertisementRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -101,11 +108,19 @@ public class AdminContentControllerIT extends BaseIT {
                 () -> new EntityNotFoundException("Отзыва с id 100 не найдено")));
     }
 
+    @Test
+    @Sql("/sql/admin/init_content_admin.sql")
+    void deleteAdvertisement_ShouldBanAdvertisement() throws Exception {
 
 
+        mockMvc.perform(delete("/api/admin/content/advertisements/1")
+                        .with(user("admin-user").roles("ADMIN")))
+                .andExpect(status().isNoContent());
 
+        Advertisement result = advertisementRepository.findById(1L).orElseThrow(
+                () -> new EntityNotFoundException("Объявления с id 1 не найдено")
+        );
 
-
-
-
+        assertEquals(AdStatus.BANNED, result.getStatus());
+    }
 }
