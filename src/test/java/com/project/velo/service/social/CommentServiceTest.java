@@ -68,7 +68,9 @@ public class CommentServiceTest {
                 1L,
                 "content",
                 LocalDateTime.now(),
-                new AuthorResponseDto(1L, user.getUsername(), BigDecimal.ONE, "avatar"));
+                new AuthorResponseDto(1L, user.getUsername(), BigDecimal.ONE, "avatar"),
+                false
+        );
         Comment comment = new Comment();
         comment.setAuthor(user);
         comment.setAdvertisement(advertisement);
@@ -164,7 +166,7 @@ public class CommentServiceTest {
         long totalElements = 12L;
 
         CommentDetailsResponseDto dto = new CommentDetailsResponseDto(
-                10L, "content", LocalDateTime.now(), null);
+                10L, "content", LocalDateTime.now(), null, false);
 
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
         given(commentRepository.getCommentsByAdvertisementWithPagination(adId, page, size)).willReturn(comments);
@@ -405,7 +407,8 @@ public class CommentServiceTest {
 
         CommentUpdateDto updateDto = new CommentUpdateDto(newContent);
         CommentDetailsResponseDto expectedDto = new CommentDetailsResponseDto(
-                commentId, newContent, LocalDateTime.now(), null);
+                commentId, newContent, LocalDateTime.now(), null, false
+        );
 
         given(commentRepository.findById(commentId)).willReturn(Optional.of(comment));
         given(mapper.toDetailsDto(comment)).willReturn(expectedDto);

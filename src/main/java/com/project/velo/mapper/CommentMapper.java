@@ -23,6 +23,7 @@ public interface CommentMapper {
 
 
 
+    @Mapping(target = "isPinned", source = "pinned")
     @Mapping(target = "author", source = "author")
     CommentDetailsResponseDto toDetailsDto(Comment comment);
 }

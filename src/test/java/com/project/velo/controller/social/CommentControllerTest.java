@@ -77,7 +77,7 @@ public class CommentControllerTest {
     void postComment_ShouldReturnDto_Success() throws Exception {
         CommentCreateDto commentCreateDto = new CommentCreateDto("content");
         AuthorResponseDto author = new AuthorResponseDto(1L, "testUser", new BigDecimal("5.0"), "avatar");
-        CommentDetailsResponseDto response = new CommentDetailsResponseDto(1L, "content", LocalDateTime.now(), author);
+        CommentDetailsResponseDto response = new CommentDetailsResponseDto(1L, "content", LocalDateTime.now(), author, false);
         Long adId = 1L;
         given(commentService.postComment(adId, commentCreateDto, "testUser")).willReturn(response);
 
@@ -158,7 +158,7 @@ public class CommentControllerTest {
     void updateComment_ShouldReturnDto_Success() throws Exception {
         CommentUpdateDto commentUpdateDto = new CommentUpdateDto("content");
         AuthorResponseDto author = new AuthorResponseDto(1L, "testUser", new BigDecimal("5.0"), "avatar");
-        CommentDetailsResponseDto response = new CommentDetailsResponseDto(1L, "content", LocalDateTime.now(), author);
+        CommentDetailsResponseDto response = new CommentDetailsResponseDto(1L, "content", LocalDateTime.now(), author, false);
         Long commentId = 1L;
 
         given(commentService.update(commentId, commentUpdateDto, "testUser")).willReturn(response);
