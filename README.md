@@ -1,6 +1,5 @@
-# Velo Marketplace API
+# Сервис для размещения частных объявлений.
 
-Сервис для размещения частных объявлений.
 ---
 
 ## Инструкция по запуску приложения
@@ -64,3 +63,53 @@
 │   ├── advertisements # Фотографии товаров
 │   └── avatars        # Аватары пользователей
 └── docker-compose.yml # Описание инфраструктуры
+```
+---
+
+## Примеры работы с API (кратко)
+
+1. **Регистрация пользователя**
+
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "username": "user1",
+  "password": "strong_password",
+  "email": "email@google.com",
+  "firstName": "firstName",
+  "lastName": "lastName"
+}
+```
+
+2. **Логин и получение JWT**
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user1",
+  "password": "strong_password"
+}
+```
+
+В ответе придёт объект `AuthResponse` с полем `token`. Далее все защищённые запросы выполняются с заголовком:
+
+```http
+Authorization: Bearer <jwt-токен>
+```
+
+3. **Получение списка товаров (публично)**
+
+```http
+GET /api/advertisements
+```
+
+4. **Доступ к защищённым ресурсам**
+
+```http
+GET /api/profiles/my
+Authorization: Bearer <jwt-токен>
+```
