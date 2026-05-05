@@ -51,6 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             var userDetails = userDetailsService.loadUserByUsername(username);
                             if (!userDetails.isEnabled()) {
                                 resolver.resolveException(request, response, null, new DisabledException("Аккаунт заблокирован"));
+                                return;
                             }
                             var authToken = new UsernamePasswordAuthenticationToken(
                                     userDetails,
