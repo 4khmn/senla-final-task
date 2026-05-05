@@ -39,6 +39,7 @@ public class Comment {
     private LocalDateTime createdAt;
 
 
+    @Builder.Default
     @Column(name = "is_pinned", nullable = false)
     private boolean isPinned = false;
 

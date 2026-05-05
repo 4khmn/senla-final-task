@@ -8,5 +8,6 @@ public record CommentDetailsResponseDto(
         Long id,
         String content,
         LocalDateTime createdAt,
-        AuthorResponseDto author
+        AuthorResponseDto author,
+        boolean isPinned
 ) {}
