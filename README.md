@@ -8,13 +8,29 @@
 
 1. **Клонируйте репозиторий:**
    ```bash
-   git clone [https://github.com/4khmn/senla-final-task.git](https://github.com/4khmn/senla-final-task.git)
+   git clone https://github.com/4khmn/senla-final-task.git
    cd senla-final-task
 
 2. **Настройте переменные окружения:**
 
 Создайте файл .env в корневой директории (используйте .env.example как образец):
 
+```text
+# Database Settings
+DB_NAME=velo_db
+DB_USER=your_secure_username_here
+DB_PASSWORD=your_secure_password_here
+
+# Admin Settings
+ADMIN_USERNAME=test-admin
+ADMIN_PASSWORD=TestAdmin1!
+ADMIN_EMAIL=test@test.com
+
+# App Settings
+SERVER_PORT=8080
+
+JWT_SECRET=your_jwt_secret_key_which_is_very_long
+```
 
 3. **Запустите контейнеры:**
    ```bash
