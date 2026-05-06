@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -20,16 +20,16 @@ services:
     build: .
     container_name: velo-app
     ports:
-      - "${SERVER_PORT}:8080"
+      - "${SERVER_PORT:-8080}:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${DB_NAME}
-      - SPRING_DATASOURCE_USERNAME=${DB_USER}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${DB_NAME:-velo_db}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER:-postgres}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-postgres}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
-      - APP_INIT_ADMIN_USERNAME=${ADMIN_USERNAME}
-      - APP_INIT_ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - APP_INIT_ADMIN_EMAIL=${ADMIN_EMAIL}
-      - JWT_SECRET=${JWT_SECRET}
+      - APP_INIT_ADMIN_USERNAME=${ADMIN_USERNAME:-main-admin}
+      - APP_INIT_ADMIN_PASSWORD=${ADMIN_PASSWORD:-Admin123!}
+      - APP_INIT_ADMIN_EMAIL=${ADMIN_EMAIL:-admin@admin.com}
+      - JWT_SECRET=${JWT_SECRET:-my-super-secret-key-for-jwt-signing-which-is-very-long}
     depends_on:
       db:
         condition: service_healthy
