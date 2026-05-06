@@ -2,6 +2,7 @@ package com.project.velo.repository;
 
 import com.project.velo.dto.request.AdvertisementFilterDto;
 import com.project.velo.entity.Advertisement;
+import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -44,9 +45,9 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Advertisement> cq = cb.createQuery(Advertisement.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
-        Join<Object, Object> authorJoin = root.join("seller");
+        Join<Advertisement, User> authorJoin = root.join("seller");
 
-        cq.where(buildPredicates(cb, root, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));
+        cq.where(buildPredicates(cb, root, authorJoin, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));
 
         Expression<Object> effectiveRating = cb.selectCase()
                 .when(cb.equal(authorJoin.get("rating"), BigDecimal.ZERO), new BigDecimal("3.5"))
@@ -88,8 +89,9 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> cq = cb.createQuery(Long.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
+        Join<Advertisement, User> authorJoin = root.join("seller");
 
-        cq.select(cb.count(root)).where(buildPredicates(cb, root, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));
+        cq.select(cb.count(root)).where(buildPredicates(cb, root, authorJoin, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));
 
         return entityManager.createQuery(cq).getSingleResult();
     }
@@ -118,11 +120,16 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
     }
 
 
-    private Predicate[] buildPredicates(CriteriaBuilder cb, Root<Advertisement> root,
-                                        String query, Long categoryId,
-                                        BigDecimal minPrice, BigDecimal maxPrice) {
+    private Predicate[] buildPredicates(CriteriaBuilder cb,
+                                        Root<Advertisement> root,
+                                        Join<Advertisement, User> authorJoin,
+                                        String query,
+                                        Long categoryId,
+                                        BigDecimal minPrice,
+                                        BigDecimal maxPrice) {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("status"), AdStatus.ACTIVE));
+        predicates.add(cb.isTrue(authorJoin.get("enabled")));
 
         if (query != null && !query.isBlank()) {
             String[] words = query.toLowerCase().split("\\s+");
