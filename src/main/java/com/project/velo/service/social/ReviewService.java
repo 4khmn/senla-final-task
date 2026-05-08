@@ -8,6 +8,7 @@ import com.project.velo.entity.SalesHistory;
 import com.project.velo.entity.User;
 import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.exception.ResourceAlreadyProcessedException;
+import com.project.velo.exception.UserDisabledException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ReviewMapper;
 import com.project.velo.repository.ReviewRepository;
@@ -35,21 +36,23 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponseDto leaveReview(Long adId, ReviewCreateDto dto, String username) {
-        if (reviewRepository.existsByAdvertisementId(adId)) {
-            throw new ResourceAlreadyProcessedException("Отзыв на это объявление уже оставлен");
-        }
-
         SalesHistory sale = salesHistoryRepository.findByAdvertisementId(adId)
-                .orElseThrow(() -> new EntityNotFoundException("Нельзя оставить отзыв: товар еще не продан или сделка не зафиксирована"));
-
+                .orElseThrow(() -> new EntityNotFoundException("Нельзя оставить отзыв: товар не найден или еще не продан"));
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
 
-
         if (!sale.getBuyer().getUsername().equals(username)) {
             throw new ValidationException("Только покупатель может оставить отзыв");
         }
+
+        if (!sale.getSeller().isEnabled()) {
+            throw new EntityNotFoundException("Объявление с id " + adId + " не найдено или недоступно");
+        }
+        if (reviewRepository.existsByAdvertisementId(adId)) {
+            throw new ResourceAlreadyProcessedException("Отзыв на это объявление уже оставлен");
+        }
+
 
         Review review = mapper.toEntity(dto);
         review.setAdvertisement(sale.getAdvertisement());
@@ -66,13 +69,34 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<ReviewResponseDto> getReviewsByUser(String username, Integer rating, String sortDirection, int page, int size) {
-        if (!userRepository.existsByUsername(username)) {
-            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
+    public PageResponse<ReviewResponseDto> getReceivedByUser(String username, Integer rating, String sortDirection, int page, int size) {
+        User user =  userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
+        );
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<Review> reviews = reviewRepository.getBySellerWithPagination(username, rating, sortDirection, page, size);
 
         long totalElements = reviewRepository.countBySeller(username, rating);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<ReviewResponseDto> dtos = reviews.stream()
+                .map(mapper::toDto)
+                .toList();
+
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
+    }
+
+    public PageResponse<ReviewResponseDto> getSentByUser(String username, int page, int size) {
+        User user =  userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
+        );
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
+        }
+        List<Review> reviews = reviewRepository.getByAuthorWithPagination(username, page, size);
+        long totalElements = reviewRepository.countByAuthor(username);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         List<ReviewResponseDto> dtos = reviews.stream()
@@ -113,12 +137,15 @@ public class ReviewService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
+        if (!review.getAuthor().isEnabled()) {
+            throw new EntityNotFoundException("Объявление, на которое был оставлен этот отзыв, больше недоступно");
+        }
 
         boolean isAuthor = review.getAuthor().getUsername().equals(username);
         boolean isAdmin = user.getRole().name().equals("ROLE_ADMIN");
 
         if (!isAuthor && !isAdmin) {
-            log.warn("Security Alert! User {} tried to delete review {} without rights", username, id);
+            log.warn("User {} tried to delete review {} without rights", username, id);
             throw new NotEnoughRightsException("У вас нет прав на удаление этого отзыва");
         }
 

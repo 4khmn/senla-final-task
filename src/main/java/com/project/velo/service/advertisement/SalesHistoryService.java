@@ -43,7 +43,7 @@ public class SalesHistoryService {
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         if (!user.isEnabled()) {
-            throw new UserDisabledException("Пользователь с username " + username + " деактивирован");
+            throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<SalesHistoryPublicResponseDto> entities = salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size)
                 .stream().map(mapper::toPublicDto).toList();

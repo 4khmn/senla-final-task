@@ -84,9 +84,9 @@ class ProfileSocialControllerTest {
         );
 
         PageResponse<ReviewResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
-        given(reviewService.getReviewsByUser("denis", null, null, 0, 10)).willReturn(pageResponse);
+        given(reviewService.getReceivedByUser("denis", null, null, 0, 10)).willReturn(pageResponse);
 
-        mockMvc.perform(get("/api/profiles/my/reviews"))
+        mockMvc.perform(get("/api/profiles/my/reviews/received"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].authorUsername").value("buyer77"))
                 .andExpect(jsonPath("$.content[0].score").value(5.0));
@@ -94,7 +94,7 @@ class ProfileSocialControllerTest {
 
     @Test
     void getUserReceivedReviews_ShouldReturnPageResponse() throws Exception {
-        given(reviewService.getReviewsByUser("maxim", null, null, 0, 10)).willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
+        given(reviewService.getReceivedByUser("maxim", null, null, 0, 10)).willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
 
         mockMvc.perform(get("/api/profiles/maxim/reviews"))
                 .andExpect(status().isOk())

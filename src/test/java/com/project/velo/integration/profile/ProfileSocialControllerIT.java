@@ -39,7 +39,7 @@ public class ProfileSocialControllerIT extends BaseIT {
     void getMyReceivedReviews_ShouldReturnReviewsPage() throws Exception {
         String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/user_reviews_response.json"));
 
-        mockMvc.perform(get("/api/profiles/my/reviews")
+        mockMvc.perform(get("/api/profiles/my/reviews/received")
                         .with(user("owner_user")))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJson));

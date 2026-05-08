@@ -1,7 +1,11 @@
 {
-  "content" : [ ],
-  "totalElements" : 0,
-  "totalPages" : 0,
+  "content" : [ {
+    "id" : 201,
+    "advertisementTitle" : "Meow",
+    "soldAt" : "2026-04-21T12:00:00"
+  } ],
+  "totalElements" : 1,
+  "totalPages" : 1,
   "page" : 0,
   "size" : 10
 }

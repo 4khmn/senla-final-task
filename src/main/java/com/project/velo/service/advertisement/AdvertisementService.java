@@ -80,6 +80,10 @@ public class AdvertisementService {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
+        User user =  advertisement.getSeller();
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Объявление с id " + id + " не найдено или недоступно");
+        }
         if (advertisement.getStatus() != AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно");
         }
@@ -247,7 +251,7 @@ public class AdvertisementService {
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
         if (!user.isEnabled()) {
-            throw new UserDisabledException("Пользователь с username " + username + " деактивирован");
+            throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<Advertisement> advertisements = advertisementRepository.findAllByUsername(username, page, size);
         long totalElements = advertisementRepository.countByUsernameAndStatus(username, AdStatus.ACTIVE);

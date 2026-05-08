@@ -25,7 +25,7 @@ public class ProfileActivityControllerIT extends BaseIT {
 
     @Test
     @Sql("/sql/profile/init_profiles.sql")
-    void shouldReturnMySales() throws Exception {
+    void getMySales_shouldReturnMySales() throws Exception {
 
         String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/profile_sales_private_response.json"));
 
@@ -37,18 +37,18 @@ public class ProfileActivityControllerIT extends BaseIT {
 
     @Test
     @Sql("/sql/profile/init_profiles.sql")
-    void shouldReturnUserSalesPublic() throws Exception {
+    void getUserSales_shouldReturnUserSalesPublic() throws Exception {
 
         String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/profile_sales_public_response.json"));
 
-        mockMvc.perform(get("/api/profiles/{username}/sales", "other_user"))
+        mockMvc.perform(get("/api/profiles/{username}/sales", "third_user"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJson));
     }
 
     @Test
     @Sql("/sql/profile/init_profiles.sql")
-    void shouldReturnMyActiveAdvertisements() throws Exception {
+    void getMyActiveAdvertisements_shouldReturnMyActiveAdvertisements() throws Exception {
         String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/profile_ads_my_response.json"));
 
         mockMvc.perform(get("/api/profiles/my/advertisements")
@@ -59,7 +59,7 @@ public class ProfileActivityControllerIT extends BaseIT {
 
     @Test
     @Sql("/sql/profile/init_profiles.sql")
-    void shouldReturn404WhenUserNotFound() throws Exception {
+    void getUserActiveAdvertisements_shouldReturn404WhenUserNotFound() throws Exception {
 
         mockMvc.perform(get("/api/profiles/non-existent/sales"))
                 .andExpect(status().isNotFound());

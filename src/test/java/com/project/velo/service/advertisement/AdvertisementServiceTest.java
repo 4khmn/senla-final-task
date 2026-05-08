@@ -154,7 +154,7 @@ public class AdvertisementServiceTest {
         Advertisement ad = new Advertisement();
         ad.setId(adId);
         ad.setStatus(AdStatus.ACTIVE);
-
+        ad.setSeller(User.builder().username("username").enabled(true).build());
         AdvertisementResponseDto expectedDto = new AdvertisementResponseDto(
                 adId, "Title", "Desc", BigDecimal.TEN, "ACTIVE",
                 false, LocalDateTime.now(), null, "Category", "img", List.of()
@@ -187,6 +187,7 @@ public class AdvertisementServiceTest {
         Advertisement ad = new Advertisement();
         ad.setId(adId);
         ad.setStatus(AdStatus.SOLD);
+        ad.setSeller(User.builder().username("username").enabled(true).build());
 
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
 
@@ -616,12 +617,14 @@ public class AdvertisementServiceTest {
         Advertisement ad = new Advertisement();
         ad.setTitle("Classic Bike");
 
+        User user = User.builder().username(username).enabled(true).build();
         AdvertisementResponseDto dto = new AdvertisementResponseDto(
                 1L, "Classic Bike", "Desc", BigDecimal.TEN, "ACTIVE",
                 false, LocalDateTime.now(), null, "Bikes", "url", List.of()
         );
+        ad.setSeller(user);
 
-        given(userRepository.existsByUsername(username)).willReturn(true);
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
         given(advertisementRepository.findAllByUsername(username, page, size))
                 .willReturn(List.of(ad));
         given(advertisementRepository.countByUsernameAndStatus(username, AdStatus.ACTIVE))
@@ -639,15 +642,14 @@ public class AdvertisementServiceTest {
         assertEquals(2, result.totalPages());
         assertEquals(dto, result.content().get(0));
 
-        verify(userRepository).existsByUsername(username);
-        verify(advertisementRepository).findAllByUsername(username, page, size);
+        verify(userRepository, times(1)).findByUsername(username);
+       verify(advertisementRepository).findAllByUsername(username, page, size);
     }
 
     @Test
     void findAdvertisementsByUsername_ShouldThrowENFException_WhenUserDoesNotExist() {
         String username = "username";
-        given(userRepository.existsByUsername(username)).willReturn(false);
-
+        given(userRepository.findByUsername(username)).willReturn(Optional.empty());
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
                 () -> advertisementService.findAdvertisementsByUsername(username, 0, 10)
         );
