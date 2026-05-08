@@ -368,4 +368,30 @@ public class ReviewServiceTest {
         assertEquals(0, result.totalElements());
         assertEquals(0, result.totalPages());
     }
+
+    @Test
+    void getSentByUser_ShouldReturnPageResponse_Success() {
+        User user = User.builder().id(1L).username("username").enabled(true).build();
+
+        given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.of(user));
+        given(reviewRepository.getByAuthorWithPagination(user.getUsername(), 0, 10)).willReturn(List.of(new Review()));
+        when(reviewRepository.countByAuthor(user.getUsername())).thenReturn(1L);
+        when(mapper.toDto(any(Review.class))).thenReturn(new ReviewResponseDto(
+                1L,
+                "title",
+                1L,
+                "username",
+                new BigDecimal("5"),
+                "content",
+                LocalDateTime.now())
+        );
+
+        PageResponse<ReviewResponseDto> result = reviewService.getSentByUser("username", 0, 10);
+
+        assertEquals("title", result.content().get(0).advertisementTitle());
+
+        verify(mapper, times(1)).toDto(any(Review.class));
+        verify(reviewRepository).getByAuthorWithPagination(anyString(), anyInt(), anyInt());
+        verify(reviewRepository).countByAuthor(anyString());
+    }
 }

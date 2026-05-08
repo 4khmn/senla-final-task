@@ -100,4 +100,13 @@ class ProfileSocialControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(0));
     }
+
+    @Test
+    void getMySentReviews_ShouldReturnPageResponse() throws Exception {
+        given(reviewService.getSentByUser("denis", 0, 10)).willReturn(new PageResponse<>(List.of(), 1, 1, 0, 10));
+
+        mockMvc.perform(get("/api/profiles/my/reviews/sent"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(0));
+    }
 }

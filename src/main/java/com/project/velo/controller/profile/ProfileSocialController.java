@@ -65,7 +65,7 @@ public class ProfileSocialController {
             security = @SecurityRequirement(name = "JWT")
     )
     @GetMapping("/my/reviews/sent")
-    public ResponseEntity<PageResponse<ReviewResponseDto>> getMyLeavedReviews(
+    public ResponseEntity<PageResponse<ReviewResponseDto>> getMySentReviews(
             @AuthenticationPrincipal UserDetails user,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
