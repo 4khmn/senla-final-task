@@ -2,7 +2,9 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.create.ReviewCreateDto;
 import com.project.velo.dto.response.common.PageResponse;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewFullResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
+import com.project.velo.dto.response.review.ReviewSentResponseDto;
 import com.project.velo.entity.Review;
 import com.project.velo.entity.SalesHistory;
 import com.project.velo.entity.User;
@@ -34,22 +36,24 @@ public class ReviewService {
 
 
     @Transactional
-    public ReviewResponseDto leaveReview(Long adId, ReviewCreateDto dto, String username) {
-        if (reviewRepository.existsByAdvertisementId(adId)) {
-            throw new ResourceAlreadyProcessedException("Отзыв на это объявление уже оставлен");
-        }
-
+    public ReviewReceivedResponseDto leaveReview(Long adId, ReviewCreateDto dto, String username) {
         SalesHistory sale = salesHistoryRepository.findByAdvertisementId(adId)
-                .orElseThrow(() -> new EntityNotFoundException("Нельзя оставить отзыв: товар еще не продан или сделка не зафиксирована"));
-
+                .orElseThrow(() -> new EntityNotFoundException("Нельзя оставить отзыв: товар не найден или еще не продан"));
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
 
-
         if (!sale.getBuyer().getUsername().equals(username)) {
             throw new ValidationException("Только покупатель может оставить отзыв");
         }
+
+        if (!sale.getSeller().isEnabled()) {
+            throw new EntityNotFoundException("Объявление с id " + adId + " не найдено или недоступно");
+        }
+        if (reviewRepository.existsByAdvertisementId(adId)) {
+            throw new ResourceAlreadyProcessedException("Отзыв на это объявление уже оставлен");
+        }
+
 
         Review review = mapper.toEntity(dto);
         review.setAdvertisement(sale.getAdvertisement());
@@ -62,21 +66,42 @@ public class ReviewService {
         seller.setRating(avgRating);
         userRepository.save(seller);
 
-        return mapper.toDto(saved);
+        return mapper.toReceivedDto(saved);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<ReviewResponseDto> getReviewsByUser(String username, Integer rating, String sortDirection, int page, int size) {
-        if (!userRepository.existsByUsername(username)) {
-            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
+    public PageResponse<ReviewReceivedResponseDto> getReceivedByUser(String username, Integer rating, String sortDirection, int page, int size) {
+        User user =  userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
+        );
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<Review> reviews = reviewRepository.getBySellerWithPagination(username, rating, sortDirection, page, size);
 
         long totalElements = reviewRepository.countBySeller(username, rating);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
-        List<ReviewResponseDto> dtos = reviews.stream()
-                .map(mapper::toDto)
+        List<ReviewReceivedResponseDto> dtos = reviews.stream()
+                .map(mapper::toReceivedDto)
+                .toList();
+
+        return new PageResponse<>(dtos, totalElements, totalPages, page, size);
+    }
+
+    public PageResponse<ReviewSentResponseDto> getSentByUser(String username, int page, int size) {
+        User user =  userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
+        );
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
+        }
+        List<Review> reviews = reviewRepository.getByAuthorWithPagination(username, page, size);
+        long totalElements = reviewRepository.countByAuthor(username);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        List<ReviewSentResponseDto> dtos = reviews.stream()
+                .map(mapper::toSentDto)
                 .toList();
 
         return new PageResponse<>(dtos, totalElements, totalPages, page, size);
@@ -84,13 +109,13 @@ public class ReviewService {
 
 
     @Transactional(readOnly = true)
-    public PageResponse<ReviewResponseDto> getAllReviews(int page, int size) {
+    public PageResponse<ReviewFullResponseDto> getAllReviews(int page, int size) {
         List<Review> reviews = reviewRepository.findAll(page, size);
 
         long totalElements = reviewRepository.countAll();
 
-        List<ReviewResponseDto> dtos = reviews.stream()
-                .map(mapper::toDto)
+        List<ReviewFullResponseDto> dtos = reviews.stream()
+                .map(mapper::toFullDto)
                 .toList();
 
         int totalPages = (int) Math.ceil((double) totalElements / size);
@@ -113,12 +138,15 @@ public class ReviewService {
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
+        if (!review.getAuthor().isEnabled()) {
+            throw new EntityNotFoundException("Объявление, на которое был оставлен этот отзыв, больше недоступно");
+        }
 
         boolean isAuthor = review.getAuthor().getUsername().equals(username);
         boolean isAdmin = user.getRole().name().equals("ROLE_ADMIN");
 
         if (!isAuthor && !isAdmin) {
-            log.warn("Security Alert! User {} tried to delete review {} without rights", username, id);
+            log.warn("User {} tried to delete review {} without rights", username, id);
             throw new NotEnoughRightsException("У вас нет прав на удаление этого отзыва");
         }
 

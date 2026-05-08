@@ -1,8 +1,9 @@
 package com.project.velo.controller.profile;
 
 import com.project.velo.dto.response.common.PageResponse;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
 import com.project.velo.dto.response.profile.UserCommentResponseDto;
+import com.project.velo.dto.response.review.ReviewSentResponseDto;
 import com.project.velo.service.social.CommentService;
 import com.project.velo.service.social.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,16 +48,31 @@ public class ProfileSocialController {
             summary = "Список отзывов, оставленных другими пользователями о текущем пользователе",
             security = @SecurityRequirement(name = "JWT")
     )
-    @GetMapping("/my/reviews")
-    public ResponseEntity<PageResponse<ReviewResponseDto>> getMyReceivedReviews(
+    @GetMapping("/my/reviews/received")
+    public ResponseEntity<PageResponse<ReviewReceivedResponseDto>> getMyReceivedReviews(
             @AuthenticationPrincipal UserDetails user,
             @RequestParam(required = false) Integer rating,
             @RequestParam(required = false) String sortDirection,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        log.info("GET /api/profiles/my/reviews - Fetching reviews by user: {}, page: {}, size: {}", user.getUsername(), page, size);
-        PageResponse<ReviewResponseDto> reviews = reviewService.getReviewsByUser(user.getUsername(), rating, sortDirection, page, size);
-        log.info("GET /api/profiles/my/reviews - Found {} reviews by user: {}, page: {}, size: {}", reviews.content().size(), user.getUsername(), page, size);
+        log.info("GET /api/profiles/my/reviews/received - Fetching reviews by user: {}, page: {}, size: {}", user.getUsername(), page, size);
+        PageResponse<ReviewReceivedResponseDto> reviews = reviewService.getReceivedByUser(user.getUsername(), rating, sortDirection, page, size);
+        log.info("GET /api/profiles/my/reviews/received - Found {} reviews by user: {}, page: {}, size: {}", reviews.content().size(), user.getUsername(), page, size);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @Operation(
+            summary = "Список отзывов, оставленных текущем пользователем",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @GetMapping("/my/reviews/sent")
+    public ResponseEntity<PageResponse<ReviewSentResponseDto>> getMySentReviews(
+            @AuthenticationPrincipal UserDetails user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        log.info("GET /api/profiles/my/reviews/sent - Fetching reviews by user: {}, page: {}, size: {}", user.getUsername(), page, size);
+        PageResponse<ReviewSentResponseDto> reviews = reviewService.getSentByUser(user.getUsername(), page, size);
+        log.info("GET /api/profiles/my/reviews/sent - Found {} reviews by user: {}, page: {}, size: {}", reviews.content().size(), user.getUsername(), page, size);
         return ResponseEntity.ok(reviews);
     }
 
@@ -64,14 +80,14 @@ public class ProfileSocialController {
     @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     @ApiResponse(responseCode = "200")
     @GetMapping("/{username}/reviews")
-    public ResponseEntity<PageResponse<ReviewResponseDto>> getUserReceivedReviews(
+    public ResponseEntity<PageResponse<ReviewReceivedResponseDto>> getUserReceivedReviews(
             @PathVariable String username,
             @RequestParam(required = false) Integer rating,
             @RequestParam(required = false) String sortDirection,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         log.info("GET /api/profiles/{}/reviews - Fetching reviews by user: {}, page: {}, size: {}", username, username, page, size);
-        PageResponse<ReviewResponseDto> reviews = reviewService.getReviewsByUser(username, rating, sortDirection, page, size);
+        PageResponse<ReviewReceivedResponseDto> reviews = reviewService.getReceivedByUser(username, rating, sortDirection, page, size);
         log.info("GET /api/profiles/{}/reviews - Found {} reviews by user: {}, page: {}, size: {}", username, reviews.content().size(), username, page, size);
         return ResponseEntity.ok(reviews);
     }

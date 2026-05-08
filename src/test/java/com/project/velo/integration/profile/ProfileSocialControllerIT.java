@@ -37,9 +37,9 @@ public class ProfileSocialControllerIT extends BaseIT {
     @Test
     @Sql("/sql/profile/init_social.sql")
     void getMyReceivedReviews_ShouldReturnReviewsPage() throws Exception {
-        String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/user_reviews_response.json"));
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/user_received_reviews_response.json"));
 
-        mockMvc.perform(get("/api/profiles/my/reviews")
+        mockMvc.perform(get("/api/profiles/my/reviews/received")
                         .with(user("owner_user")))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJson));
@@ -48,7 +48,7 @@ public class ProfileSocialControllerIT extends BaseIT {
     @Test
     @Sql("/sql/profile/init_social.sql")
     void getUserReceivedReviews_ShouldReturnPublicReviewsPage() throws Exception {
-        String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/user_reviews_response.json"));
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/user_received_reviews_response.json"));
 
         mockMvc.perform(get("/api/profiles/owner_user/reviews"))
                 .andExpect(status().isOk())
@@ -61,5 +61,16 @@ public class ProfileSocialControllerIT extends BaseIT {
         mockMvc.perform(get("/api/profiles/non_existent_user/reviews")
                         .with(user("owner_user")))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Sql("/sql/profile/init_social.sql")
+    void getMySentReviews_ShouldReturnReviewsPage() throws Exception {
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/user_sent_reviews_response.json"));
+
+        mockMvc.perform(get("/api/profiles/my/reviews/sent")
+                        .with(user("buyer_user")))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson));
     }
 }

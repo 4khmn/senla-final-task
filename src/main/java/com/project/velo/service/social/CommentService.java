@@ -11,6 +11,7 @@ import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
 import com.project.velo.exception.AdvertisementNotAvailableException;
 import com.project.velo.exception.NotEnoughRightsException;
+import com.project.velo.exception.UserDisabledException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.CommentMapper;
 import com.project.velo.repository.AdvertisementRepository;
@@ -57,6 +58,10 @@ public class CommentService {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
+        User user =  advertisement.getSeller();
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Объявление с id " + id + " не найдено или недоступно");
+        }
         if (advertisement.getStatus() != AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно");
         }

@@ -4,6 +4,7 @@ import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.response.salesHistory.SalesHistoryPrivateResponseDto;
 import com.project.velo.dto.response.salesHistory.SalesHistoryPublicResponseDto;
 import com.project.velo.entity.SalesHistory;
+import com.project.velo.entity.User;
 import com.project.velo.mapper.SalesHistoryMapper;
 import com.project.velo.repository.SalesHistoryRepository;
 import com.project.velo.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -48,8 +50,10 @@ public class SalesHistoryServiceTest {
         SalesHistoryPublicResponseDto dto = new SalesHistoryPublicResponseDto(
                 1L, "Bike", LocalDateTime.now()
         );
+        User user = new User();
+        user.setUsername(username);
 
-        given(userRepository.existsByUsername(username)).willReturn(true);
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
         given(salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size))
                 .willReturn(List.of(salesHistory));
         given(salesHistoryRepository.countSalesBySeller(username)).willReturn(12L);
@@ -63,7 +67,6 @@ public class SalesHistoryServiceTest {
         assertEquals(3, result.totalPages());
         assertEquals(dto, result.content().get(0));
 
-        verify(userRepository).existsByUsername(username);
         verify(salesHistoryRepository).findAllBySellerOrderBySoldAt(username, page, size);
         verify(salesHistoryRepository).countSalesBySeller(username);
     }

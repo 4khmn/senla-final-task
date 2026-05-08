@@ -3,6 +3,8 @@ package com.project.velo.service.advertisement;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.response.salesHistory.SalesHistoryPrivateResponseDto;
 import com.project.velo.dto.response.salesHistory.SalesHistoryPublicResponseDto;
+import com.project.velo.entity.User;
+import com.project.velo.exception.UserDisabledException;
 import com.project.velo.mapper.SalesHistoryMapper;
 import com.project.velo.repository.SalesHistoryRepository;
 import com.project.velo.repository.UserRepository;
@@ -37,8 +39,11 @@ public class SalesHistoryService {
 
     @Transactional(readOnly = true)
     public PageResponse<SalesHistoryPublicResponseDto> getPublicSales(String username, int page, int size) {
-        if (!userRepository.existsByUsername(username)) {
-            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
+        User user =  userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
+        );
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<SalesHistoryPublicResponseDto> entities = salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size)
                 .stream().map(mapper::toPublicDto).toList();

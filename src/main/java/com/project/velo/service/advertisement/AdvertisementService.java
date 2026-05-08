@@ -9,10 +9,7 @@ import com.project.velo.entity.*;
 import com.project.velo.dto.create.AdvertisementCreateDto;
 import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
 import com.project.velo.entity.enums.AdStatus;
-import com.project.velo.exception.AdvertisementNotAvailableException;
-import com.project.velo.exception.NotEnoughRightsException;
-import com.project.velo.exception.ResourceAlreadyProcessedException;
-import com.project.velo.exception.ValidationException;
+import com.project.velo.exception.*;
 import com.project.velo.mapper.AdvertisementMapper;
 import com.project.velo.repository.AdvertisementRepository;
 import com.project.velo.repository.CategoryRepository;
@@ -83,6 +80,10 @@ public class AdvertisementService {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Объявления с id " + id + " не найдено")
         );
+        User user =  advertisement.getSeller();
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Объявление с id " + id + " не найдено или недоступно");
+        }
         if (advertisement.getStatus() != AdStatus.ACTIVE) {
             throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно");
         }
@@ -246,8 +247,11 @@ public class AdvertisementService {
 
     @Transactional(readOnly = true)
     public PageResponse<AdvertisementResponseDto> findAdvertisementsByUsername(String username, int page, int size) {
-        if (!userRepository.existsByUsername(username)) {
-            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
+        User user =  userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
+        );
+        if (!user.isEnabled()) {
+            throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<Advertisement> advertisements = advertisementRepository.findAllByUsername(username, page, size);
         long totalElements = advertisementRepository.countByUsernameAndStatus(username, AdStatus.ACTIVE);

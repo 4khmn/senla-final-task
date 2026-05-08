@@ -68,6 +68,20 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
         return entityManager.createQuery(cq).getSingleResult();
     }
 
+    public List<Review> getByAuthorWithPagination(String authorUsername, int page, int size) {
+        return entityManager.createQuery("SELECT r FROM Review r WHERE r.author.username = :authorUsername ORDER BY r.createdAt DESC", Review.class)
+                .setParameter("authorUsername", authorUsername)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    public long countByAuthor(String authorUsername) {
+        return entityManager.createQuery("SELECT COUNT(*) FROM Review r WHERE r.author.username = :authorUsername", Long.class)
+                .setParameter("authorUsername", authorUsername)
+                .getSingleResult();
+    }
+
     public List<Review> findAll(int page, int size) {
         return entityManager.createQuery("SELECT r FROM Review r ORDER BY r.createdAt DESC", Review.class)
                 .setFirstResult(page * size)

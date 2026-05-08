@@ -3,7 +3,8 @@ package com.project.velo.controller.admin;
 import com.project.velo.dto.create.CategoryCreateDto;
 import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
 import com.project.velo.dto.response.advertisement.CategoryResponseDto;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewFullResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.service.advertisement.AdvertisementService;
@@ -38,12 +39,12 @@ public class AdminContentController {
             description = "Позволяет админу просматривать все отзывы в системе для модерации"
     )
     @GetMapping("/reviews")
-    public ResponseEntity<PageResponse<ReviewResponseDto>> getAllReviews(
+    public ResponseEntity<PageResponse<ReviewFullResponseDto>> getAllReviews(
             @Parameter(description = "Номер страницы") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Размер страницы") @RequestParam(defaultValue = "20") int size
     ) {
         log.info("GET /api/admin/content/reviews - Admin fetching all reviews, page: {}, size: {}", page, size);
-        PageResponse<ReviewResponseDto> reviews = reviewService.getAllReviews(page, size);
+        PageResponse<ReviewFullResponseDto> reviews = reviewService.getAllReviews(page, size);
         log.info("GET /api/admin/content/reviews - Found: {} reviews, page: {}, size: {}", reviews.size(), page, size);
         return ResponseEntity.ok(reviews);
     }

@@ -157,7 +157,7 @@ public class CommentServiceTest {
         Advertisement ad = new Advertisement();
         ad.setId(adId);
         ad.setStatus(AdStatus.ACTIVE);
-
+        ad.setSeller(User.builder().username("username").enabled(true).build());
         Comment comment = new Comment();
         comment.setId(10L);
         comment.setContent("content");
@@ -203,7 +203,7 @@ public class CommentServiceTest {
         Advertisement ad = new Advertisement();
         ad.setId(adId);
         ad.setStatus(AdStatus.ARCHIVED);
-
+        ad.setSeller(User.builder().username("username").enabled(true).build());
         given(advertisementRepository.findById(adId)).willReturn(Optional.of(ad));
 
         assertThrows(AdvertisementNotAvailableException.class, () ->

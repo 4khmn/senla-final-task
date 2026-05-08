@@ -2,7 +2,9 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.create.ReviewCreateDto;
 import com.project.velo.dto.response.common.PageResponse;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewFullResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
+import com.project.velo.dto.response.review.ReviewSentResponseDto;
 import com.project.velo.entity.Review;
 import com.project.velo.entity.SalesHistory;
 import com.project.velo.entity.User;
@@ -68,7 +70,7 @@ public class ReviewServiceTest {
         review.setContent(request.content());
         review.setScore(request.score());
 
-        ReviewResponseDto dto = new ReviewResponseDto(1L,
+        ReviewReceivedResponseDto dto = new ReviewReceivedResponseDto(1L,
                 "title",
                 1L,
                 "username",
@@ -80,17 +82,17 @@ public class ReviewServiceTest {
         given(salesHistoryRepository.findByAdvertisementId(adId)).willReturn(Optional.of(sale));
         given(userRepository.findByUsername(username)).willReturn(Optional.of(buyer));
         given(mapper.toEntity(any())).willReturn(review);
-        given(mapper.toDto(any())).willReturn(dto);
+        given(mapper.toReceivedDto(any())).willReturn(dto);
         given(reviewRepository.save(review)).willAnswer(i -> i.getArguments()[0]);
         given(reviewRepository.calculateAverageRating(2L)).willReturn(BigDecimal.ONE);
         given(userRepository.save(seller)).willAnswer(i -> i.getArguments()[0]);
 
-        ReviewResponseDto result = reviewService.leaveReview(1L, request, username);
+        ReviewReceivedResponseDto result = reviewService.leaveReview(1L, request, username);
 
         assertNotNull(result);
         assertEquals(dto, result);
 
-        verify(mapper).toDto(any());
+        verify(mapper).toReceivedDto(any());
         verify(reviewRepository).calculateAverageRating(any());
         verify(reviewRepository).save(any());
         verify(userRepository).save(seller);
@@ -100,16 +102,22 @@ public class ReviewServiceTest {
     void leaveReview_ShouldThrowResourceAlreadyProcessedException_WhenReviewAlreadyExist() {
         ReviewCreateDto request = new ReviewCreateDto(1, "content");
         String username = "username";
-
+        User buyer = new User();
+        buyer.setUsername(username);
+        User seller = new User();
+        seller.setEnabled(true);
+        SalesHistory sale = new SalesHistory();
+        sale.setSeller(seller);
+        sale.setBuyer(buyer);
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(buyer));
         given(reviewRepository.existsByAdvertisementId(any())).willReturn(true);
+        given(salesHistoryRepository.findByAdvertisementId(any())).willReturn(Optional.of(sale));
 
         ResourceAlreadyProcessedException result = assertThrows(ResourceAlreadyProcessedException.class,
                 () -> reviewService.leaveReview(1L, request, username));
 
         assertEquals("Отзыв на это объявление уже оставлен", result.getMessage());
         verifyNoInteractions(mapper);
-        verifyNoInteractions(salesHistoryRepository);
-        verifyNoInteractions(userRepository);
         verify(reviewRepository, never()).save(any());
         verify(reviewRepository, never()).calculateAverageRating(any());
     }
@@ -120,13 +128,12 @@ public class ReviewServiceTest {
         String username = "username";
         Long adId = 1L;
 
-        given(reviewRepository.existsByAdvertisementId(adId)).willReturn(false);
         given(salesHistoryRepository.findByAdvertisementId(adId)).willReturn(Optional.empty());
 
         EntityNotFoundException result = assertThrows(EntityNotFoundException.class,
                 () -> reviewService.leaveReview(1L, request, username));
 
-        assertEquals("Нельзя оставить отзыв: товар еще не продан или сделка не зафиксирована", result.getMessage());
+        assertEquals("Нельзя оставить отзыв: товар не найден или еще не продан", result.getMessage());
 
         verifyNoInteractions(mapper);
         verifyNoInteractions(userRepository);
@@ -141,7 +148,6 @@ public class ReviewServiceTest {
         SalesHistory sale = new SalesHistory();
         Long adId = 1L;
 
-        given(reviewRepository.existsByAdvertisementId(adId)).willReturn(false);
         given(salesHistoryRepository.findByAdvertisementId(adId)).willReturn(Optional.of(sale));
         given(userRepository.findByUsername(username)).willReturn(Optional.empty());
 
@@ -169,7 +175,6 @@ public class ReviewServiceTest {
         sale.setBuyer(unknown);
 
         Long adId = 1L;
-        given(reviewRepository.existsByAdvertisementId(adId)).willReturn(false);
         given(salesHistoryRepository.findByAdvertisementId(adId)).willReturn(Optional.of(sale));
         given(userRepository.findByUsername(username)).willReturn(Optional.of(buyer));
 
@@ -183,8 +188,11 @@ public class ReviewServiceTest {
     }
 
     @Test
-    void getReviewsByUser_ShouldReturnPageResponse_Success() {
+    void getReceivedByUser_ShouldReturnPageResponse_Success() {
         String username = "sellerUser";
+        User user = new User();
+        user.setUsername(username);
+        user.setEnabled(true);
         Integer rating = 5;
         String sort = "desc";
         int page = 0;
@@ -194,14 +202,14 @@ public class ReviewServiceTest {
         review.setId(1L);
         review.setContent("Excellent!");
 
-        ReviewResponseDto dto = new ReviewResponseDto(1L, "Ad", 1L, "Buyer", BigDecimal.valueOf(5), "Excellent!", LocalDateTime.now());
+        ReviewReceivedResponseDto dto = new ReviewReceivedResponseDto(1L, "Ad", 1L, "Buyer", BigDecimal.valueOf(5), "Excellent!", LocalDateTime.now());
 
-        given(userRepository.existsByUsername(username)).willReturn(true);
+        given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
         given(reviewRepository.getBySellerWithPagination(username, rating, sort, page, size)).willReturn(List.of(review));
         given(reviewRepository.countBySeller(username, rating)).willReturn(25L);
-        given(mapper.toDto(review)).willReturn(dto);
+        given(mapper.toReceivedDto(review)).willReturn(dto);
 
-        PageResponse<ReviewResponseDto> result = reviewService.getReviewsByUser(username, rating, sort, page, size);
+        PageResponse<ReviewReceivedResponseDto> result = reviewService.getReceivedByUser(username, rating, sort, page, size);
 
         assertNotNull(result);
         assertEquals(1, result.content().size());
@@ -209,18 +217,17 @@ public class ReviewServiceTest {
         assertEquals(3, result.totalPages());
         assertEquals(dto, result.content().get(0));
 
-        verify(userRepository).existsByUsername(username);
+        verify(userRepository).findByUsername(username);
         verify(reviewRepository).getBySellerWithPagination(username, rating, sort, page, size);
         verify(reviewRepository).countBySeller(username, rating);
     }
 
     @Test
-    void getReviewsByUser_ShouldThrowException_WhenUserNotFound() {
+    void getReceivedByUser_ShouldThrowException_WhenUserNotFound() {
         String username = "nonExistent";
-        given(userRepository.existsByUsername(username)).willReturn(false);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> reviewService.getReviewsByUser(username, 5, "asc", 0, 10));
+                () -> reviewService.getReceivedByUser(username, 5, "asc", 0, 10));
 
         assertEquals("Пользователя с username " + username + " не найдено", exception.getMessage());
 
@@ -326,17 +333,18 @@ public class ReviewServiceTest {
 
         when(reviewRepository.findAll(page, size)).thenReturn(reviews);
         when(reviewRepository.countAll()).thenReturn(10L);
-        when(mapper.toDto(any(Review.class))).thenReturn(new ReviewResponseDto(
+        when(mapper.toFullDto(any(Review.class))).thenReturn(new ReviewFullResponseDto(
                 1L,
                 "title",
                 1L,
-                "username",
+                "author",
+                "seller",
                 new BigDecimal("5"),
                 "content",
                 LocalDateTime.now())
         );
 
-        PageResponse<ReviewResponseDto> result = reviewService.getAllReviews(page, size);
+        PageResponse<ReviewFullResponseDto> result = reviewService.getAllReviews(page, size);
 
         assertEquals(10L, result.totalElements());
         assertEquals(2, result.totalPages());
@@ -346,7 +354,7 @@ public class ReviewServiceTest {
 
         verify(reviewRepository).findAll(page, size);
         verify(reviewRepository).countAll();
-        verify(mapper, times(2)).toDto(any());
+        verify(mapper, times(2)).toFullDto(any());
     }
 
     @Test
@@ -357,10 +365,36 @@ public class ReviewServiceTest {
         when(reviewRepository.findAll(page, size)).thenReturn(List.of());
         when(reviewRepository.countAll()).thenReturn(0L);
 
-        PageResponse<ReviewResponseDto> result = reviewService.getAllReviews(page, size);
+        PageResponse<ReviewFullResponseDto> result = reviewService.getAllReviews(page, size);
 
         assertTrue(result.content().isEmpty());
         assertEquals(0, result.totalElements());
         assertEquals(0, result.totalPages());
+    }
+
+    @Test
+    void getSentByUser_ShouldReturnPageResponse_Success() {
+        User user = User.builder().id(1L).username("username").enabled(true).build();
+
+        given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.of(user));
+        given(reviewRepository.getByAuthorWithPagination(user.getUsername(), 0, 10)).willReturn(List.of(new Review()));
+        when(reviewRepository.countByAuthor(user.getUsername())).thenReturn(1L);
+        when(mapper.toSentDto(any(Review.class))).thenReturn(new ReviewSentResponseDto(
+                1L,
+                "title",
+                1L,
+                "username",
+                new BigDecimal("5"),
+                "content",
+                LocalDateTime.now())
+        );
+
+        PageResponse<ReviewSentResponseDto> result = reviewService.getSentByUser("username", 0, 10);
+
+        assertEquals("title", result.content().get(0).advertisementTitle());
+
+        verify(mapper, times(1)).toSentDto(any(Review.class));
+        verify(reviewRepository).getByAuthorWithPagination(anyString(), anyInt(), anyInt());
+        verify(reviewRepository).countByAuthor(anyString());
     }
 }

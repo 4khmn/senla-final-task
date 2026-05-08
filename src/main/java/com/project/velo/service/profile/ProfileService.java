@@ -6,6 +6,7 @@ import com.project.velo.dto.response.profile.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
+import com.project.velo.entity.enums.AdStatus;
 import com.project.velo.entity.enums.Role;
 import com.project.velo.exception.UserDisabledException;
 import com.project.velo.exception.ValidationException;
@@ -108,11 +109,22 @@ public class ProfileService {
             throw new ValidationException("Пользователь " + username + " уже имеет enabled " + enabled);
         }
 
+
         user.setEnabled(enabled);
 
         if (enabled) {
+            user.getAdvertisements().forEach(ad -> {
+                if (ad.getStatus() == AdStatus.BANNED) {
+                    ad.setStatus(AdStatus.ACTIVE);
+                }
+            });
             log.info("Admin UNBANNED user: {}", username);
         } else {
+            user.getAdvertisements().forEach(ad -> {
+                if (ad.getStatus() == AdStatus.ACTIVE) {
+                    ad.setStatus(AdStatus.BANNED);
+                }
+            });
             log.info("Admin BANNED user: {}", username);
         }
     }

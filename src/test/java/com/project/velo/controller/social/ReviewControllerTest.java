@@ -2,7 +2,7 @@ package com.project.velo.controller.social;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.ReviewCreateDto;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
 import com.project.velo.exception.GlobalExceptionHandler;
 import com.project.velo.service.social.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +70,7 @@ public class ReviewControllerTest {
     void leaveReview_ShouldReturnDto_Success() throws Exception{
         ReviewCreateDto request = new ReviewCreateDto(1, "content");
         Long adId = 1L;
-        ReviewResponseDto response = new ReviewResponseDto(1L, "title", 1L, "testUser",  BigDecimal.ONE, "content", LocalDateTime.now());
+        ReviewReceivedResponseDto response = new ReviewReceivedResponseDto(1L, "title", 1L, "testUser",  BigDecimal.ONE, "content", LocalDateTime.now());
 
         given(reviewService.leaveReview(adId, request, "testUser")).willReturn(response);
 
