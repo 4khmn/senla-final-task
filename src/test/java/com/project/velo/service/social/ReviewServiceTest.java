@@ -2,7 +2,9 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.create.ReviewCreateDto;
 import com.project.velo.dto.response.common.PageResponse;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewFullResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
+import com.project.velo.dto.response.review.ReviewSentResponseDto;
 import com.project.velo.entity.Review;
 import com.project.velo.entity.SalesHistory;
 import com.project.velo.entity.User;
@@ -68,7 +70,7 @@ public class ReviewServiceTest {
         review.setContent(request.content());
         review.setScore(request.score());
 
-        ReviewResponseDto dto = new ReviewResponseDto(1L,
+        ReviewReceivedResponseDto dto = new ReviewReceivedResponseDto(1L,
                 "title",
                 1L,
                 "username",
@@ -80,17 +82,17 @@ public class ReviewServiceTest {
         given(salesHistoryRepository.findByAdvertisementId(adId)).willReturn(Optional.of(sale));
         given(userRepository.findByUsername(username)).willReturn(Optional.of(buyer));
         given(mapper.toEntity(any())).willReturn(review);
-        given(mapper.toDto(any())).willReturn(dto);
+        given(mapper.toReceivedDto(any())).willReturn(dto);
         given(reviewRepository.save(review)).willAnswer(i -> i.getArguments()[0]);
         given(reviewRepository.calculateAverageRating(2L)).willReturn(BigDecimal.ONE);
         given(userRepository.save(seller)).willAnswer(i -> i.getArguments()[0]);
 
-        ReviewResponseDto result = reviewService.leaveReview(1L, request, username);
+        ReviewReceivedResponseDto result = reviewService.leaveReview(1L, request, username);
 
         assertNotNull(result);
         assertEquals(dto, result);
 
-        verify(mapper).toDto(any());
+        verify(mapper).toReceivedDto(any());
         verify(reviewRepository).calculateAverageRating(any());
         verify(reviewRepository).save(any());
         verify(userRepository).save(seller);
@@ -200,14 +202,14 @@ public class ReviewServiceTest {
         review.setId(1L);
         review.setContent("Excellent!");
 
-        ReviewResponseDto dto = new ReviewResponseDto(1L, "Ad", 1L, "Buyer", BigDecimal.valueOf(5), "Excellent!", LocalDateTime.now());
+        ReviewReceivedResponseDto dto = new ReviewReceivedResponseDto(1L, "Ad", 1L, "Buyer", BigDecimal.valueOf(5), "Excellent!", LocalDateTime.now());
 
         given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
         given(reviewRepository.getBySellerWithPagination(username, rating, sort, page, size)).willReturn(List.of(review));
         given(reviewRepository.countBySeller(username, rating)).willReturn(25L);
-        given(mapper.toDto(review)).willReturn(dto);
+        given(mapper.toReceivedDto(review)).willReturn(dto);
 
-        PageResponse<ReviewResponseDto> result = reviewService.getReceivedByUser(username, rating, sort, page, size);
+        PageResponse<ReviewReceivedResponseDto> result = reviewService.getReceivedByUser(username, rating, sort, page, size);
 
         assertNotNull(result);
         assertEquals(1, result.content().size());
@@ -331,7 +333,7 @@ public class ReviewServiceTest {
 
         when(reviewRepository.findAll(page, size)).thenReturn(reviews);
         when(reviewRepository.countAll()).thenReturn(10L);
-        when(mapper.toDto(any(Review.class))).thenReturn(new ReviewResponseDto(
+        when(mapper.toReceivedDto(any(Review.class))).thenReturn(new ReviewReceivedResponseDto(
                 1L,
                 "title",
                 1L,
@@ -341,7 +343,7 @@ public class ReviewServiceTest {
                 LocalDateTime.now())
         );
 
-        PageResponse<ReviewResponseDto> result = reviewService.getAllReviews(page, size);
+        PageResponse<ReviewFullResponseDto> result = reviewService.getAllReviews(page, size);
 
         assertEquals(10L, result.totalElements());
         assertEquals(2, result.totalPages());
@@ -351,7 +353,7 @@ public class ReviewServiceTest {
 
         verify(reviewRepository).findAll(page, size);
         verify(reviewRepository).countAll();
-        verify(mapper, times(2)).toDto(any());
+        verify(mapper, times(2)).toReceivedDto(any());
     }
 
     @Test
@@ -362,7 +364,7 @@ public class ReviewServiceTest {
         when(reviewRepository.findAll(page, size)).thenReturn(List.of());
         when(reviewRepository.countAll()).thenReturn(0L);
 
-        PageResponse<ReviewResponseDto> result = reviewService.getAllReviews(page, size);
+        PageResponse<ReviewFullResponseDto> result = reviewService.getAllReviews(page, size);
 
         assertTrue(result.content().isEmpty());
         assertEquals(0, result.totalElements());
@@ -376,7 +378,7 @@ public class ReviewServiceTest {
         given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.of(user));
         given(reviewRepository.getByAuthorWithPagination(user.getUsername(), 0, 10)).willReturn(List.of(new Review()));
         when(reviewRepository.countByAuthor(user.getUsername())).thenReturn(1L);
-        when(mapper.toDto(any(Review.class))).thenReturn(new ReviewResponseDto(
+        when(mapper.toReceivedDto(any(Review.class))).thenReturn(new ReviewReceivedResponseDto(
                 1L,
                 "title",
                 1L,
@@ -386,11 +388,11 @@ public class ReviewServiceTest {
                 LocalDateTime.now())
         );
 
-        PageResponse<ReviewResponseDto> result = reviewService.getSentByUser("username", 0, 10);
+        PageResponse<ReviewSentResponseDto> result = reviewService.getSentByUser("username", 0, 10);
 
         assertEquals("title", result.content().get(0).advertisementTitle());
 
-        verify(mapper, times(1)).toDto(any(Review.class));
+        verify(mapper, times(1)).toReceivedDto(any(Review.class));
         verify(reviewRepository).getByAuthorWithPagination(anyString(), anyInt(), anyInt());
         verify(reviewRepository).countByAuthor(anyString());
     }

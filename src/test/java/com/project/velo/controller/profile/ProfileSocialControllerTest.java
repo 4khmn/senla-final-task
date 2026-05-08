@@ -1,7 +1,7 @@
 package com.project.velo.controller.profile;
 
 import com.project.velo.dto.response.common.PageResponse;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
 import com.project.velo.dto.response.profile.UserCommentResponseDto;
 import com.project.velo.service.social.CommentService;
 import com.project.velo.service.social.ReviewService;
@@ -78,12 +78,12 @@ class ProfileSocialControllerTest {
 
     @Test
     void getMyReceivedReviews_ShouldReturnPageResponse() throws Exception {
-        ReviewResponseDto dto = new ReviewResponseDto(
+        ReviewReceivedResponseDto dto = new ReviewReceivedResponseDto(
                 1L, "Giant TCR", 100L, "buyer77",
                 new BigDecimal("5.0"), "Great seller", LocalDateTime.now()
         );
 
-        PageResponse<ReviewResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+        PageResponse<ReviewReceivedResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
         given(reviewService.getReceivedByUser("denis", null, null, 0, 10)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/profiles/my/reviews/received"))

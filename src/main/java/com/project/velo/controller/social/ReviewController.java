@@ -1,7 +1,7 @@
 package com.project.velo.controller.social;
 
 import com.project.velo.dto.create.ReviewCreateDto;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
 import com.project.velo.service.social.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,13 +36,13 @@ public class ReviewController {
     @ApiResponse(responseCode = "409", description = "Отзыв на объявление уже оставлен")
     @ApiResponse(responseCode = "201", description = "Отзыв успешно оставлен")
     @PostMapping("/advertisement/{adId}")
-    public ResponseEntity<ReviewResponseDto> leaveReview(
+    public ResponseEntity<ReviewReceivedResponseDto> leaveReview(
             @PathVariable Long adId,
             @RequestBody @Valid ReviewCreateDto dto,
             @AuthenticationPrincipal UserDetails user
     ) {
         log.info("POST /api/reviews/advertisement/{} - User: {} is leaving a review for advertisement: {}", adId, user.getUsername(), adId);
-        ReviewResponseDto review = reviewService.leaveReview(adId, dto, user.getUsername());
+        ReviewReceivedResponseDto review = reviewService.leaveReview(adId, dto, user.getUsername());
         log.info("POST /api/reviews/advertisement/{} - Review: {} was successfully posted by user: {}", adId, review, user.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }

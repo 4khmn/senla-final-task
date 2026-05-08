@@ -5,7 +5,8 @@ import com.project.velo.dto.create.CategoryCreateDto;
 import com.project.velo.dto.response.advertisement.AdvertisementResponseDto;
 import com.project.velo.dto.response.advertisement.CategoryResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewFullResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
 import com.project.velo.dto.update.CategoryUpdateDto;
 import com.project.velo.exception.CustomSecurityExceptionHandler;
 import com.project.velo.security.JwtUtil;
@@ -60,7 +61,7 @@ public class AdminContentControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void getAllReviews_ShouldReturnOk() throws Exception {
-        PageResponse<ReviewResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
+        PageResponse<ReviewFullResponseDto> pageResponse = new PageResponse<>(List.of(), 0, 0, 0, 20);
         given(reviewService.getAllReviews(0, 20)).willReturn(pageResponse);
 
         mockMvc.perform(get("/api/admin/content/reviews")

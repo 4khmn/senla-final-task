@@ -2,13 +2,14 @@ package com.project.velo.service.social;
 
 import com.project.velo.dto.create.ReviewCreateDto;
 import com.project.velo.dto.response.common.PageResponse;
-import com.project.velo.dto.response.review.ReviewResponseDto;
+import com.project.velo.dto.response.review.ReviewFullResponseDto;
+import com.project.velo.dto.response.review.ReviewReceivedResponseDto;
+import com.project.velo.dto.response.review.ReviewSentResponseDto;
 import com.project.velo.entity.Review;
 import com.project.velo.entity.SalesHistory;
 import com.project.velo.entity.User;
 import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.exception.ResourceAlreadyProcessedException;
-import com.project.velo.exception.UserDisabledException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ReviewMapper;
 import com.project.velo.repository.ReviewRepository;
@@ -35,7 +36,7 @@ public class ReviewService {
 
 
     @Transactional
-    public ReviewResponseDto leaveReview(Long adId, ReviewCreateDto dto, String username) {
+    public ReviewReceivedResponseDto leaveReview(Long adId, ReviewCreateDto dto, String username) {
         SalesHistory sale = salesHistoryRepository.findByAdvertisementId(adId)
                 .orElseThrow(() -> new EntityNotFoundException("Нельзя оставить отзыв: товар не найден или еще не продан"));
         User user = userRepository.findByUsername(username).orElseThrow(
@@ -65,11 +66,11 @@ public class ReviewService {
         seller.setRating(avgRating);
         userRepository.save(seller);
 
-        return mapper.toDto(saved);
+        return mapper.toReceivedDto(saved);
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<ReviewResponseDto> getReceivedByUser(String username, Integer rating, String sortDirection, int page, int size) {
+    public PageResponse<ReviewReceivedResponseDto> getReceivedByUser(String username, Integer rating, String sortDirection, int page, int size) {
         User user =  userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
@@ -81,14 +82,14 @@ public class ReviewService {
         long totalElements = reviewRepository.countBySeller(username, rating);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
-        List<ReviewResponseDto> dtos = reviews.stream()
-                .map(mapper::toDto)
+        List<ReviewReceivedResponseDto> dtos = reviews.stream()
+                .map(mapper::toReceivedDto)
                 .toList();
 
         return new PageResponse<>(dtos, totalElements, totalPages, page, size);
     }
 
-    public PageResponse<ReviewResponseDto> getSentByUser(String username, int page, int size) {
+    public PageResponse<ReviewSentResponseDto> getSentByUser(String username, int page, int size) {
         User user =  userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
@@ -99,8 +100,8 @@ public class ReviewService {
         long totalElements = reviewRepository.countByAuthor(username);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
-        List<ReviewResponseDto> dtos = reviews.stream()
-                .map(mapper::toDto)
+        List<ReviewSentResponseDto> dtos = reviews.stream()
+                .map(mapper::toSentDto)
                 .toList();
 
         return new PageResponse<>(dtos, totalElements, totalPages, page, size);
@@ -108,13 +109,13 @@ public class ReviewService {
 
 
     @Transactional(readOnly = true)
-    public PageResponse<ReviewResponseDto> getAllReviews(int page, int size) {
+    public PageResponse<ReviewFullResponseDto> getAllReviews(int page, int size) {
         List<Review> reviews = reviewRepository.findAll(page, size);
 
         long totalElements = reviewRepository.countAll();
 
-        List<ReviewResponseDto> dtos = reviews.stream()
-                .map(mapper::toDto)
+        List<ReviewFullResponseDto> dtos = reviews.stream()
+                .map(mapper::toFullDto)
                 .toList();
 
         int totalPages = (int) Math.ceil((double) totalElements / size);
