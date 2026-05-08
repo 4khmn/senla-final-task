@@ -333,11 +333,12 @@ public class ReviewServiceTest {
 
         when(reviewRepository.findAll(page, size)).thenReturn(reviews);
         when(reviewRepository.countAll()).thenReturn(10L);
-        when(mapper.toReceivedDto(any(Review.class))).thenReturn(new ReviewReceivedResponseDto(
+        when(mapper.toFullDto(any(Review.class))).thenReturn(new ReviewFullResponseDto(
                 1L,
                 "title",
                 1L,
-                "username",
+                "author",
+                "seller",
                 new BigDecimal("5"),
                 "content",
                 LocalDateTime.now())
@@ -353,7 +354,7 @@ public class ReviewServiceTest {
 
         verify(reviewRepository).findAll(page, size);
         verify(reviewRepository).countAll();
-        verify(mapper, times(2)).toReceivedDto(any());
+        verify(mapper, times(2)).toFullDto(any());
     }
 
     @Test
@@ -378,7 +379,7 @@ public class ReviewServiceTest {
         given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.of(user));
         given(reviewRepository.getByAuthorWithPagination(user.getUsername(), 0, 10)).willReturn(List.of(new Review()));
         when(reviewRepository.countByAuthor(user.getUsername())).thenReturn(1L);
-        when(mapper.toReceivedDto(any(Review.class))).thenReturn(new ReviewReceivedResponseDto(
+        when(mapper.toSentDto(any(Review.class))).thenReturn(new ReviewSentResponseDto(
                 1L,
                 "title",
                 1L,
@@ -392,7 +393,7 @@ public class ReviewServiceTest {
 
         assertEquals("title", result.content().get(0).advertisementTitle());
 
-        verify(mapper, times(1)).toReceivedDto(any(Review.class));
+        verify(mapper, times(1)).toSentDto(any(Review.class));
         verify(reviewRepository).getByAuthorWithPagination(anyString(), anyInt(), anyInt());
         verify(reviewRepository).countByAuthor(anyString());
     }
