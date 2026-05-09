@@ -13,7 +13,7 @@ public class SalesHistoryRepository extends BaseRepository<SalesHistory, Long> {
         super(SalesHistory.class);
     }
 
-    public List<SalesHistory> findAllBySellerOrderBySoldAt(String username, int page, int size) {
+    public List<SalesHistory> findSalesByUserOrderBySoldAt(String username, int page, int size) {
         return entityManager.createQuery(
                         "SELECT s FROM SalesHistory s WHERE s.seller.username = :username ORDER BY s.soldAt DESC", SalesHistory.class)
                 .setParameter("username", username)
@@ -22,7 +22,7 @@ public class SalesHistoryRepository extends BaseRepository<SalesHistory, Long> {
                 .getResultList();
     }
 
-    public long countSalesBySeller(String username) {
+    public long countSalesByUser(String username) {
         return entityManager.createQuery(
                         "SELECT COUNT(s) FROM SalesHistory s WHERE s.seller.username = :username", Long.class)
                 .setParameter("username", username)
@@ -36,5 +36,23 @@ public class SalesHistoryRepository extends BaseRepository<SalesHistory, Long> {
                 .getResultList()
                 .stream()
                 .findFirst();
+    }
+
+
+
+    public List<SalesHistory> findPurchasesByUserOrderBySoldAt(String username, int page, int size) {
+        return entityManager.createQuery(
+                        "SELECT s FROM SalesHistory s WHERE s.buyer.username = :username ORDER BY s.soldAt DESC", SalesHistory.class)
+                .setParameter("username", username)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    public long countPurchasesByUser(String username) {
+        return entityManager.createQuery(
+                        "SELECT COUNT(s) FROM SalesHistory s WHERE s.buyer.username = :username", Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
     }
 }

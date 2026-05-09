@@ -4,7 +4,6 @@ import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.response.salesHistory.SalesHistoryPrivateResponseDto;
 import com.project.velo.dto.response.salesHistory.SalesHistoryPublicResponseDto;
 import com.project.velo.entity.User;
-import com.project.velo.exception.UserDisabledException;
 import com.project.velo.mapper.SalesHistoryMapper;
 import com.project.velo.repository.SalesHistoryRepository;
 import com.project.velo.repository.UserRepository;
@@ -28,10 +27,10 @@ public class SalesHistoryService {
         if (!userRepository.existsByUsername(username)) {
             throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
         }
-        List<SalesHistoryPrivateResponseDto> entities = salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size)
+        List<SalesHistoryPrivateResponseDto> entities = salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size)
                 .stream().map(mapper::toPrivateDto).toList();
 
-        long totalElements = salesHistoryRepository.countSalesBySeller(username);
+        long totalElements = salesHistoryRepository.countSalesByUser(username);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         return new PageResponse<>(entities, totalElements, totalPages, page, size);
@@ -45,10 +44,22 @@ public class SalesHistoryService {
         if (!user.isEnabled()) {
             throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
-        List<SalesHistoryPublicResponseDto> entities = salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size)
+        List<SalesHistoryPublicResponseDto> entities = salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size)
                 .stream().map(mapper::toPublicDto).toList();
 
-        long totalElements = salesHistoryRepository.countSalesBySeller(username);
+        long totalElements = salesHistoryRepository.countSalesByUser(username);
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        return new PageResponse<>(entities, totalElements, totalPages, page, size);
+    }
+
+
+    @Transactional(readOnly = true)
+    public PageResponse<SalesHistoryPrivateResponseDto> getPurchases(String username, int page, int size) {
+
+        List<SalesHistoryPrivateResponseDto> entities = salesHistoryRepository.findPurchasesByUserOrderBySoldAt(username, page, size)
+                .stream().map(mapper::toPrivateDto).toList();
+        long totalElements = salesHistoryRepository.countPurchasesByUser(username);
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         return new PageResponse<>(entities, totalElements, totalPages, page, size);

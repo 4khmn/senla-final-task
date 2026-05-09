@@ -69,6 +69,7 @@ class ProfileActivityControllerTest {
                 10L,
                 new BigDecimal("500.00"),
                 "buyer1",
+                "seller1",
                 LocalDateTime.now(),
                 false
         );
@@ -89,6 +90,29 @@ class ProfileActivityControllerTest {
         mockMvc.perform(get("/api/profiles/otherUser/sales"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(0));
+    }
+
+    @Test
+    void getMyPurchases_ShouldReturnPageResponse_Success() throws Exception {
+        SalesHistoryPrivateResponseDto dto = new SalesHistoryPrivateResponseDto(
+                1L,
+                "Bike",
+                10L,
+                new BigDecimal("500.00"),
+                "testUser",
+                "seller",
+                LocalDateTime.now(),
+                false
+        );
+        PageResponse<SalesHistoryPrivateResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+
+        given(salesHistoryService.getPurchases("testUser", 0, 10))
+                .willReturn(pageResponse);
+
+        mockMvc.perform(get("/api/profiles/my/purchases"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].buyerUsername").value("testUser"));
     }
 
     @Test

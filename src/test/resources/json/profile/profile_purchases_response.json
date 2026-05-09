@@ -1,0 +1,25 @@
+{
+  "content" : [ {
+    "id" : 200,
+    "advertisementTitle" : "Road Bike",
+    "advertisementId" : 101,
+    "price" : 280.00,
+    "buyerUsername" : "other_user",
+    "sellerUsername" : "owner_user",
+    "soldAt" : "2026-04-21T12:00:00",
+    "wasTop" : false
+  }, {
+    "id" : 201,
+    "advertisementTitle" : "Meow",
+    "advertisementId" : 102,
+    "price" : 280.00,
+    "buyerUsername" : "other_user",
+    "sellerUsername" : "third_user",
+    "soldAt" : "2026-04-21T12:00:00",
+    "wasTop" : true
+  } ],
+  "totalElements" : 2,
+  "totalPages" : 1,
+  "page" : 0,
+  "size" : 10
+}

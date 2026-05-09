@@ -12,6 +12,7 @@ public interface SalesHistoryMapper {
     @Mapping(target = "advertisementTitle", source = "salesHistory.advertisement.title")
     @Mapping(target = "price", source = "finalPrice")
     @Mapping(target = "buyerUsername", source = "salesHistory.buyer.username")
+    @Mapping(target = "sellerUsername", source = "salesHistory.seller.username")
     @Mapping(target = "advertisementId", source = "salesHistory.advertisement.id")
     SalesHistoryPrivateResponseDto toPrivateDto(SalesHistory salesHistory);
 

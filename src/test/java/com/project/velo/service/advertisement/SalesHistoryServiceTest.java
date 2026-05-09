@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -54,9 +55,9 @@ public class SalesHistoryServiceTest {
         user.setUsername(username);
 
         given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
-        given(salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size))
+        given(salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size))
                 .willReturn(List.of(salesHistory));
-        given(salesHistoryRepository.countSalesBySeller(username)).willReturn(12L);
+        given(salesHistoryRepository.countSalesByUser(username)).willReturn(12L);
         given(mapper.toPublicDto(salesHistory)).willReturn(dto);
 
         PageResponse<SalesHistoryPublicResponseDto> result = salesHistoryService.getPublicSales(username, page, size);
@@ -67,8 +68,8 @@ public class SalesHistoryServiceTest {
         assertEquals(3, result.totalPages());
         assertEquals(dto, result.content().get(0));
 
-        verify(salesHistoryRepository).findAllBySellerOrderBySoldAt(username, page, size);
-        verify(salesHistoryRepository).countSalesBySeller(username);
+        verify(salesHistoryRepository).findSalesByUserOrderBySoldAt(username, page, size);
+        verify(salesHistoryRepository).countSalesByUser(username);
     }
 
     @Test
@@ -99,14 +100,15 @@ public class SalesHistoryServiceTest {
                 1L,
                 new BigDecimal("120.00"),
                 "buyer-username",
+                "seller-username",
                 LocalDateTime.now(),
                 true
         );
 
         given(userRepository.existsByUsername(username)).willReturn(true);
-        given(salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size))
+        given(salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size))
                 .willReturn(List.of(salesHistory));
-        given(salesHistoryRepository.countSalesBySeller(username)).willReturn(12L);
+        given(salesHistoryRepository.countSalesByUser(username)).willReturn(12L);
         given(mapper.toPrivateDto(salesHistory)).willReturn(dto);
 
         PageResponse<SalesHistoryPrivateResponseDto> result = salesHistoryService.getPrivateSales(username, page, size);
@@ -118,8 +120,8 @@ public class SalesHistoryServiceTest {
         assertEquals(dto, result.content().get(0));
 
         verify(userRepository).existsByUsername(username);
-        verify(salesHistoryRepository).findAllBySellerOrderBySoldAt(username, page, size);
-        verify(salesHistoryRepository).countSalesBySeller(username);
+        verify(salesHistoryRepository).findSalesByUserOrderBySoldAt(username, page, size);
+        verify(salesHistoryRepository).countSalesByUser(username);
     }
 
     @Test
@@ -134,5 +136,32 @@ public class SalesHistoryServiceTest {
         assertEquals("Пользователя с username " + username + " не найдено", ex.getMessage());
         verifyNoInteractions(salesHistoryRepository);
         verifyNoInteractions(mapper);
+    }
+
+    @Test
+    void getPurchases_ShouldReturnPageResponse_Success() {
+        String username = "buyer";
+        SalesHistoryPrivateResponseDto dto = new SalesHistoryPrivateResponseDto(
+                1L,
+                "title",
+                1L,
+                BigDecimal.ONE,
+                "buyer",
+                "seller",
+                LocalDateTime.now(),
+                true
+        );
+
+        PageResponse<SalesHistoryPrivateResponseDto> pageResponse = new PageResponse<>(List.of(dto), 1, 1, 0, 10);
+        given(salesHistoryRepository.findPurchasesByUserOrderBySoldAt(username, 0, 10))
+                .willReturn(List.of(new SalesHistory()));
+        given(salesHistoryRepository.countPurchasesByUser(username)).willReturn(1L);
+        given(mapper.toPrivateDto(any())).willReturn(dto);
+        PageResponse<SalesHistoryPrivateResponseDto> result = salesHistoryService.getPurchases("buyer", 0, 10);
+        assertNotNull(result);
+        assertEquals(result, pageResponse);
+
+        verify(salesHistoryRepository).findPurchasesByUserOrderBySoldAt("buyer", 0, 10);
+        verify(mapper).toPrivateDto(any());
     }
 }

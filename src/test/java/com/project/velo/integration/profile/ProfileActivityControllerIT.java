@@ -48,6 +48,18 @@ public class ProfileActivityControllerIT extends BaseIT {
 
     @Test
     @Sql("/sql/profile/init_profiles.sql")
+    void getMyPurchases_shouldReturnMyPurchases() throws Exception {
+
+        String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/profile_purchases_response.json"));
+
+        mockMvc.perform(get("/api/profiles/my/purchases")
+                .with(user("other_user")))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedJson));
+    }
+
+    @Test
+    @Sql("/sql/profile/init_profiles.sql")
     void getMyActiveAdvertisements_shouldReturnMyActiveAdvertisements() throws Exception {
         String expectedJson = Files.readString(Path.of("src/test/resources/json/profile/profile_ads_my_response.json"));
 

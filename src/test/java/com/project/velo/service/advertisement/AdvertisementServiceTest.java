@@ -194,7 +194,7 @@ public class AdvertisementServiceTest {
         AdvertisementNotAvailableException ex = assertThrows(AdvertisementNotAvailableException.class,
                 () -> advertisementService.getById(adId));
 
-        assertTrue(ex.getMessage().contains("не доступно"));
+        assertTrue(ex.getMessage().contains("недоступно"));
         verify(mapper, never()).toDto(any());
     }
 

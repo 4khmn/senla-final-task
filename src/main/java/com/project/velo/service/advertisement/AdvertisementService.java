@@ -85,7 +85,7 @@ public class AdvertisementService {
             throw new EntityNotFoundException("Объявление с id " + id + " не найдено или недоступно");
         }
         if (advertisement.getStatus() != AdStatus.ACTIVE) {
-            throw new AdvertisementNotAvailableException("Объявление с id " + id + " не доступно");
+            throw new AdvertisementNotAvailableException("Объявление с id " + id + " недоступно");
         }
         return mapper.toDto(advertisement);
     }
@@ -182,12 +182,8 @@ public class AdvertisementService {
         User buyer = userRepository.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
         );
-        if (advertisement.getSeller().getUsername().equals(username)) {
-            throw new ValidationException("Нельзя купить свой собственный товар");
-        }
-        if (advertisement.getStatus() == AdStatus.SOLD) {
-            throw new ResourceAlreadyProcessedException("Этот товар уже продан");
-        }
+
+        validatePurchase(advertisement, username);
 
         advertisement.setStatus(AdStatus.SOLD);
 
@@ -282,5 +278,17 @@ public class AdvertisementService {
                 page,
                 size
         );
+    }
+
+    private void validatePurchase(Advertisement advertisement, String username) {
+        if (advertisement.getSeller().getUsername().equals(username)) {
+            throw new ValidationException("Нельзя купить свой собственный товар");
+        }
+        if (advertisement.getStatus() == AdStatus.SOLD) {
+            throw new ResourceAlreadyProcessedException("Этот товар уже продан");
+        }
+        if (advertisement.getStatus() != AdStatus.ACTIVE) {
+            throw new ValidationException("Данное объявление не досупно");
+        }
     }
 }
