@@ -6,11 +6,11 @@ INSERT INTO categories (name, display_name) VALUES
     ('TRANSPORT', 'Транспорт');
 
 INSERT INTO users (username, password, email, role, rating, enabled) VALUES
-    ('tech_broker', '$2a$10$fVNCXG67pMvI7H6vYpByuun8SqSAtYmD.T.Iu7Z9P.o3I6J.6A6mS', 'tech@mail.com', 'ROLE_USER', 4.90, TRUE),
-    ('realtor_pro', '$2a$10$fVNCXG67pMvI7H6vYpByuun8SqSAtYmD.T.Iu7Z9P.o3I6J.6A6mS', 'realty@mail.com', 'ROLE_USER', 4.50, TRUE),
-    ('alice_wonder', '$2a$10$fVNCXG67pMvI7H6vYpByuun8SqSAtYmD.T.Iu7Z9P.o3I6J.6A6mS', 'alice@mail.com', 'ROLE_USER', 3.20, TRUE),
-    ('bob_investor', '$2a$10$fVNCXG67pMvI7H6vYpByuun8SqSAtYmD.T.Iu7Z9P.o3I6J.6A6mS', 'bob@mail.com', 'ROLE_USER', 2.00, TRUE),
-    ('car_lover', '$2a$10$fVNCXG67pMvI7H6vYpByuun8SqSAtYmD.T.Iu7Z9P.o3I6J.6A6mS', 'car@mail.com', 'ROLE_USER', 0.00, TRUE);
+    ('tech_broker', '$2a$10$f/1xk1cYFK3RWey1Ub7EZeB9/55lMt/ex2ogeXTAoBOVi6yRUjFhC', 'tech@mail.com', 'ROLE_USER', 4.90, TRUE),
+    ('realtor_pro', '$2a$10$f/1xk1cYFK3RWey1Ub7EZeB9/55lMt/ex2ogeXTAoBOVi6yRUjFhC', 'realty@mail.com', 'ROLE_USER', 4.50, TRUE),
+    ('alice_wonder', '$2a$10$f/1xk1cYFK3RWey1Ub7EZeB9/55lMt/ex2ogeXTAoBOVi6yRUjFhC', 'alice@mail.com', 'ROLE_USER', 3.20, TRUE),
+    ('bob_investor', '$2a$10$f/1xk1cYFK3RWey1Ub7EZeB9/55lMt/ex2ogeXTAoBOVi6yRUjFhC', 'bob@mail.com', 'ROLE_USER', 2.00, TRUE),
+    ('car_lover', '$2a$10$f/1xk1cYFK3RWey1Ub7EZeB9/55lMt/ex2ogeXTAoBOVi6yRUjFhC', 'car@mail.com', 'ROLE_USER', 0.00, TRUE);
 
 INSERT INTO profiles (user_id, first_name, last_name, phone, bio) VALUES
     (2, 'Дмитрий', 'Техно', '89001112233', 'Продажа и ремонт техники Apple и игровых ПК.'),

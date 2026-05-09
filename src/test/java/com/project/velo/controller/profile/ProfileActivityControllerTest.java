@@ -69,6 +69,7 @@ class ProfileActivityControllerTest {
                 10L,
                 new BigDecimal("500.00"),
                 "buyer1",
+                "seller1",
                 LocalDateTime.now(),
                 false
         );

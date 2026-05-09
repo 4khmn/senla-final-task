@@ -29,7 +29,7 @@ public class ProfileActivityController {
 
     @Operation(
             summary = "Получить историю продаж текущего пользователя",
-            description = "Получение полной информации о завершенных сделках текущего пользователя",
+            description = "Получение полной информации о завершенных сделках (продажах) текущего пользователя",
             security = @SecurityRequirement(name = "JWT")
     )
     @GetMapping("/my/sales")
@@ -62,6 +62,24 @@ public class ProfileActivityController {
         return ResponseEntity.ok(mySales);
     }
 
+
+    @Operation(summary = "Получить историю покупок текущего пользователя",
+            description = "Получение полной информации о завершенных сделках (покупок) текущего пользователя",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @GetMapping("/my/purchases")
+    public ResponseEntity<PageResponse<SalesHistoryPrivateResponseDto>> getMyPurchases(
+            @AuthenticationPrincipal UserDetails user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        log.info("GET /api/profiles/my/purchases - Fetching purchases by user: {}, page: {}, size: {}", user.getUsername(), page, size);
+        PageResponse<SalesHistoryPrivateResponseDto> myPurchases = salesHistoryService.getPurchases(user.getUsername(), page, size);
+        log.info("GET /api/profiles/my/purchases - Found {} purchases by user: {}, page: {}, size: {}", myPurchases.size(), user.getUsername(), page, size);
+        return ResponseEntity.ok(myPurchases);
+    }
+
+
     @Operation(summary = "Получить список активных объявдений текущего пользователя", security = @SecurityRequirement(name = "JWT"))
     @GetMapping("/my/advertisements")
     public ResponseEntity<PageResponse<AdvertisementResponseDto>> getMyActiveAdvertisements(
@@ -76,6 +94,7 @@ public class ProfileActivityController {
                 advertisements.content().size(), user.getUsername(), page, size);
         return ResponseEntity.ok(advertisements);
     }
+
 
     @Operation(summary = "Получить историю продаж текущего пользователя")
     @ApiResponse(responseCode = "200")

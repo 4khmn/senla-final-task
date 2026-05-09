@@ -54,9 +54,9 @@ public class SalesHistoryServiceTest {
         user.setUsername(username);
 
         given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
-        given(salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size))
+        given(salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size))
                 .willReturn(List.of(salesHistory));
-        given(salesHistoryRepository.countSalesBySeller(username)).willReturn(12L);
+        given(salesHistoryRepository.countSalesByUser(username)).willReturn(12L);
         given(mapper.toPublicDto(salesHistory)).willReturn(dto);
 
         PageResponse<SalesHistoryPublicResponseDto> result = salesHistoryService.getPublicSales(username, page, size);
@@ -67,8 +67,8 @@ public class SalesHistoryServiceTest {
         assertEquals(3, result.totalPages());
         assertEquals(dto, result.content().get(0));
 
-        verify(salesHistoryRepository).findAllBySellerOrderBySoldAt(username, page, size);
-        verify(salesHistoryRepository).countSalesBySeller(username);
+        verify(salesHistoryRepository).findSalesByUserOrderBySoldAt(username, page, size);
+        verify(salesHistoryRepository).countSalesByUser(username);
     }
 
     @Test
@@ -99,14 +99,15 @@ public class SalesHistoryServiceTest {
                 1L,
                 new BigDecimal("120.00"),
                 "buyer-username",
+                "seller-username",
                 LocalDateTime.now(),
                 true
         );
 
         given(userRepository.existsByUsername(username)).willReturn(true);
-        given(salesHistoryRepository.findAllBySellerOrderBySoldAt(username, page, size))
+        given(salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size))
                 .willReturn(List.of(salesHistory));
-        given(salesHistoryRepository.countSalesBySeller(username)).willReturn(12L);
+        given(salesHistoryRepository.countSalesByUser(username)).willReturn(12L);
         given(mapper.toPrivateDto(salesHistory)).willReturn(dto);
 
         PageResponse<SalesHistoryPrivateResponseDto> result = salesHistoryService.getPrivateSales(username, page, size);
@@ -118,8 +119,8 @@ public class SalesHistoryServiceTest {
         assertEquals(dto, result.content().get(0));
 
         verify(userRepository).existsByUsername(username);
-        verify(salesHistoryRepository).findAllBySellerOrderBySoldAt(username, page, size);
-        verify(salesHistoryRepository).countSalesBySeller(username);
+        verify(salesHistoryRepository).findSalesByUserOrderBySoldAt(username, page, size);
+        verify(salesHistoryRepository).countSalesByUser(username);
     }
 
     @Test
