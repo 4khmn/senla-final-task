@@ -204,7 +204,7 @@ public class ReviewServiceTest {
 
         ReviewReceivedResponseDto dto = new ReviewReceivedResponseDto(1L, "Ad", 1L, "Buyer", BigDecimal.valueOf(5), "Excellent!", LocalDateTime.now());
 
-        given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
+        given(userRepository.existsByUsernameAndEnabledTrue(username)).willReturn(true);
         given(reviewRepository.getBySellerWithPagination(username, rating, sort, page, size)).willReturn(List.of(review));
         given(reviewRepository.countBySeller(username, rating)).willReturn(25L);
         given(mapper.toReceivedDto(review)).willReturn(dto);
@@ -217,19 +217,19 @@ public class ReviewServiceTest {
         assertEquals(3, result.totalPages());
         assertEquals(dto, result.content().get(0));
 
-        verify(userRepository).findByUsername(username);
+        verify(userRepository).existsByUsernameAndEnabledTrue(username);
         verify(reviewRepository).getBySellerWithPagination(username, rating, sort, page, size);
         verify(reviewRepository).countBySeller(username, rating);
     }
 
     @Test
-    void getReceivedByUser_ShouldThrowException_WhenUserNotFound() {
+    void getReceivedByUser_ShouldThrowENFException_WhenUserNotFound() {
         String username = "nonExistent";
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> reviewService.getReceivedByUser(username, 5, "asc", 0, 10));
 
-        assertEquals("Пользователя с username " + username + " не найдено", exception.getMessage());
+        assertEquals("Пользователь с username " + username + " не найден или деактивирован", exception.getMessage());
 
         verifyNoInteractions(reviewRepository);
         verifyNoInteractions(mapper);
@@ -376,7 +376,7 @@ public class ReviewServiceTest {
     void getSentByUser_ShouldReturnPageResponse_Success() {
         User user = User.builder().id(1L).username("username").enabled(true).build();
 
-        given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.of(user));
+        given(userRepository.existsByUsernameAndEnabledTrue(user.getUsername())).willReturn(true);
         given(reviewRepository.getByAuthorWithPagination(user.getUsername(), 0, 10)).willReturn(List.of(new Review()));
         when(reviewRepository.countByAuthor(user.getUsername())).thenReturn(1L);
         when(mapper.toSentDto(any(Review.class))).thenReturn(new ReviewSentResponseDto(

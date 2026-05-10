@@ -54,7 +54,7 @@ public class SalesHistoryServiceTest {
         User user = new User();
         user.setUsername(username);
 
-        given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
+        given(userRepository.existsByUsernameAndEnabledTrue(username)).willReturn(true);
         given(salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size))
                 .willReturn(List.of(salesHistory));
         given(salesHistoryRepository.countSalesByUser(username)).willReturn(12L);
@@ -75,13 +75,14 @@ public class SalesHistoryServiceTest {
     @Test
     void getPublicSales_ShouldThrowENFException_WhenUserNotFound() {
         String username = "username";
-        given(userRepository.existsByUsername(username)).willReturn(false);
+
+        given(userRepository.existsByUsernameAndEnabledTrue(username)).willReturn(false);
 
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () ->
-                salesHistoryService.getPrivateSales(username, 0, 10)
+                salesHistoryService.getPublicSales(username, 0, 10)
         );
 
-        assertEquals("Пользователя с username " + username + " не найдено", ex.getMessage());
+        assertEquals("Пользователь с username " + username + " не найден или деактивирован", ex.getMessage());
         verifyNoInteractions(salesHistoryRepository);
         verifyNoInteractions(mapper);
     }
@@ -105,7 +106,6 @@ public class SalesHistoryServiceTest {
                 true
         );
 
-        given(userRepository.existsByUsername(username)).willReturn(true);
         given(salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size))
                 .willReturn(List.of(salesHistory));
         given(salesHistoryRepository.countSalesByUser(username)).willReturn(12L);
@@ -119,24 +119,10 @@ public class SalesHistoryServiceTest {
         assertEquals(3, result.totalPages());
         assertEquals(dto, result.content().get(0));
 
-        verify(userRepository).existsByUsername(username);
         verify(salesHistoryRepository).findSalesByUserOrderBySoldAt(username, page, size);
         verify(salesHistoryRepository).countSalesByUser(username);
     }
 
-    @Test
-    void getPrivateSales_ShouldThrowENFException_WhenUserNotFound() {
-        String username = "username";
-        given(userRepository.existsByUsername(username)).willReturn(false);
-
-        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () ->
-                salesHistoryService.getPrivateSales(username, 0, 10)
-        );
-
-        assertEquals("Пользователя с username " + username + " не найдено", ex.getMessage());
-        verifyNoInteractions(salesHistoryRepository);
-        verifyNoInteractions(mapper);
-    }
 
     @Test
     void getPurchases_ShouldReturnPageResponse_Success() {

@@ -72,6 +72,7 @@ public class MessageServiceTest {
         MessageResponseDto responseDto = new MessageResponseDto(1L, "Hello!", LocalDateTime.now(), username, true, false);
 
         given(chatRepository.findById(chatId)).willReturn(Optional.of(chat));
+        given(chatRepository.isUserParticipant(chatId, username)).willReturn(true);
         given(userRepository.findByUsername(username)).willReturn(Optional.of(participant));
         given(mapper.toEntity(createDto)).willReturn(message);
         given(messageRepository.save(any(Message.class))).willAnswer(inv -> inv.getArgument(0));
@@ -102,6 +103,7 @@ public class MessageServiceTest {
         chat.setBuyer(participant2);
 
         given(chatRepository.findById(chatId)).willReturn(Optional.of(chat));
+        given(chatRepository.isUserParticipant(chatId, strangerName)).willReturn(false);
 
         NotEnoughRightsException result = assertThrows(NotEnoughRightsException.class, () ->
                 messageService.sendMessage(chatId, new MessageCreateDto("Hi"), strangerName)
@@ -124,7 +126,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    void sendMessage_ShouldThrowException_WhenSenderNotFound() {
+    void sendMessage_ShouldThrowNotEnoughRightsException_WhenSenderNotFound() {
         Long chatId = 1L;
         String username = "user";
 
@@ -137,9 +139,9 @@ public class MessageServiceTest {
         chat.setBuyer(participant2);
 
         given(chatRepository.findById(chatId)).willReturn(Optional.of(chat));
-        given(userRepository.findByUsername(username)).willReturn(Optional.empty());
+        given(chatRepository.isUserParticipant(chatId, username)).willReturn(false);
 
-        assertThrows(EntityNotFoundException.class, () ->
+        assertThrows(NotEnoughRightsException.class, () ->
                 messageService.sendMessage(chatId, new MessageCreateDto("text"), username)
         );
     }
@@ -167,7 +169,7 @@ public class MessageServiceTest {
 
         MessageResponseDto dto = new MessageResponseDto(1L, "Hello", LocalDateTime.now(), username, true, false);
 
-        given(chatRepository.findById(chatId)).willReturn(Optional.of(chat));
+        given(chatRepository.isUserParticipant(chatId, username)).willReturn(true);
         given(messageRepository.findByChatWithPagination(chatId, page, size)).willReturn(messages);
         given(messageRepository.countByChat(chatId)).willReturn(1L);
         given(mapper.toDto(message, username)).willReturn(dto);
@@ -183,7 +185,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    void getMessagesByChat_ShouldThrowNotEnoughRightsException_WhenUserNotParticipant() {
+    void getMessagesByChat_ShouldThrowENFException_WhenUserNotParticipant() {
         Long chatId = 1L;
         String stranger = "hacker";
 
@@ -193,9 +195,9 @@ public class MessageServiceTest {
         chat.setBuyer(new User());
         chat.getBuyer().setUsername("buyer");
 
-        given(chatRepository.findById(chatId)).willReturn(Optional.of(chat));
+        given(chatRepository.isUserParticipant(chatId, stranger)).willReturn(false);
 
-        assertThrows(NotEnoughRightsException.class, () ->
+        assertThrows(EntityNotFoundException.class, () ->
                 messageService.getMessagesByChat(chatId, stranger, 0, 10)
         );
 
@@ -205,8 +207,8 @@ public class MessageServiceTest {
     @Test
     void getMessagesByChat_ShouldThrowENFException_WhenChatNotFound() {
         Long chatId = 99L;
-        given(chatRepository.findById(chatId)).willReturn(Optional.empty());
 
+        given(chatRepository.isUserParticipant(eq(chatId), anyString())).willReturn(false);
         assertThrows(EntityNotFoundException.class, () ->
                 messageService.getMessagesByChat(chatId, "anyUser", 0, 10)
         );

@@ -36,7 +36,7 @@ public class MessageService {
         );
 
         if (!chatRepository.isUserParticipant(chatId, username)) {
-            throw new NotEnoughRightsException("Вы не являетесь участником чата с id " + chatId);
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не являетесь участником этого чата");
         }
 
         User sender = userRepository.findByUsername(username)
