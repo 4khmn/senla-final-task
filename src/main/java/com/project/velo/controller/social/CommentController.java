@@ -62,7 +62,7 @@ public class CommentController {
                 adId, adId, page, size);
         PageResponse<CommentDetailsResponseDto> comments = commentService.getCommentsByAdvertisement(adId, page, size);
         log.info("GET /api/comments/advertisement/{} - Found {} comments for advertisement: {}, page: {}, size: {}",
-                adId, comments.size(), adId, page, size);
+                adId, comments.content().size(), adId, page, size);
         return ResponseEntity.ok(comments);
     }
 

@@ -2,6 +2,7 @@ package com.project.velo.repository;
 
 import com.project.velo.dto.request.AdvertisementFilterDto;
 import com.project.velo.entity.Advertisement;
+import com.project.velo.entity.Category;
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
 import jakarta.persistence.TypedQuery;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Repository
@@ -41,10 +43,30 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
                 .executeUpdate();
     }
 
+    @Override
+    public Optional<Advertisement> findById(Long id) {
+        return entityManager.createQuery("SELECT a FROM Advertisement a " +
+                        "JOIN FETCH a.category " +
+                        "JOIN FETCH a.seller s " +
+                        "JOIN FETCH s.profile " +
+                        "LEFT JOIN FETCH a.images " +
+                        "WHERE a.id = :id", Advertisement.class)
+                .setParameter("id", id)
+                .getResultList()
+                .stream()
+                .findFirst();
+    }
+
     public List<Advertisement> findAllFiltered(AdvertisementFilterDto filter, int page, int size) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Advertisement> cq = cb.createQuery(Advertisement.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
+
+        // n+1
+        Fetch<Advertisement, Category> categoryFetch = root.fetch("category", JoinType.LEFT);
+        Fetch<Advertisement, User> sellerFetch = root.fetch("seller", JoinType.LEFT);
+        sellerFetch.fetch("profile", JoinType.LEFT);
+
         Join<Advertisement, User> authorJoin = root.join("seller");
 
         cq.where(buildPredicates(cb, root, authorJoin, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));

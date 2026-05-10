@@ -40,7 +40,7 @@ public class ProfileSocialController {
         log.info("GET /api/profiles/my/comments - Fetching all comments for user: {}, page: {}, size: {}", user.getUsername(), page, size);
         PageResponse<UserCommentResponseDto> comments = commentService.getCommentsByUser(user.getUsername(), page, size);
         log.info("GET /api/profiles/my/comments - Found {} comments for user: {}, page: {}, size: {}",
-                comments.size(), user.getUsername(), page, size);
+                comments.content().size(), user.getUsername(), page, size);
         return ResponseEntity.ok(comments);
     }
 

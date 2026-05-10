@@ -53,7 +53,7 @@ public class ChatController {
             @RequestParam(defaultValue = "15") int size) {
         log.info("GET /api/chats - Fetching chat list for user: {}, page: {}, size: {}", user.getUsername(), page, size);
         PageResponse<ChatListResponseDto> chats = chatService.findAllByUsername(user.getUsername(), page, size);
-        log.info("GET /api/chats - Found {} chats for user: {}, page: {}, size: {}", chats.size(), user.getUsername(), page, size);
+        log.info("GET /api/chats - Found {} chats for user: {}, page: {}, size: {}", chats.content().size(), user.getUsername(), page, size);
         return ResponseEntity.ok(chats);
     }
 
@@ -71,7 +71,7 @@ public class ChatController {
                 chatId, user.getUsername(), chatId, page, size);
         PageResponse<MessageResponseDto> messages = messageService.getMessagesByChat(chatId, user.getUsername(), page, size);
         log.info("GET /api/chats/{}/messages - Found {} messages in chat: {}, page: {}, size: {}",
-                chatId, messages.size(), chatId, page, size);
+                chatId, messages.content().size(), chatId, page, size);
         return ResponseEntity.ok(messages);
     }
 }

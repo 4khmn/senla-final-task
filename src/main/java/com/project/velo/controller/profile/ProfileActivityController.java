@@ -75,7 +75,7 @@ public class ProfileActivityController {
     ) {
         log.info("GET /api/profiles/my/purchases - Fetching purchases by user: {}, page: {}, size: {}", user.getUsername(), page, size);
         PageResponse<SalesHistoryPrivateResponseDto> myPurchases = salesHistoryService.getPurchases(user.getUsername(), page, size);
-        log.info("GET /api/profiles/my/purchases - Found {} purchases by user: {}, page: {}, size: {}", myPurchases.size(), user.getUsername(), page, size);
+        log.info("GET /api/profiles/my/purchases - Found {} purchases by user: {}, page: {}, size: {}", myPurchases.content().size(), user.getUsername(), page, size);
         return ResponseEntity.ok(myPurchases);
     }
 
