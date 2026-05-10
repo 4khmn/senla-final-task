@@ -58,7 +58,6 @@ public class ChatController {
     }
 
     @Operation(summary = "Получить сообщения чата по его id", security = @SecurityRequirement(name = "JWT"))
-    @ApiResponse(responseCode = "404", description = "Чат не найден")
     @ApiResponse(responseCode = "200")
     @GetMapping("/{chatId}/messages")
     public ResponseEntity<PageResponse<MessageResponseDto>> getChatMessages(

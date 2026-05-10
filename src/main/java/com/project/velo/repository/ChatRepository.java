@@ -15,7 +15,9 @@ public class ChatRepository extends BaseRepository<Chat, Long> {
 
     public Optional<Chat> findByAdvertisementIdAndBuyerId(Long advertisementId, Long buyerId) {
         return entityManager.createQuery(
-                "SELECT c FROM Chat c WHERE c.advertisement.id = :advertisementId AND c.buyer.id = :buyerId", Chat.class)
+                "SELECT c FROM Chat c " +
+                        "WHERE c.advertisement.id = :advertisementId " +
+                        "AND c.buyer.id = :buyerId", Chat.class)
                 .setParameter("advertisementId", advertisementId)
                 .setParameter("buyerId", buyerId)
                 .getResultList()
@@ -40,7 +42,9 @@ public class ChatRepository extends BaseRepository<Chat, Long> {
 
     public Long countByUsername(String username) {
         return entityManager.createQuery(
-                "SELECT COUNT(c) FROM Chat c WHERE c.buyer.username = :username OR c.seller.username = :username", Long.class)
+                "SELECT COUNT(c) FROM Chat c " +
+                        "WHERE c.buyer.username = :username " +
+                        "OR c.seller.username = :username", Long.class)
                 .setParameter("username", username)
                 .getSingleResult();
     }

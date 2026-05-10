@@ -21,7 +21,7 @@ public class SalesHistoryRepository extends BaseRepository<SalesHistory, Long> {
                                 "JOIN FETCH sel.profile " +
                                 "JOIN FETCH s.buyer buy " +
                                 "JOIN FETCH buy.profile " +
-                                "WHERE s.seller.username = :username " +
+                                "WHERE sel.username = :username " +
                                 "ORDER BY s.soldAt DESC", SalesHistory.class)
                 .setParameter("username", username)
                 .setFirstResult(page * size)

@@ -122,9 +122,9 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         TypedQuery<Advertisement> q = entityManager.createQuery(
                         "SELECT a FROM Advertisement a " +
                                 "JOIN FETCH a.category " +
-                                "JOIN FETCH a.seller " +
-                                "JOIN FETCH a.seller.profile " +
-                                "WHERE a.seller.username = :username " +
+                                "JOIN FETCH a.seller s " +
+                                "JOIN FETCH s.profile " +
+                                "WHERE s.username = :username " +
                                 "AND a.status = :status " +
                                 "ORDER BY a.createdAt DESC", Advertisement.class)
                 .setParameter("username", username)
@@ -136,8 +136,8 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         return entityManager.createQuery(
                         "SELECT a FROM Advertisement a " +
                                 "JOIN FETCH a.category " +
-                                "JOIN FETCH a.seller " +
-                                "JOIN FETCH a.seller.profile " +
+                                "JOIN FETCH a.seller s " +
+                                "JOIN FETCH s.profile " +
                                 "ORDER BY a.createdAt DESC", Advertisement.class)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
