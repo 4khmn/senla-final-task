@@ -15,7 +15,9 @@ public class ChatRepository extends BaseRepository<Chat, Long> {
 
     public Optional<Chat> findByAdvertisementIdAndBuyerId(Long advertisementId, Long buyerId) {
         return entityManager.createQuery(
-                "SELECT c FROM Chat c WHERE c.advertisement.id = :advertisementId AND c.buyer.id = :buyerId", Chat.class)
+                "SELECT c FROM Chat c " +
+                        "WHERE c.advertisement.id = :advertisementId " +
+                        "AND c.buyer.id = :buyerId", Chat.class)
                 .setParameter("advertisementId", advertisementId)
                 .setParameter("buyerId", buyerId)
                 .getResultList()
@@ -26,7 +28,11 @@ public class ChatRepository extends BaseRepository<Chat, Long> {
 
     public List<Chat> findAllByUsernameWithPagination(String username, int page, int size) {
         return entityManager.createQuery(
-                        "SELECT c FROM Chat c WHERE c.buyer.username = :username OR c.seller.username = :username " +
+                        "SELECT c FROM Chat c " +
+                                "JOIN FETCH c.advertisement ad " +
+                                "JOIN FETCH c.seller s " +
+                                "JOIN FETCH s.profile " +
+                                "WHERE c.buyer.username = :username OR c.seller.username = :username " +
                                 "ORDER BY c.updatedAt DESC", Chat.class)
                 .setParameter("username", username)
                 .setFirstResult(page * size)
@@ -36,7 +42,21 @@ public class ChatRepository extends BaseRepository<Chat, Long> {
 
     public Long countByUsername(String username) {
         return entityManager.createQuery(
-                "SELECT COUNT(c) FROM Chat c WHERE c.buyer.username = :username OR c.seller.username = :username", Long.class)
+                "SELECT COUNT(c) FROM Chat c " +
+                        "WHERE c.buyer.username = :username " +
+                        "OR c.seller.username = :username", Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
+    }
+
+    public boolean isUserParticipant(Long chatId, String username) {
+        return entityManager.createQuery(
+                        "SELECT COUNT(c) > 0 " +
+                                "FROM Chat c " +
+                                "WHERE c.id = :chatId " +
+                                "AND (c.seller.username = :username OR c.buyer.username = :username)",
+                        Boolean.class)
+                .setParameter("chatId", chatId)
                 .setParameter("username", username)
                 .getSingleResult();
     }

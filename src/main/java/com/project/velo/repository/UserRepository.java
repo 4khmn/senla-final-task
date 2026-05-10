@@ -40,7 +40,7 @@ public class UserRepository extends BaseRepository<User, Long>{
     }
 
     public List<User> findAllFiltered(Boolean enabled, Role role, int page, int size) {
-        StringBuilder hql = new StringBuilder("SELECT u FROM User u WHERE 1=1");
+        StringBuilder hql = new StringBuilder("SELECT u FROM User u JOIN FETCH u.profile WHERE 1=1");
 
         if (enabled != null) hql.append(" AND u.enabled = :enabled");
         if (role != null) hql.append(" AND u.role = :role");
@@ -50,7 +50,7 @@ public class UserRepository extends BaseRepository<User, Long>{
         var query = entityManager.createQuery(hql.toString(), User.class);
 
         if (enabled != null) query.setParameter("enabled", enabled);
-        if (role != null) query.setParameter("role", role.name());
+        if (role != null) query.setParameter("role", role);
 
         return query.setFirstResult(page * size)
                 .setMaxResults(size)
@@ -69,6 +69,14 @@ public class UserRepository extends BaseRepository<User, Long>{
         if (role != null) query.setParameter("role", role.name());
 
         return query.getSingleResult();
+    }
+
+    public boolean existsByUsernameAndEnabledTrue(String username) {
+        return entityManager.createQuery(
+                        "SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username AND u.enabled = true",
+                        Boolean.class)
+                .setParameter("username", username)
+                .getSingleResult();
     }
 
 }

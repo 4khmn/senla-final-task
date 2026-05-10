@@ -2,6 +2,7 @@ package com.project.velo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -42,6 +43,8 @@ public class Chat {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @BatchSize(size = 50)
+    @OrderBy("sentAt ASC")
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Message> messages = new ArrayList<>();

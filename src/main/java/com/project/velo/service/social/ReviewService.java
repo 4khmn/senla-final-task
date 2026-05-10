@@ -71,10 +71,8 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public PageResponse<ReviewReceivedResponseDto> getReceivedByUser(String username, Integer rating, String sortDirection, int page, int size) {
-        User user =  userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
-        );
-        if (!user.isEnabled()) {
+        boolean exist = userRepository.existsByUsernameAndEnabledTrue(username);
+        if (!exist) {
             throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<Review> reviews = reviewRepository.getBySellerWithPagination(username, rating, sortDirection, page, size);
@@ -90,10 +88,8 @@ public class ReviewService {
     }
 
     public PageResponse<ReviewSentResponseDto> getSentByUser(String username, int page, int size) {
-        User user =  userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
-        );
-        if (!user.isEnabled()) {
+        boolean exist = userRepository.existsByUsernameAndEnabledTrue(username);
+        if (!exist) {
             throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<Review> reviews = reviewRepository.getByAuthorWithPagination(username, page, size);

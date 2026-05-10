@@ -47,7 +47,7 @@ public class Advertisement {
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     @NotNull(message = "ID категории обязателен")
     private Category category;

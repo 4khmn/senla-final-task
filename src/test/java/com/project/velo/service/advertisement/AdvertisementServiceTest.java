@@ -624,7 +624,7 @@ public class AdvertisementServiceTest {
         );
         ad.setSeller(user);
 
-        given(userRepository.findByUsername(username)).willReturn(Optional.of(user));
+        given(userRepository.existsByUsernameAndEnabledTrue(username)).willReturn(true);
         given(advertisementRepository.findAllByUsername(username, page, size))
                 .willReturn(List.of(ad));
         given(advertisementRepository.countByUsernameAndStatus(username, AdStatus.ACTIVE))
@@ -642,14 +642,14 @@ public class AdvertisementServiceTest {
         assertEquals(2, result.totalPages());
         assertEquals(dto, result.content().get(0));
 
-        verify(userRepository, times(1)).findByUsername(username);
+        verify(userRepository, times(1)).existsByUsernameAndEnabledTrue(username);
        verify(advertisementRepository).findAllByUsername(username, page, size);
     }
 
     @Test
     void findAdvertisementsByUsername_ShouldThrowENFException_WhenUserDoesNotExist() {
         String username = "username";
-        given(userRepository.findByUsername(username)).willReturn(Optional.empty());
+        given(userRepository.existsByUsernameAndEnabledTrue(username)).willReturn(false);
         EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
                 () -> advertisementService.findAdvertisementsByUsername(username, 0, 10)
         );

@@ -1,7 +1,9 @@
 package com.project.velo.repository;
 
 import com.project.velo.dto.request.AdvertisementFilterDto;
+import com.project.velo.entity.AdImage;
 import com.project.velo.entity.Advertisement;
+import com.project.velo.entity.Category;
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
 import jakarta.persistence.TypedQuery;
@@ -15,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Repository
@@ -41,11 +44,30 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
                 .executeUpdate();
     }
 
+    @Override
+    public Optional<Advertisement> findById(Long id) {
+        return entityManager.createQuery("SELECT a FROM Advertisement a " +
+                        "JOIN FETCH a.category " +
+                        "JOIN FETCH a.seller s " +
+                        "JOIN FETCH s.profile " +
+                        "LEFT JOIN FETCH a.images " +
+                        "WHERE a.id = :id", Advertisement.class)
+                .setParameter("id", id)
+                .getResultList()
+                .stream()
+                .findFirst();
+    }
+
     public List<Advertisement> findAllFiltered(AdvertisementFilterDto filter, int page, int size) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Advertisement> cq = cb.createQuery(Advertisement.class);
         Root<Advertisement> root = cq.from(Advertisement.class);
-        Join<Advertisement, User> authorJoin = root.join("seller");
+
+        // n+1
+        Fetch<Advertisement, User> authorFetch = root.fetch("seller", JoinType.LEFT);
+        authorFetch.fetch("profile", JoinType.LEFT);
+        Join<Advertisement, User> authorJoin = (Join<Advertisement, User>) authorFetch;
+        root.fetch("category", JoinType.LEFT);
 
         cq.where(buildPredicates(cb, root, authorJoin, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));
 
@@ -98,8 +120,13 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
     public List<Advertisement> findAllByUsername(String username, int page, int size) {
         TypedQuery<Advertisement> q = entityManager.createQuery(
-                        "SELECT a FROM Advertisement a WHERE a.seller.username = :username " +
-                                "AND a.status = :status ORDER BY a.createdAt DESC", Advertisement.class)
+                        "SELECT a FROM Advertisement a " +
+                                "JOIN FETCH a.category " +
+                                "JOIN FETCH a.seller s " +
+                                "JOIN FETCH s.profile " +
+                                "WHERE s.username = :username " +
+                                "AND a.status = :status " +
+                                "ORDER BY a.createdAt DESC", Advertisement.class)
                 .setParameter("username", username)
                 .setParameter("status", AdStatus.ACTIVE);
         return applyPagination(q, page, size).getResultList();
@@ -107,7 +134,11 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
     public List<Advertisement> findAllForAdmin(int page, int size) {
         return entityManager.createQuery(
-                        "SELECT a FROM Advertisement a ORDER BY a.createdAt DESC", Advertisement.class)
+                        "SELECT a FROM Advertisement a " +
+                                "JOIN FETCH a.category " +
+                                "JOIN FETCH a.seller s " +
+                                "JOIN FETCH s.profile " +
+                                "ORDER BY a.createdAt DESC", Advertisement.class)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
                 .getResultList();

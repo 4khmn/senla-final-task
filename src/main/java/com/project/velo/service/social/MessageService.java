@@ -35,7 +35,9 @@ public class MessageService {
                 () -> new EntityNotFoundException("Чата с id " + chatId + " не найдено")
         );
 
-        validateParticipant(chat, username);
+        if (!chatRepository.isUserParticipant(chatId, username)) {
+            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не являетесь участником этого чата");
+        }
 
         User sender = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователя с username " + username + " не найдено"));
@@ -51,11 +53,10 @@ public class MessageService {
 
     @Transactional(readOnly = true)
     public PageResponse<MessageResponseDto> getMessagesByChat(Long chatId, String username, int page, int size) {
-        Chat chat = chatRepository.findById(chatId).orElseThrow(
-                () -> new EntityNotFoundException("Чата с id " + chatId + " не найдено")
-        );
 
-        validateParticipant(chat, username);
+        if (!chatRepository.isUserParticipant(chatId, username)) {
+            throw new EntityNotFoundException("Чата с id " + chatId + " не найдено");
+        }
 
         List<Message> messages = messageRepository.findByChatWithPagination(chatId, page, size);
 
@@ -93,15 +94,5 @@ public class MessageService {
             throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не можете удалять чужие сообщения");
         }
         messageRepository.delete(message);
-    }
-
-
-    private void validateParticipant(Chat chat, String username) {
-        boolean isSeller = chat.getSeller().getUsername().equals(username);
-        boolean isBuyer = chat.getBuyer().getUsername().equals(username);
-
-        if (!isSeller && !isBuyer) {
-            throw new NotEnoughRightsException("Недостаточно прав для этого действия: Вы не являетесь участником этого чата");
-        }
     }
 }
