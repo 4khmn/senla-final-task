@@ -49,7 +49,13 @@ public class SalesHistoryRepository extends BaseRepository<SalesHistory, Long> {
 
     public List<SalesHistory> findPurchasesByUserOrderBySoldAt(String username, int page, int size) {
         return entityManager.createQuery(
-                        "SELECT s FROM SalesHistory s WHERE s.buyer.username = :username ORDER BY s.soldAt DESC", SalesHistory.class)
+                        "SELECT s FROM SalesHistory s " +
+                                "JOIN FETCH s.advertisement ad " +
+                                "JOIN FETCH s.seller sel " +
+                                "JOIN FETCH sel.profile " +
+                                "JOIN FETCH s.buyer buy " +
+                                "JOIN FETCH buy.profile " +
+                                "WHERE s.buyer.username = :username ORDER BY s.soldAt DESC", SalesHistory.class)
                 .setParameter("username", username)
                 .setFirstResult(page * size)
                 .setMaxResults(size)

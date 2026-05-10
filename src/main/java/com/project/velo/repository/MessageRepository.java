@@ -15,7 +15,10 @@ public class MessageRepository extends BaseRepository<Message, Long>{
 
     public List<Message> findByChatWithPagination(Long chatId, int page, int size) {
         return entityManager.createQuery(
-                        "SELECT m FROM Message m WHERE m.chat.id = :chatId ORDER BY m.sentAt DESC", Message.class)
+                        "SELECT m FROM Message m " +
+                                "JOIN FETCH m.sender " +
+                                "JOIN FETCH m.sender.profile " +
+                                "WHERE m.chat.id = :chatId ORDER BY m.sentAt DESC", Message.class)
                 .setParameter("chatId", chatId)
                 .setFirstResult(page * size)
                 .setMaxResults(size)

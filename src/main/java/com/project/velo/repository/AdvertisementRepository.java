@@ -134,7 +134,11 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
     public List<Advertisement> findAllForAdmin(int page, int size) {
         return entityManager.createQuery(
-                        "SELECT a FROM Advertisement a ORDER BY a.createdAt DESC", Advertisement.class)
+                        "SELECT a FROM Advertisement a " +
+                                "JOIN FETCH a.category " +
+                                "JOIN FETCH a.seller " +
+                                "JOIN FETCH a.seller.profile " +
+                                "ORDER BY a.createdAt DESC", Advertisement.class)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
                 .getResultList();

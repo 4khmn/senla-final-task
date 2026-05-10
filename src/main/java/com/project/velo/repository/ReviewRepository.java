@@ -100,7 +100,13 @@ public class ReviewRepository extends BaseRepository<Review, Long> {
     }
 
     public List<Review> findAll(int page, int size) {
-        return entityManager.createQuery("SELECT r FROM Review r ORDER BY r.createdAt DESC", Review.class)
+        return entityManager.createQuery("SELECT r FROM Review r " +
+                "JOIN FETCH r.advertisement " +
+                        "JOIN FETCH r.seller s " +
+                        "JOIN FETCH s.profile " +
+                        "JOIN FETCH r.author a " +
+                        "JOIN FETCH a.profile " +
+                "ORDER BY r.createdAt DESC", Review.class)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
                 .getResultList();
