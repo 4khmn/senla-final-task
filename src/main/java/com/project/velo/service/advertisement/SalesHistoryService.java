@@ -38,10 +38,8 @@ public class SalesHistoryService {
 
     @Transactional(readOnly = true)
     public PageResponse<SalesHistoryPublicResponseDto> getPublicSales(String username, int page, int size) {
-        User user =  userRepository.findByUsername(username).orElseThrow(
-                () -> new EntityNotFoundException("Пользователя с username " + username + " не найдено")
-        );
-        if (!user.isEnabled()) {
+        boolean exist = userRepository.existsByUsernameAndEnabledTrue(username);
+        if (!exist) {
             throw new EntityNotFoundException("Пользователь с username " + username + " не найден или деактивирован");
         }
         List<SalesHistoryPublicResponseDto> entities = salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size)

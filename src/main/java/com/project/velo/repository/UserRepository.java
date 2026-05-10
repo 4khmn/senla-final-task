@@ -71,4 +71,12 @@ public class UserRepository extends BaseRepository<User, Long>{
         return query.getSingleResult();
     }
 
+    public boolean existsByUsernameAndEnabledTrue(String username) {
+        return entityManager.createQuery(
+                        "SELECT COUNT(u) > 0 FROM User u WHERE u.username = :username AND u.enabled = true",
+                        Boolean.class)
+                .setParameter("username", username)
+                .getSingleResult();
+    }
+
 }

@@ -31,7 +31,10 @@ public class CommentRepository extends BaseRepository<Comment, Long> {
 
     public List<Comment> getCommentsByAdvertisementWithPagination(Long adId, int page, int size) {
         return entityManager.createQuery(
-                        "SELECT c FROM Comment c WHERE c.advertisement.id = :adId " +
+                        "SELECT c FROM Comment c " +
+                                "JOIN FETCH c.author a " +
+                                "JOIN FETCH a.profile " +
+                                "WHERE c.advertisement.id = :adId " +
                                 "ORDER BY c.isPinned DESC, c.createdAt DESC", Comment.class)
                 .setParameter("adId", adId)
                 .setFirstResult(page * size)
