@@ -24,9 +24,6 @@ public class SalesHistoryService {
 
     @Transactional(readOnly = true)
     public PageResponse<SalesHistoryPrivateResponseDto> getPrivateSales(String username, int page, int size) {
-        if (!userRepository.existsByUsername(username)) {
-            throw new EntityNotFoundException("Пользователя с username " + username + " не найдено");
-        }
         List<SalesHistoryPrivateResponseDto> entities = salesHistoryRepository.findSalesByUserOrderBySoldAt(username, page, size)
                 .stream().map(mapper::toPrivateDto).toList();
 

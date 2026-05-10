@@ -14,7 +14,10 @@ public class CommentRepository extends BaseRepository<Comment, Long> {
 
     public List<Comment> getCommentsByUserWithPagination(String username, int page, int size) {
         return entityManager.createQuery(
-                        "SELECT c FROM Comment c WHERE c.author.username = :username ORDER BY c.createdAt DESC", Comment.class)
+                "SELECT c FROM Comment c " +
+                        "JOIN FETCH c.advertisement " +
+                        "WHERE c.author.username = :username " +
+                        "ORDER BY c.createdAt DESC", Comment.class)
                 .setParameter("username", username)
                 .setFirstResult(page * size)
                 .setMaxResults(size)

@@ -17,7 +17,6 @@ public class SalesHistoryRepository extends BaseRepository<SalesHistory, Long> {
         return entityManager.createQuery(
                         "SELECT s FROM SalesHistory s " +
                                 "JOIN FETCH s.advertisement ad " +
-                                "JOIN FETCH ad.category " +
                                 "JOIN FETCH s.seller sel " +
                                 "JOIN FETCH sel.profile " +
                                 "JOIN FETCH s.buyer buy " +

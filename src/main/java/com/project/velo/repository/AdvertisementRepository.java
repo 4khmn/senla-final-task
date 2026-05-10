@@ -1,6 +1,7 @@
 package com.project.velo.repository;
 
 import com.project.velo.dto.request.AdvertisementFilterDto;
+import com.project.velo.entity.AdImage;
 import com.project.velo.entity.Advertisement;
 import com.project.velo.entity.Category;
 import com.project.velo.entity.User;
@@ -63,11 +64,10 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
         Root<Advertisement> root = cq.from(Advertisement.class);
 
         // n+1
-        Fetch<Advertisement, Category> categoryFetch = root.fetch("category", JoinType.LEFT);
-        Fetch<Advertisement, User> sellerFetch = root.fetch("seller", JoinType.LEFT);
-        sellerFetch.fetch("profile", JoinType.LEFT);
-
-        Join<Advertisement, User> authorJoin = root.join("seller");
+        Fetch<Advertisement, User> authorFetch = root.fetch("seller", JoinType.LEFT);
+        authorFetch.fetch("profile", JoinType.LEFT);
+        Join<Advertisement, User> authorJoin = (Join<Advertisement, User>) authorFetch;
+        root.fetch("category", JoinType.LEFT);
 
         cq.where(buildPredicates(cb, root, authorJoin, filter.query(), filter.categoryId(), filter.minPrice(), filter.maxPrice()));
 
@@ -120,8 +120,13 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
     public List<Advertisement> findAllByUsername(String username, int page, int size) {
         TypedQuery<Advertisement> q = entityManager.createQuery(
-                        "SELECT a FROM Advertisement a WHERE a.seller.username = :username " +
-                                "AND a.status = :status ORDER BY a.createdAt DESC", Advertisement.class)
+                        "SELECT a FROM Advertisement a " +
+                                "JOIN FETCH a.category " +
+                                "JOIN FETCH a.seller " +
+                                "JOIN FETCH a.seller.profile " +
+                                "WHERE a.seller.username = :username " +
+                                "AND a.status = :status " +
+                                "ORDER BY a.createdAt DESC", Advertisement.class)
                 .setParameter("username", username)
                 .setParameter("status", AdStatus.ACTIVE);
         return applyPagination(q, page, size).getResultList();
