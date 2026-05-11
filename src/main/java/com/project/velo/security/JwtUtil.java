@@ -17,8 +17,8 @@ import java.util.Date;
 public class JwtUtil {
     private final SecretKey key;
 
-    // Время жизни токена (1 час)
-    private final long expirationMs = 36000000; // 60 * 60 * 1000
+    // Время жизни токена (30 мин)
+    private final long expirationMs = 1800000; // 30 * 60 * 1000
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
