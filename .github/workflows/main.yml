@@ -22,8 +22,3 @@ jobs:
 
       - name: Run Tests
         run: mvn clean test
-        env:
-          APP_INIT_ADMIN_USERNAME: test-admin
-          APP_INIT_ADMIN_PASSWORD: TestAdmin1!
-          APP_INIT_ADMIN_EMAIL: test@test.com
-          JWT_SECRET: jwt_secret_key_which_is_very_long_meow_meow
