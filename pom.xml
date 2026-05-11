@@ -72,6 +72,12 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- cache -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
         <!-- dev tools -->
         <dependency>
             <groupId>org.projectlombok</groupId>
