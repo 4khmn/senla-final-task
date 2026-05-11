@@ -94,7 +94,7 @@ public class AdvertisementService {
     }
 
     @Cacheable(value = "advertisements",
-            key = "{ #filter != null ? #filter.toString() : 'no_filter', #page, #size }",
+            key = "{ #filter.empty ? 'no_filter': #filter.toString(), #page, #size }",
             condition = "#page < 2",
             unless = "#result == null || #result.content().isEmpty()"
     )
