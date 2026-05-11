@@ -19,11 +19,13 @@ import com.project.velo.service.storage.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,7 @@ public class AdvertisementService {
     private final SalesHistoryRepository salesHistoryRepository;
     private final FileStorageService storageService;
 
-
+    @CacheEvict(value = "advertisements", allEntries = true)
     @Transactional
     public AdvertisementResponseDto create(AdvertisementCreateDto dto, List<MultipartFile> files, String username) {
         Advertisement advertisement = mapper.toEntity(dto);
@@ -75,6 +77,7 @@ public class AdvertisementService {
         return mapper.toDto(savedAd);
     }
 
+    @Cacheable(value = "advertisement_details", key = "#id")
     @Transactional(readOnly = true)
     public AdvertisementResponseDto getById(Long id) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
@@ -90,6 +93,11 @@ public class AdvertisementService {
         return mapper.toDto(advertisement);
     }
 
+    @Cacheable(value = "advertisements",
+            key = "{ #filter != null ? #filter.toString() : 'no_filter', #page, #size }",
+            condition = "#page < 2",
+            unless = "#result == null || #result.content().isEmpty()"
+    )
     @Transactional(readOnly = true)
     public PageResponse<AdvertisementShortResponseDto> getAll(AdvertisementFilterDto filter, int page, int size) {
         List<Advertisement> entities = advertisementRepository.findAllFiltered(filter, page, size);
@@ -111,6 +119,10 @@ public class AdvertisementService {
         );
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "advertisement_details", key = "#id"),
+            @CacheEvict(value = "advertisements", allEntries = true)
+    })
     @Transactional
     public AdvertisementResponseDto update(Long id, AdvertisementUpdateDto dto, List<MultipartFile> files, String username) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
@@ -148,6 +160,10 @@ public class AdvertisementService {
         return mapper.toDto(advertisement);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "advertisement_details", key = "#id"),
+            @CacheEvict(value = "advertisements", allEntries = true)
+    })
     @Transactional
     public void delete(Long id, String username) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
@@ -166,6 +182,10 @@ public class AdvertisementService {
         }
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "advertisement_details", key = "#id"),
+            @CacheEvict(value = "advertisements", allEntries = true)
+    })
     @Transactional
     public void deleteByAdmin(Long id) {
         Advertisement advertisement = advertisementRepository.findById(id).orElseThrow(
@@ -174,6 +194,10 @@ public class AdvertisementService {
         advertisement.setStatus(AdStatus.BANNED);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "advertisement_details", key = "#adId"),
+            @CacheEvict(value = "advertisements", allEntries = true)
+    })
     @Transactional
     public void processPurchase(Long adId, String username) {
         Advertisement advertisement = advertisementRepository.findById(adId).orElseThrow(
@@ -200,6 +224,10 @@ public class AdvertisementService {
         salesHistoryRepository.save(history);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "advertisement_details", key = "#adId"),
+            @CacheEvict(value = "advertisements", allEntries = true)
+    })
     @Transactional
     public void promote(Long adId, AdvertisementPromoteDto dto, String username) {
         Advertisement advertisement = advertisementRepository.findById(adId).orElseThrow(
@@ -286,7 +314,7 @@ public class AdvertisementService {
             throw new ResourceAlreadyProcessedException("Этот товар уже продан");
         }
         if (advertisement.getStatus() != AdStatus.ACTIVE) {
-            throw new ValidationException("Данное объявление не досупно");
+            throw new ValidationException("Данное объявление не доступно");
         }
     }
 }
