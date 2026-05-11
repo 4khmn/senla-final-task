@@ -63,6 +63,10 @@ public class CacheIT extends BaseIT {
         advertisementService.getAll(filterDto, 0, 10);
 
         assertNotNull(cacheManager.getCache(cacheName).get(expectedKey));
+
+        advertisementService.delete(100L, "seller1");
+
+        assertNull(cacheManager.getCache(cacheName).get(expectedKey));
     }
 
     @Test
