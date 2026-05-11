@@ -16,6 +16,17 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: velo-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   app:
     build: .
     container_name: velo-app
@@ -26,12 +37,17 @@ services:
       - SPRING_DATASOURCE_USERNAME=${DB_USER:-postgres}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-postgres}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_CACHE_TYPE=redis
       - APP_INIT_ADMIN_USERNAME=${ADMIN_USERNAME:-main-admin}
       - APP_INIT_ADMIN_PASSWORD=${ADMIN_PASSWORD:-Admin123!}
       - APP_INIT_ADMIN_EMAIL=${ADMIN_EMAIL:-admin@admin.com}
       - JWT_SECRET=${JWT_SECRET:-my-super-secret-key-for-jwt-signing-which-is-very-long}
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
 volumes:

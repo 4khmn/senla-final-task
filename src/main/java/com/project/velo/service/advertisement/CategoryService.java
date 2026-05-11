@@ -9,6 +9,8 @@ import com.project.velo.mapper.CategoryMapper;
 import com.project.velo.repository.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper mapper;
 
+    @CacheEvict(value = "categories", allEntries = true)
     @Transactional
     public CategoryResponseDto create(CategoryCreateDto dto) {
         if (categoryRepository.existsByName(dto.name())) {
@@ -33,11 +36,14 @@ public class CategoryService {
         return mapper.toDto(category);
     }
 
+    @Cacheable(value = "categories")
     @Transactional(readOnly = true)
     public List<CategoryResponseDto> getAll() {
         return categoryRepository.findAll().stream().map(mapper::toDto).toList();
     }
 
+
+    @CacheEvict(value = "categories", allEntries = true)
     @Transactional
     public CategoryResponseDto update(Long id, CategoryUpdateDto dto) {
         if (categoryRepository.existsByName(dto.name())) {
@@ -51,6 +57,7 @@ public class CategoryService {
     }
 
 
+    @CacheEvict(value = "categories", allEntries = true)
     @Transactional
     public void delete(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
