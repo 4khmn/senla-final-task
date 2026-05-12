@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.velo.dto.create.UserCreateDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.dto.response.profile.ProfilePrivateResponseDto;
+import com.project.velo.entity.User;
 import com.project.velo.exception.CustomSecurityExceptionHandler;
 import com.project.velo.security.JwtUtil;
 import com.project.velo.security.SecurityConfig;
@@ -82,7 +83,7 @@ public class AdminUsersControllerTest {
                         .param("enabled", String.valueOf(enabled)))
                 .andExpect(status().isNoContent());
 
-        verify(profileService).setUserStatus(username, enabled);
+        verify(profileService).setUserStatus(username, any(), enabled);
     }
 
     @Test

@@ -282,7 +282,7 @@ public class ProfileServiceTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        profileService.setUserStatus(username, false);
+        profileService.setUserStatus(username, any(), false);
 
         assertFalse(user.isEnabled());
         verify(userRepository).findByUsername(username);
@@ -297,7 +297,7 @@ public class ProfileServiceTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         ValidationException result = assertThrows(ValidationException.class,
-                () -> profileService.setUserStatus(username, true));
+                () -> profileService.setUserStatus(username, any(), true));
 
         assertTrue(result.getMessage().contains("уже имеет enabled true"));
     }
@@ -307,6 +307,6 @@ public class ProfileServiceTest {
         when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
-                () -> profileService.setUserStatus("unknown", false));
+                () -> profileService.setUserStatus("unknown", any(), false));
     }
 }
