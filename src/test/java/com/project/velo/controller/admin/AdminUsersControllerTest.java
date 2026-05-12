@@ -83,7 +83,7 @@ public class AdminUsersControllerTest {
                         .param("enabled", String.valueOf(enabled)))
                 .andExpect(status().isNoContent());
 
-        verify(profileService).setUserStatus(username, any(), enabled);
+        verify(profileService).setUserStatus(eq(username), any(), eq(enabled));
     }
 
     @Test

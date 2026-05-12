@@ -6,6 +6,8 @@ import com.project.velo.dto.response.profile.ProfilePublicResponseDto;
 import com.project.velo.dto.update.ProfileUpdateDto;
 import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
+import com.project.velo.entity.enums.Role;
+import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ProfileMapper;
 import com.project.velo.mapper.UserMapper;
@@ -17,7 +19,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -308,5 +313,48 @@ public class ProfileServiceTest {
 
         assertThrows(EntityNotFoundException.class,
                 () -> profileService.setUserStatus("unknown", any(), false));
+    }
+
+    @Test
+    void setUserStatus_ShouldReturnNotEnoughRights_WhenChangeAdminAndNotMainAdmin() {
+        String targetUsername = "otherAdmin";
+        String currentAdminName = "not_main_admin";
+
+        User targetUser = new User();
+        targetUser.setUsername(targetUsername);
+        targetUser.setRole(Role.ROLE_ADMIN);
+        targetUser.setEnabled(true);
+
+        UserDetails currentUser = mock(UserDetails.class);
+        when(currentUser.getUsername()).thenReturn(currentAdminName);
+
+        when(userRepository.findByUsername(targetUsername)).thenReturn(Optional.of(targetUser));
+
+
+        assertThrows(NotEnoughRightsException.class,
+                () -> profileService.setUserStatus(targetUsername, currentUser, false)
+        );
+    }
+
+
+    @Test
+    void setUserStatus_ShouldChangeStatus_WhenChangeAdminAndMainAdmin() {
+        String targetUsername = "otherAdmin";
+        String currentAdminName = "main-admin";
+        ReflectionTestUtils.setField(profileService, "adminUsername", currentAdminName);
+
+        User targetUser = new User();
+        targetUser.setUsername(targetUsername);
+        targetUser.setRole(Role.ROLE_ADMIN);
+        targetUser.setEnabled(true);
+
+        UserDetails currentUser = mock(UserDetails.class);
+        when(currentUser.getUsername()).thenReturn(currentAdminName);
+
+        when(userRepository.findByUsername(targetUsername)).thenReturn(Optional.of(targetUser));
+
+        profileService.setUserStatus(targetUsername, currentUser, false);
+
+        assertFalse(targetUser.isEnabled());
     }
 }
