@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,7 @@ public class AdvertisementController {
     @ApiResponse(responseCode = "404", description = "Объявление не найдено")
     @ApiResponse(responseCode = "200")
     @GetMapping("/{id}")
-    public ResponseEntity<AdvertisementResponseDto> getAdvertisementById(@PathVariable Long id) {
+    public ResponseEntity<AdvertisementResponseDto> getAdvertisementById(@PathVariable @Positive Long id) {
         log.info("GET /api/advertisements/{} - Fetching advertisement by id: {}", id, id);
         AdvertisementResponseDto advertisement = advertisementService.getById(id);
         log.info("GET /api/advertisements/{} - advertisement with id: {} successfully retrieved", id, id);
@@ -119,9 +120,9 @@ public class AdvertisementController {
 
             @AuthenticationPrincipal UserDetails user
     ) {
-        log.info("PATCH /api/advertisement/{} - Updating advertisement with id: {}", id, id);
+        log.info("PATCH /api/advertisements/{} - Updating advertisement with id: {}", id, id);
         AdvertisementResponseDto advertisement = advertisementService.update(id, dto, files, user.getUsername());
-        log.info("PATCH /api/advertisement/{} - Advertisement with id: {} was successfully updated", id, id);
+        log.info("PATCH /api/advertisements/{} - Advertisement with id: {} was successfully updated", id, id);
         return ResponseEntity.ok(advertisement);
     }
 

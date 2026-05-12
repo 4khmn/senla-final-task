@@ -7,11 +7,11 @@ public record AdvertisementFilterDto(
         Long categoryId,
         BigDecimal minPrice,
         BigDecimal maxPrice,
-        String sortDirection
+        String priceSortDirection
 ) {
 
     public boolean isEmpty() {
-        return query == null && categoryId == null && minPrice == null && maxPrice == null && sortDirection == null;
+        return query == null && categoryId == null && minPrice == null && maxPrice == null && priceSortDirection == null;
     }
 
 }
