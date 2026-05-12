@@ -1,9 +1,7 @@
 package com.project.velo.repository;
 
 import com.project.velo.dto.request.AdvertisementFilterDto;
-import com.project.velo.entity.AdImage;
 import com.project.velo.entity.Advertisement;
-import com.project.velo.entity.Category;
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
 import jakarta.persistence.TypedQuery;
@@ -82,9 +80,9 @@ public class AdvertisementRepository extends BaseRepository<Advertisement, Long>
 
         List<Order> orders = new ArrayList<>();
 
-        boolean isPriceSort = filter.sortDirection() != null && !filter.sortDirection().isBlank();
+        boolean isPriceSort = filter.priceSortDirection() != null && !filter.priceSortDirection().isBlank();
         if (isPriceSort) {
-            if ("asc".equalsIgnoreCase(filter.sortDirection())) {
+            if ("asc".equalsIgnoreCase(filter.priceSortDirection())) {
                 orders.add(cb.asc(root.get("price")));
             } else {
                 orders.add(cb.desc(root.get("price")));

@@ -2,8 +2,10 @@ package com.project.velo.repository;
 
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.Role;
+import jakarta.persistence.criteria.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,37 +41,35 @@ public class UserRepository extends BaseRepository<User, Long>{
         return count>0;
     }
 
+
+
     public List<User> findAllFiltered(Boolean enabled, Role role, int page, int size) {
-        StringBuilder hql = new StringBuilder("SELECT u FROM User u JOIN FETCH u.profile WHERE 1=1");
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> cq = cb.createQuery(User.class);
+        Root<User> root = cq.from(User.class);
 
-        if (enabled != null) hql.append(" AND u.enabled = :enabled");
-        if (role != null) hql.append(" AND u.role = :role");
+        root.fetch("profile", JoinType.LEFT);
 
-        hql.append(" ORDER BY u.id DESC");
+        cq.where(buildPredicates(cb, root, enabled, role));
 
-        var query = entityManager.createQuery(hql.toString(), User.class);
+        cq.orderBy(cb.desc(root.get("id")));
 
-        if (enabled != null) query.setParameter("enabled", enabled);
-        if (role != null) query.setParameter("role", role);
-
-        return query.setFirstResult(page * size)
+        return entityManager.createQuery(cq)
+                .setFirstResult(page * size)
                 .setMaxResults(size)
                 .getResultList();
     }
 
     public long countFiltered(Boolean enabled, Role role) {
-        StringBuilder hql = new StringBuilder("SELECT COUNT(u) FROM User u WHERE 1=1");
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+        Root<User> root = cq.from(User.class);
+        cq.select(cb.count(root));
+        cq.where(buildPredicates(cb, root, enabled, role));
 
-        if (enabled != null) hql.append(" AND u.enabled = :enabled");
-        if (role != null) hql.append(" AND u.role = :role");
-
-        var query = entityManager.createQuery(hql.toString(), Long.class);
-
-        if (enabled != null) query.setParameter("enabled", enabled);
-        if (role != null) query.setParameter("role", role.name());
-
-        return query.getSingleResult();
+        return entityManager.createQuery(cq).getSingleResult();
     }
+
 
     public boolean existsByUsernameAndEnabledTrue(String username) {
         return entityManager.createQuery(
@@ -79,4 +79,17 @@ public class UserRepository extends BaseRepository<User, Long>{
                 .getSingleResult();
     }
 
+    private Predicate[] buildPredicates(CriteriaBuilder cb, Root<User> root, Boolean enabled, Role role) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (enabled != null) {
+            predicates.add(cb.equal(root.get("enabled"), enabled));
+        }
+
+        if (role != null) {
+            predicates.add(cb.equal(root.get("role"), role));
+        }
+
+        return predicates.toArray(new Predicate[0]);
+    }
 }

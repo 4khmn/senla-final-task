@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Admin: Users", description = "Управление пользователями")
@@ -53,17 +55,18 @@ public class AdminUserController {
     @PatchMapping("/{username}/status")
     public ResponseEntity<Void> updateUserStatus(
             @PathVariable String username,
-            @RequestParam boolean enabled
-    ) {
-        log.info("PATCH /api/admin/users/{}/status - Admin changing status to: {}", username, enabled);
-        profileService.setUserStatus(username, enabled);
+            @RequestParam boolean enabled,
+            @AuthenticationPrincipal UserDetails currentUser
+            ) {
+        log.info("PATCH /api/admin/users/{}/status - Admin {} changing status to: {}", username, currentUser.getUsername(), enabled);
+        profileService.setUserStatus(username, currentUser, enabled);
         log.info("PATCH /api/admin/users/{}/status - Status successfully updated to: {}", username, enabled);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(
             summary = "Регистрация админа в системе",
-            description = "Создание учетной записи с правами ADMIN. Доступно только действующим администраторам"
+            description = "Создание учетной записи с правами ADMIN. Доступно только действующим администраторам. Администратор не может менять статус другого администратора (за исключением главного администратора)."
     )
     @ApiResponse(responseCode = "201", description = "Админ успешно создан")
     @ApiResponse(responseCode = "400", description = "Ошибка валидации входных данных")

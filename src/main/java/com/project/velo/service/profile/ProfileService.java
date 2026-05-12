@@ -8,6 +8,7 @@ import com.project.velo.entity.Profile;
 import com.project.velo.entity.User;
 import com.project.velo.entity.enums.AdStatus;
 import com.project.velo.entity.enums.Role;
+import com.project.velo.exception.NotEnoughRightsException;
 import com.project.velo.exception.UserDisabledException;
 import com.project.velo.exception.ValidationException;
 import com.project.velo.mapper.ProfileMapper;
@@ -17,6 +18,8 @@ import com.project.velo.service.storage.FileStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +36,9 @@ public class ProfileService {
     private final UserMapper userMapper;
     private final ProfileMapper profileMapper;
     private final FileStorageService storageService;
+
+    @Value("${app.init.admin.username}")
+    private String adminUsername;
 
     @Transactional(readOnly = true)
     public ProfilePublicResponseDto getPublicByUsername(String username) {
@@ -101,13 +107,16 @@ public class ProfileService {
     }
 
     @Transactional
-    public void setUserStatus(String username, boolean enabled) {
+    public void setUserStatus(String username, UserDetails currentUser, boolean enabled) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с именем " + username + " не найден"));
-
+        if (user.getRole().equals(Role.ROLE_ADMIN) && !currentUser.getUsername().equals(adminUsername)) {
+            throw new NotEnoughRightsException("Вы не можете менять статус других админов");
+        }
         if (user.isEnabled() == enabled) {
             throw new ValidationException("Пользователь " + username + " уже имеет enabled " + enabled);
         }
+
 
 
         user.setEnabled(enabled);
