@@ -1,5 +1,4 @@
 CREATE TABLE favorites (
-    id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     advertisement_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
