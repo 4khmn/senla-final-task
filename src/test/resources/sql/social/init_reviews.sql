@@ -8,6 +8,7 @@ DELETE FROM profiles;
 DELETE FROM advertisements;
 DELETE FROM categories;
 DELETE FROM users;
+DELETE FROM favorites;
 
 INSERT INTO users (id, username, password, email, role, rating, enabled, created_at)
 VALUES (1, 'seller_user', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7u41W3u', 'seller@test.com', 'ROLE_USER', 5.00, TRUE, '2026-04-30 10:00:00'),
