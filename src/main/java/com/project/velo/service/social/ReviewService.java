@@ -148,7 +148,9 @@ public class ReviewService {
         }
 
         reviewRepository.delete(review);
-
+        BigDecimal avgRating = reviewRepository.calculateAverageRating(review.getSeller().getId());
+        review.getSeller().setRating(avgRating);
+        userRepository.save(review.getSeller());
         if (isAdmin) {
             log.info("ADMIN ACTION: Admin: {} deleted review: {} (Author: {}, Target Seller: {})",
                     username, id, review.getAuthor().getUsername(), review.getSeller().getUsername());
