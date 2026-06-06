@@ -20,7 +20,7 @@ public interface FavoriteMapper {
     @Mapping(target = "isTop", source = "favorite.advertisement.top")
     @Mapping(target = "createdAt", source = "favorite.advertisement.createdAt")
     @Mapping(target = "sellerUsername", source = "favorite.advertisement.seller.username")
-    @Mapping(target = "sellerScore", source = "favorite.advertisement.seller.score")
+    @Mapping(target = "sellerScore", source = "favorite.advertisement.seller.rating")
     AdvertisementShortResponseDto toDto(Favorite favorite);
 
 
