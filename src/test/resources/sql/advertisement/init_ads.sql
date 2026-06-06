@@ -8,6 +8,7 @@ DELETE FROM profiles;
 DELETE FROM advertisements;
 DELETE FROM categories;
 DELETE FROM users;
+DELETE FROM favorites;
 
 INSERT INTO categories (id, name, display_name) VALUES
     (1, 'Bicycles', 'Велосипеды');

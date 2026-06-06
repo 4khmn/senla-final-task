@@ -8,6 +8,7 @@ DELETE FROM profiles;
 DELETE FROM advertisements;
 DELETE FROM categories;
 DELETE FROM users;
+DELETE FROM favorites;
 
 
 INSERT INTO users (id, username, password, email, role, rating, enabled, created_at)

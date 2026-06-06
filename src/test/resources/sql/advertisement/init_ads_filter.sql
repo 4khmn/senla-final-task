@@ -8,6 +8,7 @@ DELETE FROM profiles;
 DELETE FROM advertisements;
 DELETE FROM categories;
 DELETE FROM users;
+DELETE FROM favorites;
 
 INSERT INTO users (id, username, password, email, role)
     VALUES (1, 'seller1', 'password', 'seller@test.com', 'ROLE_USER');

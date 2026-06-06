@@ -10,6 +10,7 @@ public record AdvertisementShortResponseDto(
         String categoryName,
         String primaryImageUrl,
         boolean isTop,
+        boolean isActive,
         LocalDateTime createdAt,
         String sellerUsername,
         BigDecimal sellerScore

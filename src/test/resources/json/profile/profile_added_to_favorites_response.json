@@ -1,0 +1,29 @@
+{
+  "content" : [ {
+    "id" : 501,
+    "title" : "SECOND ADVERTISEMENT",
+    "price" : 1000.00,
+    "categoryName" : "Bicycles",
+    "primaryImageUrl" : null,
+    "isTop" : false,
+    "isActive" : true,
+    "createdAt" : "2026-04-29T12:00:00",
+    "sellerUsername" : "owner_user",
+    "sellerScore" : 5.00
+  }, {
+    "id" : 500,
+    "title" : "My Bike",
+    "price" : 1000.00,
+    "categoryName" : "Bicycles",
+    "primaryImageUrl" : null,
+    "isTop" : false,
+    "isActive" : true,
+    "createdAt" : "2026-04-29T10:00:00",
+    "sellerUsername" : "owner_user",
+    "sellerScore" : 5.00
+  } ],
+  "totalElements" : 2,
+  "totalPages" : 1,
+  "page" : 0,
+  "size" : 10
+}

@@ -208,9 +208,9 @@ public class AdvertisementServiceTest {
         List<Advertisement> entities = List.of(ad1, ad2);
 
         AdvertisementShortResponseDto dto1 = new AdvertisementShortResponseDto(
-                1L, "Title 1", BigDecimal.TEN, "cat1", "img1", false, LocalDateTime.now(), "seller", BigDecimal.ONE);
+                1L, "Title 1", BigDecimal.TEN, "cat1", "img1", false, true, LocalDateTime.now(), "seller", BigDecimal.ONE);
         AdvertisementShortResponseDto dto2 = new AdvertisementShortResponseDto(
-                2L, "Title 2", BigDecimal.valueOf(20), "cat2", "img2", true, LocalDateTime.now(), "seller", BigDecimal.ONE);
+                2L, "Title 2", BigDecimal.valueOf(20), "cat2", "img2", true, true, LocalDateTime.now(), "seller", BigDecimal.ONE);
 
         given(advertisementRepository.findAllFiltered(filter, page, size))
                 .willReturn(entities);
