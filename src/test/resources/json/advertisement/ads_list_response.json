@@ -6,6 +6,7 @@
     "categoryName" : "Bicycles",
     "primaryImageUrl" : null,
     "isTop" : false,
+    "isActive" : true,
     "createdAt" : "2026-04-28T10:00:00",
     "sellerUsername" : "seller1",
     "sellerScore" : 0.00

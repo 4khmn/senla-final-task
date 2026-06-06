@@ -79,7 +79,7 @@ public class AdvertisementControllerTest {
     void getAllAdvertisements_ShouldReturnPageResponse_Success() throws Exception {
         AdvertisementShortResponseDto dto = new AdvertisementShortResponseDto(
                 1L, "title", new BigDecimal("2000.00"), "categoryName",
-                "img.jpg", true, LocalDateTime.now(), "seller", new BigDecimal("4.8")
+                "img.jpg", true, true, LocalDateTime.now(), "seller", new BigDecimal("4.8")
         );
         AdvertisementFilterDto filter = new AdvertisementFilterDto(null, null, null, null, null);
 

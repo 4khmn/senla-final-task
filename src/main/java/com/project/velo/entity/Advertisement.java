@@ -84,6 +84,10 @@ public class Advertisement {
         comment.setAdvertisement(this);
     }
 
+    public boolean isActive() {
+        return status == AdStatus.ACTIVE;
+    }
+
     public boolean isTopActive() {
         return topUntil != null && topUntil.isAfter(LocalDateTime.now());
     }

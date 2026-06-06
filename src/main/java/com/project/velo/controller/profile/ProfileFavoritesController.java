@@ -24,8 +24,8 @@ public class ProfileFavoritesController {
     @GetMapping
     public ResponseEntity<PageResponse<AdvertisementShortResponseDto>> getMyFavorites(
             @AuthenticationPrincipal UserDetails user,
-            @RequestParam int page,
-            @RequestParam int size
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
         log.info("GET /api/profiles/my/favorites - Fetching all favorites for user: {}, page: {}, size: {}", user.getUsername(), page, size);
         PageResponse<AdvertisementShortResponseDto> favorites = favoritesService.getAllByUser(user.getUsername(), page, size);
