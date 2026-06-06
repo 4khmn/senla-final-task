@@ -3,6 +3,9 @@ package com.project.velo.controller.profile;
 import com.project.velo.dto.response.advertisement.AdvertisementShortResponseDto;
 import com.project.velo.dto.response.common.PageResponse;
 import com.project.velo.service.profile.FavoritesService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,10 @@ public class ProfileFavoritesController {
     private final FavoritesService favoritesService;
 
 
+    @Operation(
+            summary = "Список объявлений, добавленных в избранное текущего пользователя",
+            security = @SecurityRequirement(name = "JWT")
+    )
     @GetMapping
     public ResponseEntity<PageResponse<AdvertisementShortResponseDto>> getMyFavorites(
             @AuthenticationPrincipal UserDetails user,
@@ -33,6 +40,12 @@ public class ProfileFavoritesController {
         return ResponseEntity.ok(favorites);
     }
 
+    @Operation(
+            summary = "Добавить объявление по id в избранное текущего пользователя",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @ApiResponse(responseCode = "404", description = "Объявление не найдено")
+    @ApiResponse(responseCode = "204", description = "Объявление успешно добавлено в избранное")
     @PostMapping
     public ResponseEntity<Void> addToFavorite(
             @AuthenticationPrincipal UserDetails user,
@@ -44,6 +57,11 @@ public class ProfileFavoritesController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Удалить объявление по id из избранного текущего пользователя",
+            security = @SecurityRequirement(name = "JWT")
+    )
+    @ApiResponse(responseCode = "204", description = "Объявление успешно удалено из избранного")
     @DeleteMapping
     public ResponseEntity<Void> removeFromFavorite(
             @AuthenticationPrincipal UserDetails user,
